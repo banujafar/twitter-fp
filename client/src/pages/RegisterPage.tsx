@@ -5,10 +5,10 @@ import { BsTwitter } from "react-icons/bs";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { registerUser  } from "../store/features/auth/authSlice";
-import { RootState } from "../store";
+import { AppDispatch, RootState } from "../store";
 
 const RegisterPage = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const error = useSelector((state: RootState) => state.auth.error);
 
@@ -59,7 +59,7 @@ const RegisterPage = () => {
                     };
                     try {
                       const result = await dispatch(
-                        registerUser(credentials) as any
+                        registerUser(credentials)
                       );
                       if (registerUser.fulfilled.match(result)) {
                         setSubmitting(false);
