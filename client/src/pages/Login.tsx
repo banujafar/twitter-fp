@@ -6,13 +6,12 @@ import { FcGoogle } from 'react-icons/fc';
 import { Link } from 'react-router-dom';
 
 interface MyFormValues {
-  userName: string;
   email: string;
   password: string;
 }
 
 const Login: React.FC<object> = () => {
-  const initialValues: MyFormValues = { userName: '', email: '', password: '' };
+  const initialValues: MyFormValues = {email: '', password: '' };
   return (
     <div className="flex">
       <Aside />
@@ -27,6 +26,18 @@ const Login: React.FC<object> = () => {
               onSubmit={(values, actions) => {
                 console.log({ values, actions });
                 alert(JSON.stringify(values, null, 2));
+                fetch('http://localhost:3000/auth/login',{
+                  method:"POST",
+                  headers:{
+                    "Content-Type":"application/json",
+
+                  },
+                  body:JSON.stringify(values)
+                }).then(response=>{
+                  if(!response.ok){throw new Error("Error")}
+                  window.location.href='/register'
+                 
+                })
                 actions.setSubmitting(false);
               }}
             >
@@ -39,8 +50,8 @@ const Login: React.FC<object> = () => {
                   <span>Continue with Google</span>
                 </Link>
                 <Field
-                  id="userInfo"
-                  name="userInfo"
+                  id="email"
+                  name="email"
                   placeholder="Email or Username"
                   className="w-full px-3 py-2 border rounded-2xl focus:outline-none focus:border-blue-500"
                 />
