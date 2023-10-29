@@ -1,0 +1,18 @@
+{
+  "compilerOptions":
+    {
+      "target": "ES2018",
+      "module": "ES6",
+      "outDir": "dist",
+      "sourceMap": true,
+      "esModuleInterop": true,
+      "moduleResolution": "Node",
+      "experimentalDecorators": true,
+      "allowImportingTsExtensions": true,
+      "noEmit": true,
+      "emitDecoratorMetadata": true,
+      "allowSyntheticDefaultImports": true,
+    },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"],
+}

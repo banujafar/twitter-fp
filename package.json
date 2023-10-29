@@ -1,0 +1,31 @@
+{
+  "name": "twitter-fp",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint  client/**/*.tsx server/**/*.ts",
+    "format": "prettier --write client/**/*.tsx server/**/*.ts",
+    "lint:fix": "npm run lint -- --fix"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "typescript": "^5.2.2"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.9.0",
+    "@typescript-eslint/parser": "^6.9.0",
+    "eslint": "^8.52.0",
+    "husky": "^8.0.3",
+    "prettier": "^3.0.3"
+  }
+}
