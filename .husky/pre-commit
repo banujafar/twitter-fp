@@ -2,5 +2,4 @@
 . "$(dirname -- "$0")/_/husky.sh"
 
 # Lint and format all TypeScript files
-npx eslint "**/*.ts" "**/*.tsx" --fix
-npx prettier --write "**/*.ts" "**/*.tsx"
+npx eslint "**/*.ts" "**/*.tsx" 
