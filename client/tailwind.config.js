@@ -2,15 +2,20 @@
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
-    extend: {
-      screens: {
-        xs: '320px',
-        sm: '480px',
-        md: '768px',
-        lg: '976px',
-        xl: '1440px',
-      },
+    screens: {
+      xs: '320px',
+      sm: '480px',
+      md: '768px',
+      lg: '976px',
+      xl: '1440px',
     },
+   
+    extend: {
+      colors:{
+        primaryGray: "#71767B"
+      }
+    },
+   
   },
   plugins: [],
-}
+};
