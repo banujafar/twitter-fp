@@ -3,15 +3,16 @@ import { Formik, Form, Field } from 'formik';
 import Aside from '../components/ui/Aside';
 import { BsTwitter } from 'react-icons/bs';
 import { FcGoogle } from 'react-icons/fc';
-import { Link } from 'react-router-dom';
-
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 interface MyFormValues {
-  email: string;
   password: string;
+  email: string;
 }
 
 const Login: React.FC<object> = () => {
-  const initialValues: MyFormValues = {email: '', password: '' };
+  const initialValues: MyFormValues = { email: '', password: '' };
+  const navigate = useNavigate();
   return (
     <div className="flex">
       <Aside />
@@ -24,20 +25,22 @@ const Login: React.FC<object> = () => {
             <Formik
               initialValues={initialValues}
               onSubmit={(values, actions) => {
-                console.log({ values, actions });
                 alert(JSON.stringify(values, null, 2));
-                fetch('http://localhost:3000/auth/login',{
-                  method:"POST",
-                  headers:{
-                    "Content-Type":"application/json",
-
-                  },
-                  body:JSON.stringify(values)
-                }).then(response=>{
-                  if(!response.ok){throw new Error("Error")}
-                  window.location.href='/register'
-                 
-                })
+                axios
+                  .post('http://localhost:3000/auth/login', values, {
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    withCredentials: true,
+                  })
+                  .then((response) => {
+                    if (response.status === 200) {
+                      navigate('/');
+                    }
+                  })
+                  .catch((error) => {
+                    console.error('Error', error);
+                  });
                 actions.setSubmitting(false);
               }}
             >
@@ -50,8 +53,8 @@ const Login: React.FC<object> = () => {
                   <span>Continue with Google</span>
                 </Link>
                 <Field
-                  id="email"
-                  name="email"
+                  id="text"
+                  name="text"
                   placeholder="Email or Username"
                   className="w-full px-3 py-2 border rounded-2xl focus:outline-none focus:border-blue-500"
                 />

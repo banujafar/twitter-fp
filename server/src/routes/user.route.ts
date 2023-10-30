@@ -1,6 +1,8 @@
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import registerUser from '../services/user.service.ts';
 import passport from 'passport';
+import jwt from 'jsonwebtoken';
+import { User } from '../entity/user.entity.ts';
 const userRouter = Router();
 
 userRouter.post('/register', async (req: Request, res: Response) => {
@@ -18,8 +20,12 @@ userRouter.post('/register', async (req: Request, res: Response) => {
   }
 });
 
-userRouter.post('/login', (req, res, next) => {
-  passport.authenticate(['local', 'local-username'], (err, user, info) => {
+userRouter.post('/login', (req:Request, res:Response, next:NextFunction) => {
+  if (req.body.remember) {
+    req.session.cookie.originalMaxAge = 7 * 24 * 60 * 60 * 1000;
+  }
+
+  passport.authenticate(['local', 'local-username'], (err: object, user: User, info: { message: string; }) => {
     if (err) {
       return next(err);
     }
@@ -31,7 +37,10 @@ userRouter.post('/login', (req, res, next) => {
       if (err) {
         return next(err);
       }
-      console.log(req.cookies);
+      const token = jwt.sign({ userId: req.session['passport'].user.id }, process.env.SECRET_KEY, {
+        expiresIn: '10h',
+      });
+      res.cookie('token', token, { httpOnly: true, secure: true });
       return res.status(200).json({ message: 'Login Successful' });
     });
   })(req, res, next);
