@@ -13,6 +13,7 @@ userRouter.post('/register', async (req: Request, res: Response) => {
     if (typeof token !== 'string') {
       return res.status(400).json({ message: token.error });
     }
+    res.cookie('token', token, { httpOnly: true, secure: true });
 
     return res.status(201).json({ message: 'Registration successful', token: `Bearer ${token}` });
   } catch (error) {

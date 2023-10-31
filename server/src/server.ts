@@ -52,7 +52,7 @@ AppDataSource.initialize()
   });
 
 app.use('/auth', userRouter);
-app.use('/',checkAuthMiddleware)
+app.use('/checkAuth',checkAuthMiddleware)
 app.listen('3000', () => {
   console.log('Server is up on 3000');
 });

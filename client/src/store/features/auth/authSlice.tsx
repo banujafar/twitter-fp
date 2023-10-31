@@ -13,6 +13,7 @@ export const registerUser = createAsyncThunk(
     try {
       const response = await fetch("http://localhost:3000/auth/register", {
         method: "POST",
+        credentials:'include',
         headers: {
           "Content-Type": "application/json",
         },

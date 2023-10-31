@@ -8,13 +8,13 @@ const ProtectedRoute = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/checkAuthentication', {
+        const response = await axios.get('http://localhost:3000/checkAuth', {
           withCredentials: true,
         });
 
         if (response.status === 200) {
           const { isAuth } = response.data;
-          if (isAuth) {
+          if (isAuth ) {
             setAuthenticated(true);
           }
         }

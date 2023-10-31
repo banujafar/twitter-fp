@@ -53,8 +53,8 @@ const Login: React.FC<object> = () => {
                   <span>Continue with Google</span>
                 </Link>
                 <Field
-                  id="text"
-                  name="text"
+                  id="email"
+                  name="email"
                   placeholder="Email or Username"
                   className="w-full px-3 py-2 border rounded-2xl focus:outline-none focus:border-blue-500"
                 />
