@@ -12,7 +12,9 @@ export default {
    
     extend: {
       colors:{
-        primaryGray: "#71767B"
+        primaryGray: "#71767B",
+        twitterColor: "#1DA1F2",
+        navHoverColor: "rgba(15, 20, 25, 0.1)"
       }
     },
    
