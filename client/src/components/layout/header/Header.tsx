@@ -11,8 +11,57 @@ import {
   BiUser,
 } from "react-icons/bi";
 import userImage from "../../../assets/images/user.jpg";
+import { useState } from "react";
 
 const Header = () => {
+  const [notifications, setNotifications] = useState(true);
+
+  const iconStyle = {
+    width: "1.75rem",
+    height: "1.75rem",
+  };
+
+  const navLinks = [
+    {
+      to: "/",
+      label: "Home",
+      icon: GoHome,
+      activeIcon: GoHomeFill,
+      notifications: () => notifications,
+    },
+    {
+      to: "/explore",
+      label: "Explore",
+      icon: IoSearchOutline,
+      activeIcon: IoSearch,
+    },
+    {
+      to: "/notifications",
+      label: "Notifications",
+      icon: IoMdNotificationsOutline,
+      activeIcon: IoMdNotifications,
+    },
+    {
+      to: "/messages",
+      label: "Messages",
+      icon: BiEnvelope,
+      activeIcon: BiSolidEnvelope,
+    },
+    {
+      to: "/lists",
+      label: "Lists",
+      icon: RiFileList2Line,
+      activeIcon: RiFileList2Fill,
+    },
+    {
+      to: "/communities",
+      label: "Communities",
+      icon: BsPeople,
+      activeIcon: BsPeopleFill,
+    },
+    { to: "/profile", label: "Profile", icon: BiUser, activeIcon: BiSolidUser },
+  ];
+
   const location = useLocation();
 
   return (
@@ -27,175 +76,35 @@ const Header = () => {
         </div>
         <div className="w-full">
           <nav className="flex items-start flex-col">
-            <Link
-              to="/"
-              className="hover:bg-navHoverColor transition ease-in rounded-full"
-            >
-              <div className="flex p-3 w-full items-center">
-                <div className="relative">
-                  {location.pathname === "/" ? (
-                    <GoHomeFill
-                      style={{ width: "1.75rem", height: "1.75rem" }}
-                    />
-                  ) : (
-                    <GoHome style={{ width: "1.75rem", height: "1.75rem" }} />
-                  )}
-
-                  <div className="rounded-full absolute top-[-4px] right-[1px] w-2 h-2 bg-cyan-500"></div>
+            {navLinks.map((link) => (
+              <Link
+                to={link.to}
+                key={link.to}
+                className="hover:bg-navHoverColor transition ease-in rounded-full"
+              >
+                <div className="flex p-3 w-full items-center">
+                  <div className="relative">
+                    {location.pathname === link.to ? (
+                      <link.activeIcon style={iconStyle} />
+                    ) : (
+                      <link.icon style={iconStyle} />
+                    )}
+                    {link.notifications ? (
+                      <div className="rounded-full absolute top-[-4px] right-[1px] w-2 h-2 bg-cyan-500"></div>
+                    ) : (
+                      ""
+                    )}
+                  </div>
+                  <div
+                    className={`mr-4 ml-5 text-xl ${
+                      location.pathname === link.to ? "font-bold" : ""
+                    }`}
+                  >
+                    {link.label}
+                  </div>
                 </div>
-                <div
-                  className={`mr-4 ml-5 text-xl ${
-                    location.pathname === "/" ? "font-bold" : ""
-                  }`}
-                >
-                  Home
-                </div>
-              </div>
-            </Link>
-            <Link
-              to="/explore"
-              className="hover:bg-navHoverColor transition ease-in rounded-full"
-            >
-              <div className="flex p-3 w-full">
-                <div className="relative">
-                  {location.pathname === "/explore" ? (
-                    <IoSearch style={{ width: "1.75rem", height: "1.75rem" }} />
-                  ) : (
-                    <IoSearchOutline
-                      style={{ width: "1.75rem", height: "1.75rem" }}
-                    />
-                  )}
-                </div>
-                <div
-                  className={`mr-4 ml-5 text-xl ${
-                    location.pathname === "/explore" ? "font-bold" : ""
-                  }`}
-                >
-                  Explore
-                </div>
-              </div>
-            </Link>
-            <Link
-              to="/notifications"
-              className="hover:bg-navHoverColor transition ease-in rounded-full"
-            >
-              <div className="flex p-3 w-full">
-                <div className="relative">
-                  {location.pathname === "/notifications" ? (
-                    <IoMdNotifications
-                      style={{ width: "1.75rem", height: "1.75rem" }}
-                    />
-                  ) : (
-                    <IoMdNotificationsOutline
-                      style={{ width: "1.75rem", height: "1.75rem" }}
-                    />
-                  )}
-                </div>
-                <div
-                  className={`mr-4 ml-5 text-xl ${
-                    location.pathname === "/notifications" ? "font-bold" : ""
-                  }`}
-                >
-                  Notifications
-                </div>
-              </div>
-            </Link>
-            <Link
-              to="/messages"
-              className="hover:bg-navHoverColor transition ease-in rounded-full"
-            >
-              <div className="flex p-3 w-full">
-                <div className="relative">
-                  {location.pathname === "/messages" ? (
-                    <BiSolidEnvelope
-                      style={{ width: "1.75rem", height: "1.75rem" }}
-                    />
-                  ) : (
-                    <BiEnvelope
-                      style={{ width: "1.75rem", height: "1.75rem" }}
-                    />
-                  )}
-                </div>
-                <div
-                  className={`mr-4 ml-5 text-xl ${
-                    location.pathname === "/messages" ? "font-bold" : ""
-                  }`}
-                >
-                  Messages
-                </div>
-              </div>
-            </Link>
-            <Link
-              to="/lists"
-              className="hover:bg-navHoverColor transition ease-in rounded-full"
-            >
-              <div className="flex p-3 w-full">
-                <div className="relative">
-                  {location.pathname === "/lists" ? (
-                    <RiFileList2Fill
-                      style={{ width: "1.75rem", height: "1.75rem" }}
-                    />
-                  ) : (
-                    <RiFileList2Line
-                      style={{ width: "1.75rem", height: "1.75rem" }}
-                    />
-                  )}
-                </div>
-                <div
-                  className={`mr-4 ml-5 text-xl ${
-                    location.pathname === "/lists" ? "font-bold" : ""
-                  }`}
-                >
-                  Lists
-                </div>
-              </div>
-            </Link>
-            <Link
-              to="/communities"
-              className="hover:bg-navHoverColor transition ease-in rounded-full"
-            >
-              <div className="flex p-3 w-full">
-                <div className="relative">
-                  {location.pathname === "/communities" ? (
-                    <BsPeopleFill
-                      style={{ width: "1.75rem", height: "1.75rem" }}
-                    />
-                  ) : (
-                    <BsPeople style={{ width: "1.75rem", height: "1.75rem" }} />
-                  )}
-                </div>
-                <div
-                  className={`mr-4 ml-5 text-xl ${
-                    location.pathname === "/communities" ? "font-bold" : ""
-                  }`}
-                >
-                  Communities
-                </div>
-              </div>
-            </Link>
-            <Link
-              to="/profile"
-              className="hover:bg-navHoverColor transition ease-in rounded-full"
-            >
-              <div className="flex p-3 w-full">
-                <div className="relative">
-                  {location.pathname === "/profile" ? (
-                    <BiSolidUser
-                      style={{ width: "1.75rem", height: "1.75rem" }}
-                    />
-                  ) : (
-                    <BiUser style={{ width: "1.75rem", height: "1.75rem" }} />
-                  )}
-                </div>
-                <div
-                  className={`mr-4 ml-5 text-xl ${
-                    location.pathname === "/profile" ? "font-bold" : ""
-                  }`}
-                >
-                  Profile
-                </div>
-              </div>
-            </Link>
+              </Link>
+            ))}
           </nav>
         </div>
         <div className="mt-1 mb-1">
