@@ -1,3 +1,4 @@
+
 const Home = () => {
   return (
     <div >
@@ -111,6 +112,7 @@ const Home = () => {
         beatae ipsa eveniet fugiat eum mollitia tempora non saepe, ullam nam!
         Molestias officia veniam repellendus eaque dolores nulla nisi vero.
       </p>
+
     </div>
   );
 };
