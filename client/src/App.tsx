@@ -7,6 +7,7 @@ import Layout from './components/layout/layout';
 import { useSelector } from 'react-redux';
 import { RootState } from './store';
 import Modal from './components/ui/ForgotPassModal';
+import ResetPassword from './pages/ResetPassword';
 
 function App() {
   const { isOpen } = useSelector((state: RootState) => state.modal);
@@ -26,6 +27,7 @@ function App() {
         </Route>
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/reset_password/:id/:token" element={<ResetPassword/>}/>
       </Routes>
       {/* <h1 className=" text-sm text-cyan-400">Hello world!</h1> */}
     </>

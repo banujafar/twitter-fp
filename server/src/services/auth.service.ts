@@ -30,7 +30,7 @@ const loginUser = (req: Request, res: Response, next: NextFunction) => {
   })(req, res, next);
 };
 
-const forgotPass = async (email:string) => {
+const forgotPass = async (email: string) => {
   //send email with reset link to user
   if (!validator.isEmail(email)) {
     throw new Error('Invalid Email Format');
@@ -53,8 +53,21 @@ const forgotPass = async (email:string) => {
 
   await newToken.save();
 
-  const link = `http://localhost:5173/reset_password/${resetToken}`;
+  const link = `http://localhost:5173/reset_password/${user.id}/${resetToken}`;
 
   sendEmail(user.email, 'Password Reset Request', user.username, link);
 };
-export { loginUser,forgotPass };
+const checkTokenForReset = async ({ id, token }) => {
+  const userToken = await Token.findOneBy({ userId: id }); // Replace 'findOneBy' with your actual query logic
+  if (!userToken) {
+    throw new Error('Invalid Link');
+  }
+  bcrypt.compare(token, userToken.token, (err, result) => {
+    if (result) {
+      return { message: 'matched' };
+    } else {
+      throw new Error('Link Expired');
+    }
+  });
+};
+export { loginUser, forgotPass,checkTokenForReset };

@@ -38,6 +38,7 @@ const Modal = () => {
             onSubmit={async (values, { resetForm }) => {
               const email = values.email;
               const result = await dispatch(forgotPass({ email }));
+              console.log(result)
               if (result) {
                 setSuccessMessage('Email sent successfully');
               } else {

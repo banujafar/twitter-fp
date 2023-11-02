@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { AuthState, IUserLogin, IUserRegister } from '../../../models/auth';
+import { AuthState, IResetParams, IUserLogin, IUserRegister } from '../../../models/auth';
 
 const initialState: AuthState = {
   token: null,
@@ -55,8 +55,8 @@ export const loginUser = createAsyncThunk('auth/loginUser', async (userData: IUs
   }
 });
 
-export const forgotPass = createAsyncThunk('auth/forgotPass', async (email:object) => {
-  console.log(email)
+export const forgotPass = createAsyncThunk('auth/forgotPass', async (email: object) => {
+  console.log(email);
   try {
     const response = await fetch('http://localhost:3000/auth/forgotpass', {
       method: 'POST',
@@ -64,12 +64,31 @@ export const forgotPass = createAsyncThunk('auth/forgotPass', async (email:objec
       headers: {
         'Content-type': 'application/json',
       },
-      body:JSON.stringify(email),
+      body: JSON.stringify(email),
     });
     if (!response.ok) {
       throw new Error('Forgot password failed');
     }
     const data = await response.json();
+    return data;
+  } catch (error) {
+    throw error;
+  }
+});
+export const resetPass = createAsyncThunk('auth/resetPass', async (resetData: IResetParams) => {
+  try {
+    const { id, token } = resetData;
+    const response = await fetch(`http://localhost:3000/auth/reset_password/${id}/${token}`, {
+      credentials: 'include',
+      headers: {
+        'Content-type': 'application/json',
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Check Token Failed');
+    }
+    const data = await response.json();
+    console.log(data)
     return data;
   } catch (error) {
     throw error;
@@ -106,6 +125,14 @@ const authSlice = createSlice({
       })
       .addCase(forgotPass.rejected, (state, action) => {
         (state.user = null), (state.error = action.error.message ?? null);
+      })
+      .addCase(resetPass.fulfilled, (state, action) => {
+        state.token = action.payload.token;
+        state.error = null;
+      })
+      .addCase(resetPass.rejected, (state, action) => {
+        state.token = null;
+        state.error = action.error.message || 'Check token failed';
       });
   },
 });
