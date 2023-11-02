@@ -19,3 +19,10 @@ export interface IResetParams {
   id: string | undefined;
   token: string | undefined;
 }
+
+export interface IConfirmReset {
+  id: string | undefined;
+  token: string | undefined;
+  password: string;
+  confirm_password: string;
+}

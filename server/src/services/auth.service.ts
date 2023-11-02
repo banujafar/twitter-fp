@@ -57,17 +57,54 @@ const forgotPass = async (email: string) => {
 
   sendEmail(user.email, 'Password Reset Request', user.username, link);
 };
+
 const checkTokenForReset = async ({ id, token }) => {
-  const userToken = await Token.findOneBy({ userId: id }); // Replace 'findOneBy' with your actual query logic
-  if (!userToken) {
-    throw new Error('Invalid Link');
-  }
-  bcrypt.compare(token, userToken.token, (err, result) => {
-    if (result) {
-      return { message: 'matched' };
-    } else {
-      throw new Error('Link Expired');
+  return new Promise(async (resolve, reject) => {
+    try {
+      const userToken = await Token.findOneBy({ userId: id });
+
+      if (!userToken) {
+        resolve({ message: 'Invalid Link' });
+      } else {
+        const isTokenExpired = isExpired(userToken.createdAt); // Define a function to check expiration
+        console.log(isTokenExpired);
+
+        if (isTokenExpired) {
+          resolve(false);
+        } else {
+          bcrypt.compare(token, userToken.token, (err, result) => {
+            if (result) {
+              resolve(true);
+            } else {
+              resolve(false);
+            }
+          });
+        }
+      }
+    } catch (error) {
+      reject(error);
     }
   });
 };
-export { loginUser, forgotPass,checkTokenForReset };
+
+const confirmRequestResetPass=async({id,password,confirm_password})=>{
+  const user=await User.findOneBy({id});
+  console.log(user)
+  if(!user){
+    throw new Error("No such User");
+    }
+    if(password!==confirm_password){
+      throw new Error("Passwords do not match")
+      }
+      const hashPass=await bcrypt.hash(password,10);
+      user.password=hashPass;
+      await user.save();
+}
+// Function to check if a token is expired
+function isExpired(createdAt) {
+  const currentTime = new Date().getTime() / 1000;
+  const expiredTime = new Date(createdAt).getTime() / 1000 + 300;
+  return currentTime > expiredTime;
+}
+
+export { loginUser, forgotPass, checkTokenForReset,confirmRequestResetPass };

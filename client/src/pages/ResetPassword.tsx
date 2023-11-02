@@ -1,31 +1,32 @@
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../store';
-import { resetPass } from '../store/features/auth/authSlice';
+import { confirmResetPassword, resetPass } from '../store/features/auth/authSlice';
+
 const ResetPassword = () => {
-  const [loading, setLoading] = useState(true); // Initialize loading state to true
+  //TODO:WILL BE RECHANGED WITH LOADER
+  const [loading, setLoading] = useState(true);
   const [resetError, setResetError] = useState('');
   const { token, id } = useParams();
   const dispatch = useDispatch<AppDispatch>();
-  console.log('token', token, id);
+  const navigate=useNavigate()
+
   useEffect(() => {
-    // Make the initial request to check the token
     const checkToken = async () => {
       try {
         const result = await dispatch(resetPass({ id, token }));
-        console.log(result)
         if (result.payload) {
           setLoading(false);
         } else {
-            setLoading(false)
+          setLoading(false);
           setResetError('Link is expired or Invalid params');
         }
       } catch (error) {
         setLoading(false);
-        setResetError('An error occurred'); // Set a generic error message
+        setResetError('An error occurred');
       }
     };
 
@@ -35,61 +36,84 @@ const ResetPassword = () => {
   const formik = useFormik({
     initialValues: {
       password: '',
-      confirmPassword: '',
+      confirm_password: '',
     },
     validationSchema: Yup.object({
       password: Yup.string().required('Password is required').min(8, 'Password must be at least 8 characters long'),
-      confirmPassword: Yup.string()
+      confirm_password: Yup.string()
         .oneOf([Yup.ref('password')], 'Passwords must match')
         .required('Confirm Password is required'),
     }),
-    onSubmit: (values) => {
-      // Implement your reset password logic here
+    onSubmit: async(values) => {
       console.log('Form submitted with values:', values);
+      console.log(values);
+      const resetData = {
+        ...values,
+        id,
+        token,
+      };
+      console.log(resetData)
+      const result=await dispatch(confirmResetPassword(resetData));
+      if(result){
+        navigate('/login');
+      }else{
+        setResetError("Failed to Reset Password");
+        navigate('/register')
+      }
     },
   });
 
   return (
-    <div className="flex justify-center">
-      {loading ? (
-        <div>Loading...</div>
-      ) : resetError ? (
-        <div className="error">{resetError}</div>
-      ) : (
-        <form onSubmit={formik.handleSubmit}>
-          <div>
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              value={formik.values.password}
-            />
-            {formik.touched.password && formik.errors.password ? (
-              <div className="error">{formik.errors.password}</div>
-            ) : null}
-          </div>
+    <div className="flex justify-center min-h-screen items-center">
+      <div className="bg-white shadow-md p-4 w-96 rounded-lg">
+        {loading ? (
+          <div>Loading...</div>
+        ) : resetError ? (
+          <div className="text-red-500">{resetError}</div>
+        ) : (
+          <form onSubmit={formik.handleSubmit}>
+            <div className="mb-4">
+              <label htmlFor="password" className="block font-bold text-gray-700">
+                Password
+              </label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.password}
+                className="w-full border border-gray-300 rounded-md py-2 px-3"
+              />
+              {formik.touched.password && formik.errors.password ? (
+                <div className="text-red-500">{formik.errors.password}</div>
+              ) : null}
+            </div>
 
-          <div>
-            <label htmlFor="confirmPassword">Confirm Password</label>
-            <input
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              value={formik.values.confirmPassword}
-            />
-            {formik.touched.confirmPassword && formik.errors.confirmPassword ? (
-              <div className="error">{formik.errors.confirmPassword}</div>
-            ) : null}
-          </div>
+            <div className="mb-4">
+              <label htmlFor="confirmPassword" className="block font-bold text-gray-700">
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                id="confirm_password"
+                name="confirm_password"
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.confirm_password}
+                className="w-full border border-gray-300 rounded-md py-2 px-3"
+              />
+              {formik.touched.confirm_password && formik.errors.confirm_password ? (
+                <div className="text-red-500">{formik.errors.confirm_password}</div>
+              ) : null}
+            </div>
 
-          <button type="submit">Reset Password</button>
-        </form>
-      )}
+            <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded-md">
+              Reset Password
+            </button>
+          </form>
+        )}
+      </div>
     </div>
   );
 };

@@ -33,12 +33,14 @@ const Login: React.FC<object> = () => {
             <Formik
               initialValues={initialValues}
               onSubmit={async (values, actions) => {
-                alert(JSON.stringify(values, null, 2));
                 const result = await dispatch(loginUser(values));
                 if (result) {
                   navigate('/');
+                }else{
+                  actions.setFieldError('email', "Email or Password is incorrect");
+                  actions.setSubmitting(false);
                 }
-                actions.setSubmitting(false);
+               
               }}
             >
               <Form className="flex flex-col gap-4 w-3/4">

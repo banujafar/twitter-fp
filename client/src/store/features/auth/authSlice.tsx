@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { AuthState, IResetParams, IUserLogin, IUserRegister } from '../../../models/auth';
+import { AuthState, IConfirmReset, IResetParams, IUserLogin, IUserRegister } from '../../../models/auth';
 
 const initialState: AuthState = {
   token: null,
@@ -88,12 +88,37 @@ export const resetPass = createAsyncThunk('auth/resetPass', async (resetData: IR
       throw new Error('Check Token Failed');
     }
     const data = await response.json();
-    console.log(data)
+    console.log(data);
     return data;
   } catch (error) {
     throw error;
   }
 });
+
+export const confirmResetPassword = createAsyncThunk(
+  'auth/confirmResetPassword',
+  async (confirmPassData: IConfirmReset) => {
+    try {
+      const { id, token, password, confirm_password } = confirmPassData;
+      const response = await fetch(`http://localhost:3000/auth/reset_password/${id}/${token}`, {
+        method:'POST',
+        credentials: 'include',
+        headers: {
+          'Content-type': 'application/json',
+        },
+        body: JSON.stringify({ id,password, confirm_password }),
+      });
+      if (!response.ok) {
+        throw new Error("Password couldn't be changed");
+      }
+      const data = await response.json();
+      console.log(data);
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  },
+);
 
 const authSlice = createSlice({
   name: 'auth',
@@ -132,6 +157,14 @@ const authSlice = createSlice({
       })
       .addCase(resetPass.rejected, (state, action) => {
         state.token = null;
+        state.error = action.error.message || 'Check token failed';
+      })
+      .addCase(confirmResetPassword.fulfilled, (state, action) => {
+        state.user = action.payload.message;
+        state.error = null;
+      })
+      .addCase(confirmResetPassword.rejected, (state, action) => {
+        state.user = null;
         state.error = action.error.message || 'Check token failed';
       });
   },

@@ -13,7 +13,6 @@ export class Token extends BaseEntity {
 
     @Column({
         type: "timestamp",
-        default: () => `CURRENT_TIMESTAMP + interval '10800 seconds'`, // Set default to 3600 seconds from current time
     })
     createdAt: Date;
 }
