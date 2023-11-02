@@ -9,3 +9,8 @@ export interface AuthState {
   error: string | null;
   user: IUserRegister | null;
 }
+
+export interface IUserLogin {
+  email: string;
+  password: string;
+}

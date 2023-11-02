@@ -4,7 +4,10 @@ import Aside from '../components/ui/Aside';
 import { BsTwitter } from 'react-icons/bs';
 import { FcGoogle } from 'react-icons/fc';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { openModal } from '../store/features/modal/modalSlice';
+import { loginUser } from '../store/features/auth/authSlice';
+import { AppDispatch } from '../store';
 interface MyFormValues {
   password: string;
   email: string;
@@ -13,6 +16,11 @@ interface MyFormValues {
 const Login: React.FC<object> = () => {
   const initialValues: MyFormValues = { email: '', password: '' };
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+
+  const handleOpenModal = () => {
+    dispatch(openModal());
+  };
   return (
     <div className="flex">
       <Aside />
@@ -24,23 +32,12 @@ const Login: React.FC<object> = () => {
             </span>
             <Formik
               initialValues={initialValues}
-              onSubmit={(values, actions) => {
+              onSubmit={async (values, actions) => {
                 alert(JSON.stringify(values, null, 2));
-                axios
-                  .post('http://localhost:3000/auth/login', values, {
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                    withCredentials: true,
-                  })
-                  .then((response) => {
-                    if (response.status === 200) {
-                      navigate('/');
-                    }
-                  })
-                  .catch((error) => {
-                    console.error('Error', error);
-                  });
+                const result = await dispatch(loginUser(values));
+                if (result) {
+                  navigate('/');
+                }
                 actions.setSubmitting(false);
               }}
             >
@@ -69,7 +66,9 @@ const Login: React.FC<object> = () => {
                     <Field id="remember" type="checkbox" name="remember" value="remember me" />
                     Remember me
                   </label>
-                  <Link to={'/recoverPass'}>Forgot password?</Link>
+                  <span onClick={handleOpenModal} className=" cursor-pointer">
+                    Forgot password?
+                  </span>
                 </div>
 
                 <button
