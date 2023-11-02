@@ -1,5 +1,5 @@
 import express from 'express';
-import { AppDataSource } from './data-source.ts';
+import { AppDataSource } from './config/db-config.ts';
 import bodyParser from 'body-parser';
 import userRouter from './routes/user.route.ts';
 import cors from 'cors';
@@ -7,8 +7,8 @@ import passport from 'passport';
 import session from 'express-session';
 import { TypeormStore } from 'connect-typeorm';
 import { Session } from './entity/session.entity.ts';
-import passportConfig from './passportConfig.ts';
-import checkAuthMiddleware from './middlewares/checkAuth.ts';
+import passportConfig from './config/passport-config.ts';
+import checkAuthMiddleware from './middlewares/check-auth.ts';
 
 const app = express();
 
@@ -28,7 +28,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      maxAge: 86400,
+      maxAge: 3600 || 7 * 24 * 60 * 60 * 1000,
       httpOnly: true,
       secure: app.get('env') === 'production' ? true : false,
       sameSite: 'lax',
@@ -52,7 +52,7 @@ AppDataSource.initialize()
   });
 
 app.use('/auth', userRouter);
-app.use('/checkAuth',checkAuthMiddleware)
+app.use('/checkAuth', checkAuthMiddleware);
 app.listen('3000', () => {
   console.log('Server is up on 3000');
 });

@@ -1,5 +1,5 @@
 import { Strategy as LocalStrategy } from 'passport-local';
-import { User } from './entity/user.entity.ts';
+import { User } from '../entity/user.entity.ts';
 import bcrypt from 'bcrypt';
 import validator from 'validator';
 import { FindOptionsWhere } from 'typeorm';
@@ -7,6 +7,7 @@ import { PassportStatic } from 'passport';
 
 const passportConfig = (passport: PassportStatic) => {
   passport.use(
+    'local-email',
     new LocalStrategy(
       { usernameField: 'email', passwordField: 'password' },
       (email: string, password: string, done) => {
@@ -35,6 +36,7 @@ const passportConfig = (passport: PassportStatic) => {
       },
     ),
   );
+
   passport.use(
     'local-username',
     new LocalStrategy(
