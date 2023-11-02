@@ -19,7 +19,7 @@ const sendEmail = async (email:string, subject:string, username:string, link:str
       from: process.env.EMAIL_USER,
       to: email,
       subject: subject,
-      html: `Hi ${username} <br/>Please click <a href={${link}}>Link</a> to reset password`,
+      html: `Hi ${username},<br/>Please click <a href="${link}">this link</a> to reset your password.`,
     });
     return { message: 'email sent successfully' };
   } catch (error) {
