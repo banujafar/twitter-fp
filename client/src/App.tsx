@@ -5,17 +5,20 @@ import Home from './pages/Home';
 import ProtectedRoute from './utils/ProtectedRoute';
 import Layout from './components/layout/layout';
 
+
 function App() {
  
   return (
     <>
       <Routes>
         <Route element={<ProtectedRoute/>}>
+
           <Route path="/" element={
             <Layout>
               <Home />
             </Layout>
           } />
+         
           </Route>
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<Login />} />
