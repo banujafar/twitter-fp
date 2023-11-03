@@ -87,19 +87,19 @@ const checkTokenForReset = async ({ id, token }) => {
   });
 };
 
-const confirmRequestResetPass=async({id,password,confirm_password})=>{
-  const user=await User.findOneBy({id});
-  console.log(user)
-  if(!user){
-    throw new Error("No such User");
-    }
-    if(password!==confirm_password){
-      throw new Error("Passwords do not match")
-      }
-      const hashPass=await bcrypt.hash(password,10);
-      user.password=hashPass;
-      await user.save();
-}
+const confirmRequestResetPass = async ({ id, password, confirm_password }) => {
+  const user = await User.findOneBy({ id });
+  console.log(user);
+  if (!user) {
+    throw new Error('No such User');
+  }
+  if (password !== confirm_password) {
+    throw new Error('Passwords do not match');
+  }
+  const hashPass = await bcrypt.hash(password, 10);
+  user.password = hashPass;
+  await user.save();
+};
 // Function to check if a token is expired
 function isExpired(createdAt) {
   const currentTime = new Date().getTime() / 1000;
@@ -107,4 +107,4 @@ function isExpired(createdAt) {
   return currentTime > expiredTime;
 }
 
-export { loginUser, forgotPass, checkTokenForReset,confirmRequestResetPass };
+export { loginUser, forgotPass, checkTokenForReset, confirmRequestResetPass };

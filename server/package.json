@@ -21,6 +21,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/passport-google-oauth2": "^0.1.7",
+    "@types/passport-local": "^1.0.37",
     "bcrypt": "^5.1.1",
     "connect-typeorm": "^2.0.0",
     "cookie-parser": "^1.4.6",
@@ -32,6 +34,7 @@
     "nodemailer-sendmail-transport": "^1.0.2",
     "nodemailer-smtp-transport": "^2.4.2",
     "passport": "^0.6.0",
+    "passport-google-oauth2": "^0.2.0",
     "passport-local": "^1.0.0",
     "pg": "^8.11.3",
     "typeorm": "^0.3.17",

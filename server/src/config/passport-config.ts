@@ -2,9 +2,10 @@ import { Strategy as LocalStrategy } from 'passport-local';
 import { User } from '../entity/user.entity.ts';
 import bcrypt from 'bcrypt';
 import validator from 'validator';
-import { FindOptionsWhere } from 'typeorm';
+import { Callback, FindOptionsWhere } from 'typeorm';
 import { PassportStatic } from 'passport';
-
+import { Strategy as GoogleStrategy } from 'passport-google-oauth2';
+import { Request } from 'express';
 const passportConfig = (passport: PassportStatic) => {
   passport.use(
     'local-email',
@@ -59,6 +60,21 @@ const passportConfig = (passport: PassportStatic) => {
             });
           })
           .catch((err) => done(err));
+      },
+    ),
+  );
+
+  //Login with google
+  passport.use(
+    new GoogleStrategy(
+      {
+        clientID: process.env.OAUTH_CLIENTID,
+        clientSecret: process.env.OAUTH_CLIENT_SECRET,
+        callbackURL: 'http://localhost:3000/auth/google/callback',
+        passReqToCallback: true,
+      },
+      (request: Request, accessToken:string, refreshToken:string, profile, done:Callback) => {
+        done(null,profile)
       },
     ),
   );

@@ -21,6 +21,9 @@ const Login: React.FC<object> = () => {
   const handleOpenModal = () => {
     dispatch(openModal());
   };
+  const handleLoginwithGoogle=()=>{
+    //handle google login here
+  }
   return (
     <div className="flex">
       <Aside />
@@ -49,7 +52,7 @@ const Login: React.FC<object> = () => {
                   className="bg-white mt-20 py-2 px-3 rounded-2xl w-full focus:outline-none flex gap-2 items-center font-semibold"
                 >
                   <FcGoogle size={'25'} />
-                  <span>Continue with Google</span>
+                  <span onClick={handleLoginwithGoogle}>Continue with Google</span>
                 </Link>
                 <Field
                   id="email"
