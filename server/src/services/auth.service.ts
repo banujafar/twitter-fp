@@ -64,7 +64,7 @@ const checkTokenForReset = async ({ id, token }) => {
       const userToken = await Token.findOneBy({ userId: id });
 
       if (!userToken) {
-        resolve({ message: 'Invalid Link' });
+        resolve(true);
       } else {
         const isTokenExpired = isExpired(userToken.createdAt); // Define a function to check expiration
         console.log(isTokenExpired);
