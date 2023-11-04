@@ -28,7 +28,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      maxAge: 3600 || 7 * 24 * 60 * 60 * 1000,
+      maxAge: 36000 || 7 * 24 * 60 * 60 * 1000,
       httpOnly: true,
       secure: app.get('env') === 'production' ? true : false,
       sameSite: 'lax',

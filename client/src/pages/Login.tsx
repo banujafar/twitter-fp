@@ -21,9 +21,11 @@ const Login: React.FC<object> = () => {
   const handleOpenModal = () => {
     dispatch(openModal());
   };
-  const handleLoginwithGoogle=()=>{
+  const handleLoginwithGoogle = () => {
     //handle google login here
-  }
+    window.open('http://localhost:3000/auth/google/callback'), '_self';
+  };
+
   return (
     <div className="flex">
       <Aside />
@@ -39,11 +41,10 @@ const Login: React.FC<object> = () => {
                 const result = await dispatch(loginUser(values));
                 if (result) {
                   navigate('/');
-                }else{
-                  actions.setFieldError('email', "Email or Password is incorrect");
+                } else {
+                  actions.setFieldError('email', 'Email or Password is incorrect');
                   actions.setSubmitting(false);
                 }
-               
               }}
             >
               <Form className="flex flex-col gap-4 w-3/4">

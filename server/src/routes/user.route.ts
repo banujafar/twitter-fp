@@ -62,7 +62,8 @@ userRouter.post('/reset_password/:id/:token', async (req, res) => {
 userRouter.get(
   '/google',
   passport.authenticate('google', {
-    successRedirect: '/',
+    scope: ['email', 'profile'],
+    successRedirect: process.env.CLIENT_URL,
     failureRedirect: '/login',
   }),
 );
@@ -70,7 +71,8 @@ userRouter.get(
 userRouter.get(
   '/google/callback',
   passport.authenticate('google', {
-    successRedirect: '/',
+    scope: ['email', 'profile'],
+    successRedirect: process.env.CLIENT_URL,
     failureRedirect: '/login',
   }),
 );
