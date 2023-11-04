@@ -1,12 +1,13 @@
 import { Strategy as LocalStrategy } from 'passport-local';
-import { User } from './entity/user.entity.ts';
+import { User } from '../entity/user.entity.ts';
 import bcrypt from 'bcrypt';
 import validator from 'validator';
-import { FindOptionsWhere } from 'typeorm';
 import { PassportStatic } from 'passport';
-
+import { Strategy as GoogleStrategy } from 'passport-google-oauth2';
+import { Request } from 'express';
 const passportConfig = (passport: PassportStatic) => {
   passport.use(
+    'local-email',
     new LocalStrategy(
       { usernameField: 'email', passwordField: 'password' },
       (email: string, password: string, done) => {
@@ -35,6 +36,7 @@ const passportConfig = (passport: PassportStatic) => {
       },
     ),
   );
+
   passport.use(
     'local-username',
     new LocalStrategy(
@@ -61,12 +63,26 @@ const passportConfig = (passport: PassportStatic) => {
     ),
   );
 
-  passport.serializeUser((user: User, done) => {
+  //Login with google
+  passport.use(
+    new GoogleStrategy(
+      {
+        clientID: process.env.OAUTH_CLIENTID,
+        clientSecret: process.env.OAUTH_CLIENT_SECRET,
+        callbackURL: process.env.CALLBACK_URL,
+        passReqToCallback: true,
+      },
+      (request: Request, accessToken: string, refreshToken: string, profile, done) => {
+        return done(null, profile);
+      },
+    ),
+  );
+
+  passport.serializeUser((user, done) => {
     done(null, user);
   });
 
-  passport.deserializeUser((id: FindOptionsWhere<User>, done) => {
-    const user = User.findOneBy(id);
+  passport.deserializeUser((user, done) => {
     done(null, user);
   });
 };
