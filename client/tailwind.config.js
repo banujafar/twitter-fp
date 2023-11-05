@@ -16,7 +16,10 @@ export default {
         primaryGray: "#71767B",
         twitterColor: "#1DA1F2",
         navHoverColor: "rgba(15, 20, 25, 0.1)"
-      }
+      },
+      boxShadow: {
+        'logout': 'rgba(101, 119, 134, 0.2) 0px 0px 15px, rgba(101, 119, 134, 0.15) 0px 0px 3px 1px',
+      },
     },
    
   },
