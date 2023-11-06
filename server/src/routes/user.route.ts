@@ -77,4 +77,16 @@ userRouter.get(
   }),
 );
 
+userRouter.post('/logout', (req: Request, res: Response, next: NextFunction) => {
+  req.logout(function (err) {
+    if (err) {
+      next(err);
+    }
+    res.status(200).clearCookie('connect.sid');
+    req.session.destroy(function (err) {
+     res.json('logout successfully')
+    });
+  });
+});
+
 export default userRouter;
