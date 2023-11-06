@@ -120,6 +120,28 @@ export const confirmResetPassword = createAsyncThunk(
   },
 );
 
+export const logoutUser = createAsyncThunk('auth/logoutUser', async () => {
+  try {
+    const response = await fetch('http://localhost:3000/auth/logout', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Logout failed');
+    }
+
+    const data = await response.json();
+    console.log(data)
+    return data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+});
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -166,6 +188,14 @@ const authSlice = createSlice({
       .addCase(confirmResetPassword.rejected, (state, action) => {
         state.user = null;
         state.error = action.error.message || 'Check token failed';
+      })
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.user = null;
+        state.error = null;
+      })
+      .addCase(logoutUser.rejected, (state, action) => {
+        state.user = null;
+        state.error = action.error.message || 'Logout failed';
       });
   },
 });

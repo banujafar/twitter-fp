@@ -1,66 +1,71 @@
-import { BsTwitter, BsPeopleFill, BsPeople } from "react-icons/bs";
-import { GoHome, GoHomeFill } from "react-icons/go";
-import { IoMdNotificationsOutline, IoMdNotifications } from "react-icons/io";
-import { Link, useLocation } from "react-router-dom";
-import { IoSearchOutline, IoSearch } from "react-icons/io5";
-import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
-import {
-  BiEnvelope,
-  BiSolidEnvelope,
-  BiSolidUser,
-  BiUser,
-} from "react-icons/bi";
-import userImage from "../../../assets/images/user.jpg";
-import { useState } from "react";
+import { BsTwitter, BsPeopleFill, BsPeople } from 'react-icons/bs';
+import { GoHome, GoHomeFill } from 'react-icons/go';
+import { IoMdNotificationsOutline, IoMdNotifications } from 'react-icons/io';
+import { Link, useLocation } from 'react-router-dom';
+import { IoSearchOutline, IoSearch } from 'react-icons/io5';
+import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
+import { BiEnvelope, BiSolidEnvelope, BiSolidUser, BiUser } from 'react-icons/bi';
+import userImage from '../../../assets/images/user.jpg';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../../../store';
+import { logoutUser } from '../../../store/features/auth/authSlice';
 
 const Header = () => {
   const [notifications, setNotifications] = useState(true);
   const [logoutPopover, setLogoutPopover] = useState(false);
-
+  const dispatch = useDispatch<AppDispatch>();
+  const handleLogOut = async () => {
+    //Handle logout
+    const result=await dispatch(logoutUser());
+    if(result.payload){
+      window.location.href="/";
+    }
+  };
   const iconStyle = {
-    width: "1.75rem",
-    height: "1.75rem",
+    width: '1.75rem',
+    height: '1.75rem',
   };
 
   const navLinks = [
     {
-      to: "/",
-      label: "Home",
+      to: '/',
+      label: 'Home',
       icon: GoHome,
       activeIcon: GoHomeFill,
       notifications: () => notifications,
     },
     {
-      to: "/explore",
-      label: "Explore",
+      to: '/explore',
+      label: 'Explore',
       icon: IoSearchOutline,
       activeIcon: IoSearch,
     },
     {
-      to: "/notifications",
-      label: "Notifications",
+      to: '/notifications',
+      label: 'Notifications',
       icon: IoMdNotificationsOutline,
       activeIcon: IoMdNotifications,
     },
     {
-      to: "/messages",
-      label: "Messages",
+      to: '/messages',
+      label: 'Messages',
       icon: BiEnvelope,
       activeIcon: BiSolidEnvelope,
     },
     {
-      to: "/favorites",
-      label: "Favorites",
+      to: '/favorites',
+      label: 'Favorites',
       icon: AiOutlineHeart,
       activeIcon: AiFillHeart,
     },
     {
-      to: "/communities",
-      label: "Communities",
+      to: '/communities',
+      label: 'Communities',
       icon: BsPeople,
       activeIcon: BsPeopleFill,
     },
-    { to: "/profile", label: "Profile", icon: BiUser, activeIcon: BiSolidUser },
+    { to: '/profile', label: 'Profile', icon: BiUser, activeIcon: BiSolidUser },
   ];
 
   const location = useLocation();
@@ -68,9 +73,7 @@ const Header = () => {
   return (
     <header
       className={`${
-        logoutPopover
-          ? "lg:overflow-y-auto md:overflow-hidden sm:overflow-hidden xs:overflow-hidden"
-          : ""
+        logoutPopover ? 'lg:overflow-y-auto md:overflow-hidden sm:overflow-hidden xs:overflow-hidden' : ''
       } min-w-[275px] lg:min-w-[275px] md:w-[88px] sm:min-w-[88px] xs:min-w-[88px] xxs:min-w-[0] h-screen max-w-full sticky top-0 left-0 overflow-y-auto bg-white`}
     >
       <div className="w-full px-2 flex items-start justify-start flex-col lg:items-start md:items-center sm:items-center xs:items-center lg:justify-start md:justify-center sm:justify-center xs:justify-center">
@@ -84,11 +87,7 @@ const Header = () => {
         <div className="w-full flex items-center justify-start lg:items-center lg:justify-start md:items-center md:justify-center sm:items-center sm:justify-center xs:items-center xs:justify-center">
           <nav className="relative flex items-start flex-col">
             {navLinks.map((link) => (
-              <Link
-                to={link.to}
-                key={link.to}
-                className="hover:bg-navHoverColor transition ease-in rounded-full"
-              >
+              <Link to={link.to} key={link.to} className="hover:bg-navHoverColor transition ease-in rounded-full">
                 <div className="flex p-3 w-full items-center">
                   <div className="relative">
                     {location.pathname === link.to ? (
@@ -99,12 +98,12 @@ const Header = () => {
                     {link.notifications ? (
                       <div className="rounded-full absolute top-[-4px] right-[1px] w-2 h-2 bg-cyan-500"></div>
                     ) : (
-                      ""
+                      ''
                     )}
                   </div>
                   <div
                     className={`mr-4 ml-5 text-xl lg:flex md:hidden sm:hidden xs:hidden  ${
-                      location.pathname === link.to ? "font-bold" : ""
+                      location.pathname === link.to ? 'font-bold' : ''
                     }`}
                   >
                     {link.label}
@@ -114,20 +113,14 @@ const Header = () => {
             ))}
             {logoutPopover ? (
               <div className="lg:-bottom-14 md:fixed md:bottom-16 sm:fixed sm:bottom-16 xs:fixed xs:bottom-16 lg:absolute rounded-md -bottom-14 bg-white shadow-logout absolute flex justify-center items-center min-w-[225px]">
-                <button
-                  type="button"
-                  className="flex items-center justify-center py-3 w-full font-bold text-base"
-                >
-                  <Link
-                    to="/logout"
-                    className="w-full py-1 hover:bg-navHoverColor"
-                  >
+                <button type="button" className="flex items-center justify-center py-3 w-full font-bold text-base">
+                  <div onClick={handleLogOut} className="w-full py-1 hover:bg-navHoverColor cursor-pointer">
                     Log out @username
-                  </Link>
+                  </div>
                 </button>
               </div>
             ) : (
-              ""
+              ''
             )}
           </nav>
         </div>
