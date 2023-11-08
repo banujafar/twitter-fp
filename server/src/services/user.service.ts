@@ -2,6 +2,7 @@ import { User } from "../entity/user.entity.ts";
 import bcrypt from "bcrypt";
 import validator from "validator";
 import jwt from "jsonwebtoken";
+import AppError from "../config/appError.ts";
 
 const registerUser = async (
   username: string,
@@ -9,11 +10,11 @@ const registerUser = async (
   password: string
 ): Promise<string | { error: string }> => {
   if (!username || !email || !password) {
-    return { error: "please enter credentials" };
+    throw new AppError('Missing credentials', 400);
   }
 
   if (!validator.isEmail(email)) {
-    return { error: "Invalid email format" };
+    throw new AppError('Invalid email format', 400);
   }
 
   const existingUser = await User.findOne({
@@ -21,7 +22,7 @@ const registerUser = async (
   });
 
   if (existingUser) {
-    return { error: `User with this email or username already exists` };
+    throw new AppError('User with this email or username already exists', 400);
   }
 
   const user = new User();
