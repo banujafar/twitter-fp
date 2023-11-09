@@ -8,7 +8,8 @@ import session from 'express-session';
 import { TypeormStore } from 'connect-typeorm';
 import { Session } from './entity/session.entity.ts';
 import passportConfig from './config/passport-config.ts';
-import checkAuthMiddleware from './middlewares/check-auth.ts';
+import checkAuthMiddleware from './middlewares/checkAuth.ts';
+import errorHandler from './middlewares/errorHandler.ts';
 
 const app = express();
 
@@ -53,6 +54,7 @@ AppDataSource.initialize()
 
 app.use('/auth', userRouter);
 app.use('/checkAuth', checkAuthMiddleware);
+app.use(errorHandler)
 app.listen('3000', () => {
   console.log('Server is up on 3000');
 });

@@ -4,10 +4,11 @@ import Aside from '../components/ui/Aside';
 import { BsTwitter } from 'react-icons/bs';
 import { FcGoogle } from 'react-icons/fc';
 import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { openModal } from '../store/features/modal/modalSlice';
 import { loginUser } from '../store/features/auth/authSlice';
-import { AppDispatch } from '../store';
+import { AppDispatch, RootState } from '../store';
+import TwitterLoader from '../components/loaders/twitterLoader';
 interface MyFormValues {
   password: string;
   email: string;
@@ -17,6 +18,7 @@ const Login: React.FC<object> = () => {
   const initialValues: MyFormValues = { email: '', password: '' };
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
+  const loading = useSelector((state: RootState) => state.auth.loading);
 
   const handleOpenModal = () => {
     dispatch(openModal());
@@ -25,7 +27,12 @@ const Login: React.FC<object> = () => {
     //handle google login here
     window.open('http://localhost:3000/auth/google/callback'), '_self';
   };
-
+  if (loading) {
+    return(
+     <TwitterLoader />
+    )
+     
+  }
   return (
     <div className="flex">
       <Aside />
