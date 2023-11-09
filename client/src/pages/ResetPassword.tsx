@@ -5,6 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../store';
 import { confirmResetPassword, resetPass } from '../store/features/auth/authSlice';
+import TwitterLoader from '../components/loaders/twitterLoader';
 
 const ResetPassword = () => {
   //TODO:WILL BE RECHANGED WITH LOADER
@@ -12,7 +13,7 @@ const ResetPassword = () => {
   const [resetError, setResetError] = useState('');
   const { token, id } = useParams();
   const dispatch = useDispatch<AppDispatch>();
-  const navigate=useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
     const checkToken = async () => {
@@ -44,7 +45,7 @@ const ResetPassword = () => {
         .oneOf([Yup.ref('password')], 'Passwords must match')
         .required('Confirm Password is required'),
     }),
-    onSubmit: async(values) => {
+    onSubmit: async (values) => {
       console.log('Form submitted with values:', values);
       console.log(values);
       const resetData = {
@@ -52,23 +53,25 @@ const ResetPassword = () => {
         id,
         token,
       };
-      console.log(resetData)
-      const result=await dispatch(confirmResetPassword(resetData));
-      if(result){
+      console.log(resetData);
+      const result = await dispatch(confirmResetPassword(resetData));
+      if (result) {
         navigate('/login');
-      }else{
-        setResetError("Failed to Reset Password");
-        navigate('/register')
+      } else {
+        setResetError('Failed to Reset Password');
+        navigate('/register');
       }
     },
   });
 
+  if (loading) {
+    return <TwitterLoader />;
+  }
+
   return (
     <div className="flex justify-center min-h-screen items-center">
       <div className="bg-white shadow-md p-4 w-96 rounded-lg">
-        {loading ? (
-          <div>Loading...</div>
-        ) : resetError ? (
+        {resetError ? (
           <div className="text-red-500">{resetError}</div>
         ) : (
           <form onSubmit={formik.handleSubmit}>

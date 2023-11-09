@@ -1,17 +1,21 @@
-import { ErrorMessage, Field, Formik, Form } from "formik";
-import * as Yup from "yup";
-import Aside from "../components/ui/Aside";
-import { BsTwitter } from "react-icons/bs";
-import { Link, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { registerUser  } from "../store/features/auth/authSlice";
-import { AppDispatch, RootState } from "../store";
+import { ErrorMessage, Field, Formik, Form } from 'formik';
+import * as Yup from 'yup';
+import Aside from '../components/ui/Aside';
+import { BsTwitter } from 'react-icons/bs';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { registerUser } from '../store/features/auth/authSlice';
+import { AppDispatch, RootState } from '../store';
+import TwitterLoader from '../components/loaders/twitterLoader';
 
 const RegisterPage = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const error = useSelector((state: RootState) => state.auth.error);
+  const { error, loading } = useSelector((state: RootState) => state.auth);
 
+  if (loading) {
+    return <TwitterLoader />;
+  }
   return (
     <>
       <div className="flex">
@@ -22,34 +26,27 @@ const RegisterPage = () => {
               <span className="text-gray-300 text-5xl">
                 <BsTwitter />
               </span>
-              <h1 className="text-gray-300 text-6xl mb-10 mt-10 font-bold">
-                Happening now
-              </h1>
-              <h2 className="text-gray-300 text-3xl mb-8 font-bold">
-                Join Twitter now
-              </h2>
+              <h1 className="text-gray-300 text-6xl mb-10 mt-10 font-bold">Happening now</h1>
+              <h2 className="text-gray-300 text-3xl mb-8 font-bold">Join Twitter now</h2>
 
               <div className="">
                 <Formik
                   initialValues={{
-                    username: "",
-                    email: "",
-                    password: "",
+                    username: '',
+                    email: '',
+                    password: '',
                   }}
                   validationSchema={Yup.object().shape({
                     username: Yup.string()
-                      .required("Username is required")
-                      .max(50, "Username must be at most 50 characters"),
+                      .required('Username is required')
+                      .max(50, 'Username must be at most 50 characters'),
                     email: Yup.string()
-                      .required("Email is required")
-                      .matches(
-                        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-                        "Invalid email format"
-                      ),
+                      .required('Email is required')
+                      .matches(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/, 'Invalid email format'),
                     password: Yup.string()
-                      .required("Password is required")
-                      .min(6, "Password must contain from 6 to 50 characters")
-                      .max(50, "Password must contain from 6 to 50 characters"),
+                      .required('Password is required')
+                      .min(6, 'Password must contain from 6 to 50 characters')
+                      .max(50, 'Password must contain from 6 to 50 characters'),
                   })}
                   onSubmit={async (values, { setSubmitting }) => {
                     const credentials = {
@@ -58,15 +55,13 @@ const RegisterPage = () => {
                       password: values.password,
                     };
                     try {
-                      const result = await dispatch(
-                        registerUser(credentials)
-                      );
+                      const result = await dispatch(registerUser(credentials));
                       if (registerUser.fulfilled.match(result)) {
                         setSubmitting(false);
-                        navigate("/");
+                        navigate('/');
                       }
                     } catch (error) {
-                      console.error("Login error:", error);
+                      console.error('Login error:', error);
                       setSubmitting(false);
                     }
                   }}
@@ -74,10 +69,7 @@ const RegisterPage = () => {
                   {({ isSubmitting, isValid }) => (
                     <Form>
                       <div className="mb-4">
-                        <label
-                          htmlFor="username"
-                          className="block text-white text-base font-bold mb-2"
-                        >
+                        <label htmlFor="username" className="block text-white text-base font-bold mb-2">
                           Username
                         </label>
                         <Field
@@ -86,20 +78,11 @@ const RegisterPage = () => {
                           name="username"
                           placeholder="username"
                           className=" w-full px-3 py-2 border rounded-2xl focus:outline-none focus:border-blue-500"
-                        
-                        
                         />
-                        <ErrorMessage
-                          name="username"
-                          component="div"
-                          className="text-red-500 text-base"
-                        />
+                        <ErrorMessage name="username" component="div" className="text-red-500 text-base" />
                       </div>
                       <div className="mb-4">
-                        <label
-                          htmlFor="email"
-                          className="block text-white text-base font-bold mb-2"
-                        >
+                        <label htmlFor="email" className="block text-white text-base font-bold mb-2">
                           Email
                         </label>
                         <Field
@@ -109,17 +92,10 @@ const RegisterPage = () => {
                           placeholder="email"
                           className=" w-full px-3 py-2 border rounded-2xl focus:outline-none focus:border-blue-500"
                         />
-                        <ErrorMessage
-                          name="email"
-                          component="div"
-                          className="text-red-500 text-base"
-                        />
+                        <ErrorMessage name="email" component="div" className="text-red-500 text-base" />
                       </div>
                       <div className="mb-4">
-                        <label
-                          htmlFor="password"
-                          className="block text-white text-base font-bold mb-2"
-                        >
+                        <label htmlFor="password" className="block text-white text-base font-bold mb-2">
                           Password
                         </label>
                         <Field
@@ -129,17 +105,11 @@ const RegisterPage = () => {
                           placeholder="********"
                           className="w-full px-3 py-2 border rounded-2xl focus:outline-none focus:border-blue-500"
                         />
-                        <ErrorMessage
-                          name="password"
-                          component="div"
-                          className="text-red-500 text-base"
-                        />
+                        <ErrorMessage name="password" component="div" className="text-red-500 text-base" />
                       </div>
                       {error && (
                         <div>
-                          <h5 className="text-red-600 font-medium">
-                            Error occurred
-                          </h5>
+                          <h5 className="text-red-600 font-medium">Error occurred</h5>
                         </div>
                       )}
                       <button
@@ -147,8 +117,8 @@ const RegisterPage = () => {
                         disabled={isSubmitting || !isValid}
                         className={
                           isValid
-                            ? "hover:bg-blue-400  focus:bg-blue-400 bg-blue-500 text-white mt-3 w-full rounded-2xl py-2 px-6 focus:outline-none"
-                            : "bg-blue-500 text-white mt-3 py-2 px-6 rounded-2xl w-full focus:outline-none"
+                            ? 'hover:bg-blue-400  focus:bg-blue-400 bg-blue-500 text-white mt-3 w-full rounded-2xl py-2 px-6 focus:outline-none'
+                            : 'bg-blue-500 text-white mt-3 py-2 px-6 rounded-2xl w-full focus:outline-none'
                         }
                       >
                         Sign Up
