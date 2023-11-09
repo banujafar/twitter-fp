@@ -1,10 +1,14 @@
-import { User } from '../entity/user.entity.ts';
-import bcrypt from 'bcrypt';
-import validator from 'validator';
-import jwt from 'jsonwebtoken';
-import AppError from '../config/appError.ts';
+import { User } from "../entity/user.entity.ts";
+import bcrypt from "bcrypt";
+import validator from "validator";
+import jwt from "jsonwebtoken";
+import AppError from "../config/appError.ts";
 
-const registerUser = async (username: string, email: string, password: string): Promise<string | { error: string }> => {
+const registerUser = async (
+  username: string,
+  email: string,
+  password: string
+): Promise<string | { error: string }> => {
   if (!username || !email || !password) {
     throw new AppError('Missing credentials', 400);
   }
@@ -21,36 +25,31 @@ const registerUser = async (username: string, email: string, password: string): 
     throw new AppError('User with this email or username already exists', 400);
   }
 
+  const verificationToken = jwt.sign({ email }, process.env.SECRET_KEY, {
+    expiresIn: "1h",
+  });
+  
   const user = new User();
   user.email = email;
   user.username = username;
   user.password = await bcrypt.hash(password, 10);
-  user.isVerified = false;
-  await user.save();
-  user.token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY, {
-    expiresIn: '10h',
-  });
+  user.isVerified = false
+  user.token = verificationToken;
+
 
   return user.token;
 };
 
-async function findUserByVerificationToken(verificationToken) {
-  try {
-    const user = await User.findOne({ where: { token: verificationToken } });
-    return user;
-  } catch (error) {
-    console.error('Error while finding user by verification token:', error);
-    return null;
-  }
-}
+
 
 async function markEmailAsVerified(verificationToken) {
   try {
-    const user = await User.findOne({ where: { token: verificationToken } });
+    const user = await User.findOne({ where: { token: verificationToken }  });
     if (user) {
       user.isVerified = true;
       user.token = null;
       await user.save();
+      
       return user;
     }
   } catch (error) {
@@ -59,4 +58,9 @@ async function markEmailAsVerified(verificationToken) {
   }
 }
 
-export { registerUser, findUserByVerificationToken, markEmailAsVerified };
+
+
+export {
+  registerUser,
+  markEmailAsVerified
+};

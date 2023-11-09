@@ -1,11 +1,11 @@
 import bcrypt from 'bcrypt';
 import { Router, Request, Response, NextFunction } from 'express';
-import { registerUser, findUserByVerificationToken, markEmailAsVerified } from '../services/user.service.ts';
+import { registerUser, markEmailAsVerified } from '../services/user.service.ts';
 import { checkTokenForReset, confirmRequestResetPass, forgotPass, loginUser } from '../services/auth.service.ts';
 import passport from 'passport';
 import sendEmail from '../utils/sendEmail.ts';
 import { User } from '../entity/user.entity.ts';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import tryCatch from '../utils/tryCatch.ts';
 import AppError from '../config/appError.ts';
 
@@ -27,12 +27,11 @@ userRouter.post(
       const emailSentResult = await sendEmail(email, 'Email Verification', username, verificationLink);
 
       if (emailSentResult.message === 'email sent successfully') {
-        return res
-          .status(201)
-          .json({
-            user: req.body,
-            message: 'Registration successful. Check your email for verification instructions.',
-          });
+
+        return res.status(201).json({
+          user: req.body,
+          message: 'Check your email for verification instructions.',
+        });
       } else {
         return res.status(500).json({ message: 'Failed to send verification email' });
       }
@@ -49,8 +48,11 @@ userRouter.get('/verify/:token', async (req: Request, res: Response) => {
     if (!token) {
       return res.status(400).json({ message: 'Invalid or missing verification token' });
     }
+    const { email } = jwt.verify(token, process.env.SECRET_KEY) as JwtPayload;
 
-    const user = await findUserByVerificationToken(token);
+    const user = await User.findOne({
+      where: { email, token },
+    });
 
     if (user) {
       if (user.isVerified) {
@@ -60,17 +62,14 @@ userRouter.get('/verify/:token', async (req: Request, res: Response) => {
       const verificationResult = markEmailAsVerified(token);
 
       if (verificationResult) {
-        
         user.isVerified = true;
         user.token = null;
         await user.save();
-
         const authToken = jwt.sign({ userId: user.id }, process.env.SECRET_KEY, {
-          expiresIn: '10h',
+          expiresIn: '1h',
         });
-        return res.status(200).json({ message: 'Email verified. You can now log in.', token: `Bearer ${authToken}` });
 
-       
+        return res.status(200).json({ message: 'Email verified. You can now log in.', token: `Bearer ${authToken}` });
       } else {
         return res.status(500).json({ message: 'Failed to verify email' });
       }
