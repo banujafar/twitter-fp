@@ -1,8 +1,11 @@
 import bcrypt from 'bcrypt';
 import { Router, Request, Response, NextFunction } from 'express';
-import registerUser from '../services/user.service.ts';
+import { registerUser, findUserByVerificationToken, markEmailAsVerified } from '../services/user.service.ts';
 import { checkTokenForReset, confirmRequestResetPass, forgotPass, loginUser } from '../services/auth.service.ts';
 import passport from 'passport';
+import sendEmail from '../utils/sendEmail.ts';
+import { User } from '../entity/user.entity.ts';
+import jwt from 'jsonwebtoken';
 import tryCatch from '../utils/tryCatch.ts';
 import AppError from '../config/appError.ts';
 
@@ -18,10 +21,70 @@ userRouter.post(
     if (typeof token !== 'string') {
       throw new AppError(token.error, 400);
     }
+    try{
 
-    res.status(201).json({ message: 'Registration successful', token: `Bearer ${token}` });
-  }),
+      const redirectUrl = 'http://localhost:5173/';
+      const verificationLink = `http://localhost:5173/auth/verify?token=${token}&redirectUrl=${encodeURIComponent(
+        redirectUrl,
+      )}`;
+  
+      const emailSentResult = await sendEmail(email, 'Email Verification', username, verificationLink);
+  
+      if (emailSentResult.message === 'email sent successfully') {
+        return res
+          .status(201)
+          .json({ user: req.body, message: 'Registration successful. Check your email for verification instructions.' });
+      } else {
+        return res.status(500).json({ message: 'Failed to send verification email' });
+      }
+    } catch (error) {
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+  })
 );
+
+
+
+userRouter.get('/verify/:token', async (req: Request, res: Response) => {
+  try {
+    const { token } = req.params;
+
+    if (!token) {
+      return res.status(400).json({ message: 'Invalid or missing verification token' });
+    }
+
+    const user = await findUserByVerificationToken(token);
+
+    if (user) {
+      if (user.isVerified) {
+        return res.status(200).json({ message: 'Email already verified. You can now log in.' });
+      }
+
+      const verificationResult = markEmailAsVerified(token);
+
+      if (verificationResult) {
+        const authToken = jwt.sign({ userId: user.id }, process.env.SECRET_KEY, {
+          expiresIn: '10h',
+        });
+        // return res.status(200).json({ message: 'Email verified. You can now log in.', token: `Bearer ${authToken}` });
+
+        const redirectUrl = req.query.redirectUrl as string;
+
+        if (redirectUrl) {
+          return res.redirect(302, redirectUrl);
+        } else {
+          return res.status(200).json({ message: 'Email verified. You can now log in.', token: `Bearer ${authToken}` });
+        }
+      } else {
+        return res.status(500).json({ message: 'Failed to verify email' });
+      }
+    } else {
+      return res.status(400).json({ message: 'Invalid or expired verification token' });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 //Login router
 userRouter.post('/login', loginUser);

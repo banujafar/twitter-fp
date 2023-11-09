@@ -38,4 +38,37 @@ const registerUser = async (
   return token;
 };
 
-export default registerUser;
+
+
+async function findUserByVerificationToken(verificationToken) {
+  try {
+    const user = await User.findOne({where: { token: verificationToken }});
+    return user;
+  } catch (error) {
+    console.error('Error while finding user by verification token:', error);
+    return null;
+  }
+}
+
+async function markEmailAsVerified(verificationToken) {
+  try {
+    const user = await User.findOne({ where: { token: verificationToken }  });
+    if (user) {
+      user.isVerified = true;
+      user.token = null;
+      await user.save();
+      return user;
+    }
+  } catch (error) {
+    console.error('Error while marking email as verified:', error);
+    return null;
+  }
+}
+
+
+
+export {
+  registerUser,
+  findUserByVerificationToken,
+  markEmailAsVerified
+};
