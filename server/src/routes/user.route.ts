@@ -21,29 +21,26 @@ userRouter.post(
     if (typeof token !== 'string') {
       throw new AppError(token.error, 400);
     }
-    try{
+    try {
+      const verificationLink = `http://localhost:5173/auth/verify?token=${token}`;
 
-      const redirectUrl = 'http://localhost:5173/';
-      const verificationLink = `http://localhost:5173/auth/verify?token=${token}&redirectUrl=${encodeURIComponent(
-        redirectUrl,
-      )}`;
-  
       const emailSentResult = await sendEmail(email, 'Email Verification', username, verificationLink);
-  
+
       if (emailSentResult.message === 'email sent successfully') {
         return res
           .status(201)
-          .json({ user: req.body, message: 'Registration successful. Check your email for verification instructions.' });
+          .json({
+            user: req.body,
+            message: 'Registration successful. Check your email for verification instructions.',
+          });
       } else {
         return res.status(500).json({ message: 'Failed to send verification email' });
       }
     } catch (error) {
       return res.status(500).json({ message: 'Internal server error' });
     }
-  })
+  }),
 );
-
-
 
 userRouter.get('/verify/:token', async (req: Request, res: Response) => {
   try {
@@ -63,18 +60,17 @@ userRouter.get('/verify/:token', async (req: Request, res: Response) => {
       const verificationResult = markEmailAsVerified(token);
 
       if (verificationResult) {
+        
+        user.isVerified = true;
+        user.token = null;
+        await user.save();
+
         const authToken = jwt.sign({ userId: user.id }, process.env.SECRET_KEY, {
           expiresIn: '10h',
         });
-        // return res.status(200).json({ message: 'Email verified. You can now log in.', token: `Bearer ${authToken}` });
+        return res.status(200).json({ message: 'Email verified. You can now log in.', token: `Bearer ${authToken}` });
 
-        const redirectUrl = req.query.redirectUrl as string;
-
-        if (redirectUrl) {
-          return res.redirect(302, redirectUrl);
-        } else {
-          return res.status(200).json({ message: 'Email verified. You can now log in.', token: `Bearer ${authToken}` });
-        }
+       
       } else {
         return res.status(500).json({ message: 'Failed to verify email' });
       }

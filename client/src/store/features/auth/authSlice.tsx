@@ -5,6 +5,7 @@ const initialState: AuthState = {
   token: null,
   error: null,
   loading: null,
+  user: null
 };
 
 const BASE_URL = 'http://localhost:3000/auth';
@@ -12,6 +13,10 @@ const BASE_URL = 'http://localhost:3000/auth';
 export const registerUser = createAsyncThunk('auth/registerUser', async (userData: IUserRegister) => {
   return fetchWrapper(`${BASE_URL}/register`, 'POST', userData);
 });
+
+export const verifyEmail = createAsyncThunk('auth/verifyEmail', async (verificationToken: string) => {
+  return fetchWrapper(`${BASE_URL}/verify?token=${verificationToken}`, 'GET');
+})
 
 export const loginUser = createAsyncThunk('auth/loginUser', async (userData: IUserLogin) => {
   return fetchWrapper(`${BASE_URL}/login`, 'POST', userData);
@@ -48,12 +53,27 @@ const authSlice = createSlice({
         state.loading = true;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
+        state.loading = false;
         state.token = action.payload.token;
+        state.user = action.payload.user;
         state.error = null;
       })
       .addCase(registerUser.rejected, (state, action) => {
+        state.loading = false;
         state.token = null;
+        state.user = null;
         state.error = action.error.message ?? null;
+      })
+      .addCase(verifyEmail.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(verifyEmail.fulfilled, (state) => {
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(verifyEmail.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'verify failed';
       })
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
