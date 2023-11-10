@@ -48,88 +48,50 @@ const authSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
+    const setPending = (state:any) => {
+      state.loading = true;
+    };
+
+    const setError = (state:any, action:any) => {
+      state.error = action.error.message || null;
+      state.loading = false;
+    };
+
+    const setFulfilled = (state:any, action:any) => {
+      state.error = action.payload?.error?.message || null;
+      state.loading = false;
+    };
+
     builder
-      .addCase(registerUser.pending, (state) => {
-        state.loading = true;
-      })
+      .addCase(registerUser.pending, setPending)
       .addCase(registerUser.fulfilled, (state, action) => {
-        state.loading = false;
-        state.token = action.payload.token;
-        state.user = action.payload.user;
-        state.error = action.payload.error?.message  || null;
+        setFulfilled(state, action);
+        if (!state.error) {
+          state.token = action.payload.token;
+          state.user = action.payload.user;
+        }
       })
-      .addCase(registerUser.rejected, (state, action) => {
-        state.loading = false;
-        state.token = null;
-        state.user = null;
-        state.error = action.error.message ?? null;
-        state.loading = false;
-      })
-      .addCase(verifyEmail.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(verifyEmail.fulfilled, (state,action) => {
-        state.loading = false;
-        state.error = action.payload.error?.message || null;
-      })
-      .addCase(verifyEmail.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message || 'verify failed';
-      })
-      .addCase(loginUser.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(loginUser.fulfilled, (state, action) => {
-        state.error = action.payload.error?.message || null;
-        state.loading = false;
-      })
-      .addCase(loginUser.rejected, (state, action) => {
-        state.error = action.error.message ?? null;
-        state.loading = false;
-      })
-      .addCase(forgotPass.fulfilled, (state, action) => {
-        state.error = action.payload.error.message || null;
-        state.loading = false;
-      })
-      .addCase(forgotPass.rejected, (state, action) => {
-        state.error = action.error.message ?? null;
-        state.loading = false;
-      })
-      .addCase(resetPass.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(resetPass.fulfilled, (state, action) => {
-        state.error = action.payload.error?.message || null;
-        state.loading = false;
-      })
+      .addCase(registerUser.rejected, setError)
+      .addCase(verifyEmail.pending, setPending)
+      .addCase(verifyEmail.fulfilled, setFulfilled)
+      .addCase(verifyEmail.rejected, setError)
+      .addCase(loginUser.pending, setPending)
+      .addCase(loginUser.fulfilled, setFulfilled)
+      .addCase(loginUser.rejected, setError)
+      .addCase(forgotPass.fulfilled, setFulfilled)
+      .addCase(forgotPass.rejected, setError)
+      .addCase(resetPass.pending, setPending)
+      .addCase(resetPass.fulfilled, setFulfilled)
       .addCase(resetPass.rejected, (state, action) => {
+        setError(state, action);
         state.token = null;
-        state.error = action.error.message || 'Reset password Request failed';
-        state.loading = false;
       })
-      .addCase(confirmResetPassword.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(confirmResetPassword.fulfilled, (state, action) => {
-        state.error = action.payload.error.message  || null;
-        state.loading = false;
-      })
-      .addCase(confirmResetPassword.rejected, (state, action) => {
-        state.error = action.error.message || 'Reset passwrod failed';
-        state.loading = false;
-      })
-      .addCase(logoutUser.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(logoutUser.fulfilled, (state, action) => {
-        state.error =action.payload.error?.message  || null;
-        state.loading = false;
-      })
-      .addCase(logoutUser.rejected, (state, action) => {
-        state.error = action.error.message || 'Logout failed';
-        state.loading = false;
-      })
-     
+      .addCase(confirmResetPassword.pending, setPending)
+      .addCase(confirmResetPassword.fulfilled, setFulfilled)
+      .addCase(confirmResetPassword.rejected, setError)
+      .addCase(logoutUser.pending, setPending)
+      .addCase(logoutUser.fulfilled, setFulfilled)
+      .addCase(logoutUser.rejected, setError);
   },
 });
 
