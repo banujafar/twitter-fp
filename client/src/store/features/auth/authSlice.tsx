@@ -19,7 +19,7 @@ export const verifyEmail = createAsyncThunk('auth/verifyEmail', async (verificat
 })
 
 export const loginUser = createAsyncThunk('auth/loginUser', async (userData: IUserLogin) => {
-  return fetchWrapper(`${BASE_URL}/login`, 'POST', userData);
+  return await fetchWrapper(`${BASE_URL}/login`, 'POST', userData);
 });
 
 export const forgotPass = createAsyncThunk('auth/forgotPass', async (email: object) => {
@@ -56,20 +56,21 @@ const authSlice = createSlice({
         state.loading = false;
         state.token = action.payload.token;
         state.user = action.payload.user;
-        state.error = null;
+        state.error = action.payload.error?.message  || null;
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
         state.token = null;
         state.user = null;
         state.error = action.error.message ?? null;
+        state.loading = false;
       })
       .addCase(verifyEmail.pending, (state) => {
         state.loading = true;
       })
-      .addCase(verifyEmail.fulfilled, (state) => {
+      .addCase(verifyEmail.fulfilled, (state,action) => {
         state.loading = false;
-        state.error = null;
+        state.error = action.payload.error?.message || null;
       })
       .addCase(verifyEmail.rejected, (state, action) => {
         state.loading = false;
@@ -78,46 +79,57 @@ const authSlice = createSlice({
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
       })
-      .addCase(loginUser.fulfilled, (state) => {
-        state.error = null;
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.error = action.payload.error?.message || null;
+        state.loading = false;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.error = action.error.message ?? null;
+        state.loading = false;
       })
-      .addCase(forgotPass.fulfilled, (state) => {
-        state.error = null;
+      .addCase(forgotPass.fulfilled, (state, action) => {
+        state.error = action.payload.error.message || null;
+        state.loading = false;
       })
       .addCase(forgotPass.rejected, (state, action) => {
         state.error = action.error.message ?? null;
+        state.loading = false;
       })
       .addCase(resetPass.pending, (state) => {
         state.loading = true;
       })
-      .addCase(resetPass.fulfilled, (state) => {
-        state.error = null;
+      .addCase(resetPass.fulfilled, (state, action) => {
+        state.error = action.payload.error?.message || null;
+        state.loading = false;
       })
       .addCase(resetPass.rejected, (state, action) => {
         state.token = null;
         state.error = action.error.message || 'Reset password Request failed';
+        state.loading = false;
       })
       .addCase(confirmResetPassword.pending, (state) => {
         state.loading = true;
       })
-      .addCase(confirmResetPassword.fulfilled, (state) => {
-        state.error = null;
+      .addCase(confirmResetPassword.fulfilled, (state, action) => {
+        state.error = action.payload.error.message  || null;
+        state.loading = false;
       })
       .addCase(confirmResetPassword.rejected, (state, action) => {
         state.error = action.error.message || 'Reset passwrod failed';
+        state.loading = false;
       })
       .addCase(logoutUser.pending, (state) => {
         state.loading = true;
       })
-      .addCase(logoutUser.fulfilled, (state) => {
-        state.error = null;
+      .addCase(logoutUser.fulfilled, (state, action) => {
+        state.error =action.payload.error?.message  || null;
+        state.loading = false;
       })
       .addCase(logoutUser.rejected, (state, action) => {
         state.error = action.error.message || 'Logout failed';
-      });
+        state.loading = false;
+      })
+     
   },
 });
 

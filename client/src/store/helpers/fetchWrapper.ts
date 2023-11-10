@@ -8,16 +8,14 @@ const fetchWrapper = async (url: string, method: string, body?: object) => {
       },
       body: body ? JSON.stringify(body) : undefined,
     });
-
-    if (!response.ok) {
-      throw new Error(`${method} failed`);
-    }
     const data = await response.json();
-    console.log(data);
+    if (!response.ok) {   
+      throw new Error(`${data.message}`);
+    }
     return data;
   } catch (error) {
     console.error(error);
-    throw error;
+    return {error};
   }
 };
 export default fetchWrapper;

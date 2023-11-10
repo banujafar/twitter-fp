@@ -51,10 +51,11 @@ AppDataSource.initialize()
     console.log(err);
     console.log('There is an error with connection');
   });
-
-app.use('/auth', userRouter);
+  
 app.use('/checkAuth', checkAuthMiddleware);
+app.use('/auth', userRouter);
 app.use(errorHandler)
+
 app.listen('3000', () => {
   console.log('Server is up on 3000');
 });

@@ -9,27 +9,36 @@ import sendEmail from '../utils/sendEmail.ts';
 import tryCatch from '../utils/tryCatch.ts';
 import AppError from '../config/appError.ts';
 
-const loginUser = tryCatch(async (req: Request, res: Response, next: NextFunction) => {
-  await passport.authenticate(
+const loginUser = async (req: Request, res: Response, next: NextFunction) => {
+  passport.authenticate(
     ['local-email', 'local-username'],
-    (err: object, user: User, info: { message: string }) => {
-      if (!user) {
-        throw new AppError('Incorrect credentials', 400);
-      }
+    async (err: {message:string,statusCode:number}, user: User, info: { message: string }) => {
+      try {
 
-      req.logIn(user, async (err) => {
-        if (req.body.remember) {
-          req.session.cookie.originalMaxAge = 7 * 24 * 60 * 60 * 1000;
+        if (!user) {
+          throw new AppError(err.message,err.statusCode);
         }
-        if (err) {
-          next(err);
-          throw new AppError('Login failed', 500);
-        }
-        return res.status(200).json({ message: 'Login Successful' });
-      });
-    },
+
+        req.logIn(user, async (err) => {
+          if (req.body.remember) {
+            req.session.cookie.originalMaxAge = 7 * 24 * 60 * 60 * 1000;
+          }
+          if (err) {
+            throw new AppError(err.message,err.statusCode);
+          }
+          return res.status(200).json({ message: 'Login Successful' });
+        });
+      } catch (error) {
+        // Handle any errors here
+        next(error);
+      }
+    }
+   
   )(req, res, next);
-});
+};
+
+export default loginUser;
+
 
 const forgotPass = async (email: string) => {
   if (!validator.isEmail(email)) {

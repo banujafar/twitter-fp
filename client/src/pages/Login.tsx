@@ -8,7 +8,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { openModal } from '../store/features/modal/modalSlice';
 import { loginUser } from '../store/features/auth/authSlice';
 import { AppDispatch, RootState } from '../store';
-import TwitterLoader from '../components/loaders/twitterLoader';
+import TwitterLoader from '../components/loaders/TwitterLoader';
+
 interface MyFormValues {
   password: string;
   email: string;
@@ -18,7 +19,7 @@ const Login: React.FC<object> = () => {
   const initialValues: MyFormValues = { email: '', password: '' };
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const loading = useSelector((state: RootState) => state.auth.loading);
+  const  loading  = useSelector((state: RootState) => state.auth.loading);
 
   const handleOpenModal = () => {
     dispatch(openModal());
@@ -27,12 +28,11 @@ const Login: React.FC<object> = () => {
     //handle google login here
     window.open('http://localhost:3000/auth/google/callback'), '_self';
   };
+
   if (loading) {
-    return(
-     <TwitterLoader />
-    )
-     
+    return <TwitterLoader />;
   }
+
   return (
     <div className="flex">
       <Aside />
@@ -46,7 +46,7 @@ const Login: React.FC<object> = () => {
               initialValues={initialValues}
               onSubmit={async (values, actions) => {
                 const result = await dispatch(loginUser(values));
-                if (result) {
+                if (!result.payload.error) {
                   navigate('/');
                 } else {
                   actions.setFieldError('email', 'Email or Password is incorrect');

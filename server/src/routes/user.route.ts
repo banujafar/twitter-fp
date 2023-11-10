@@ -86,14 +86,10 @@ userRouter.post('/login', loginUser);
 //Forgot password
 userRouter.post(
   '/forgotpass',
-  tryCatch((req: Request, res: Response, next) => {
+  tryCatch(async (req: Request, res: Response, next) => {
     const { email } = req.body;
-    const result = forgotPass(email);
-    if (result) {
-      return res.status(200).json({ message: 'Email sent successfully' });
-    } else {
-      return res.status(400).send({ message: 'No account found' });
-    }
+    
+    await forgotPass(email).then(() => res.status(200).json({ message: 'Email sent successfully' }));
   }),
 );
 
@@ -104,7 +100,7 @@ userRouter.get(
     const id = +req.params.id;
 
     await checkTokenForReset({ id, token }).then(() => {
-      res.status(200).json('Password reset successful');
+      res.status(200).json('Password reset page has been retrieved successfully');
     });
   }),
 );
