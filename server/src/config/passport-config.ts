@@ -14,11 +14,11 @@ const passportConfig = (passport: PassportStatic) => {
         User.findOneBy({ email })
           .then((user) => {
             if (!user) {
-              return done(null, false, { message: 'User not found' });
+              return done({ isOperational: true, statusCode: 404, message: 'User not found' });
             }
 
             if (email && !validator.isEmail(email)) {
-              return done(null, false, { message: 'Incorrect email' });
+              return done({ isOperational: true, statusCode: 400, message: 'Incorrect email' });
             }
 
             bcrypt.compare(password, user.password, (err, result) => {
@@ -28,7 +28,7 @@ const passportConfig = (passport: PassportStatic) => {
               if (result) {
                 return done(null, user);
               } else {
-                return done(null, false, { message: 'Wrong password' });
+                return done({ isOperational: true, statusCode: 401, message: 'Wrong password' });
               }
             });
           })

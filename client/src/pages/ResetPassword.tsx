@@ -5,7 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../store';
 import { confirmResetPassword, resetPass } from '../store/features/auth/authSlice';
-import TwitterLoader from '../components/loaders/twitterLoader';
+import TwitterLoader from '../components/loaders/TwitterLoader';
 
 const ResetPassword = () => {
   //TODO:WILL BE RECHANGED WITH LOADER
