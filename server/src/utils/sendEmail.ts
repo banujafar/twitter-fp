@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 
+//Send email to user
 const sendEmail = async (email:string, subject:string, username:string, link:string, text:string) => {
   console.log(email);
   try {

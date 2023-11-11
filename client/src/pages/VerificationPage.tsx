@@ -13,9 +13,10 @@ const VerificationPage: React.FC = () => {
   const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
   const navigate = useNavigate();
   useEffect(() => {
-    const checkToken = async () => {
+    const getVerifyEmail = async () => {
       try {
         const result = await dispatch(verifyEmail(token));
+        console.log(result.payload);
         if (!result.payload.error) {
           setVerificationStatus('Verification successful! Redirecting....');
           setTimeout(() => {
@@ -29,7 +30,7 @@ const VerificationPage: React.FC = () => {
       }
     };
 
-    checkToken();
+    getVerifyEmail();
   }, [dispatch, token]);
 
   if (loading) {

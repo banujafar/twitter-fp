@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { registerUser } from '../services/user.service.ts';
+import { markEmailAsVerified, registerUser } from '../services/user.service.ts';
 import {
   checkTokenForReset,
   confirmRequestResetPass,
@@ -13,6 +13,7 @@ import AppError from '../config/appError.ts';
 import { Token } from '../entity/token.entity.ts';
 
 const userRouter = Router();
+
 //Register router
 userRouter.post(
   '/register',
@@ -28,47 +29,24 @@ userRouter.post(
           });
         })
         .catch(() => {
-          return res.status(500).json({ message: 'Failed to send verification email' });
+          throw new AppError('Failed to send verification email', 500);
         });
     });
   }),
 );
 
-userRouter.get(
-  '/verify',
-  tryCatch(async (req: Request, res: Response) => {
-    const token = String(req.query.token);
-
-    if (!token) {
-      return res.status(400).json({ message: 'Invalid or missing verification token' });
-    }
-
-    const userToken = await Token.findOneBy({ token });
-
-    if (!userToken) {
-      console.log(userToken);
-      return res.status(400).json({ message: 'Invalid or expired verification token' });
-    }
-
-    const user = await User.findOne({
-      where: { id: userToken.userId },
-    });
-
-    if (user) {
-      if (user.isVerified) {
-        return res.status(200).json({ message: 'Email already verified. You can now log in.' });
-      }
-      user.isVerified = true;
-      await user.save();
-      return res.status(200).json({ message: 'Email verified. You can now log in.' });
-    } else {
-      return res.status(500).json({ message: 'Failed to verify email' });
-    }
-  }),
-);
+//Get Request route for confirm email
+userRouter.get('/verify', tryCatch(async (req: Request, res: Response) => {
+  const token = String(req.query.token);
+  await markEmailAsVerified(token).then(async (result) => {
+    res.status(200).json('email verified');
+    await Token.delete({ token: token });
+  });
+}));
 
 //Login router
 userRouter.post('/login', loginUser);
+
 //Forgot password
 userRouter.post(
   '/forgotpass',
@@ -78,6 +56,7 @@ userRouter.post(
   }),
 );
 
+//Get reset password link
 userRouter.get(
   '/reset_password/:id/:token',
   tryCatch(async (req, res) => {
@@ -90,6 +69,7 @@ userRouter.get(
   }),
 );
 
+//Send new password
 userRouter.post(
   '/reset_password/:id/:token',
   tryCatch(async (req, res) => {
@@ -102,6 +82,7 @@ userRouter.post(
   }),
 );
 
+//Login with Google
 userRouter.get('/google', (req, res, next) => {
   passport.authenticate('google', {
     scope: ['email', 'profile'],
@@ -118,6 +99,7 @@ userRouter.get('/google/callback', (req, res, next) => {
   })(req, res, next);
 });
 
+//Logout process route
 userRouter.post(
   '/logout',
   tryCatch((req: Request, res: Response, next: NextFunction) => {

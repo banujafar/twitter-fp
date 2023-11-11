@@ -6,6 +6,8 @@ import { PassportStatic } from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth2';
 import { Request } from 'express';
 import AppError from './appError.ts';
+
+//Login user with email or username with using passport local strategy
 const passportConfig = (passport: PassportStatic) => {
   passport.use(
     'local-email',
@@ -64,7 +66,7 @@ const passportConfig = (passport: PassportStatic) => {
     ),
   );
 
-  //Login with google
+  //Login with google strategy
   passport.use(
     new GoogleStrategy(
       {
