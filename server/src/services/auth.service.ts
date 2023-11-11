@@ -9,29 +9,35 @@ import sendEmail from '../utils/sendEmail.ts';
 import tryCatch from '../utils/tryCatch.ts';
 import AppError from '../config/appError.ts';
 
-const loginUser = tryCatch(async (req: Request, res: Response, next: NextFunction) => {
-  await passport.authenticate(
+const loginUser = async (req: Request, res: Response, next: NextFunction) => {
+  passport.authenticate(
     ['local-email', 'local-username'],
-    (err: object, user: User, info: { message: string }) => {
-      if (!user) {
-        throw new AppError('Incorrect credentials', 400);
-      }
+    async (err: { message: string; statusCode: number }, user: User, info: { message: string }) => {
+      try {
+        if (!user) {
+          throw new AppError(err.message, err.statusCode);
+        }
 
-      req.logIn(user, async (err) => {
-        if (req.body.remember) {
-          req.session.cookie.originalMaxAge = 7 * 24 * 60 * 60 * 1000;
-        }
-        if (err) {
-          next(err);
-          throw new AppError('Login failed', 500);
-        }
-        return res.status(200).json({ message: 'Login Successful' });
-      });
+        req.logIn(user, async (err) => {
+          if (req.body.remember) {
+            req.session.cookie.originalMaxAge = 7 * 24 * 60 * 60 * 1000;
+          }
+          if (err) {
+            throw new AppError(err.message, err.statusCode);
+          }
+          return res.status(200).json({ message: 'Login Successful' });
+        });
+      } catch (error) {
+        // Handle any errors here
+        next(error);
+      }
     },
   )(req, res, next);
-});
+};
 
-const forgotPass = async (email: string) => {
+export default loginUser;
+
+const verificationwithLink = async (email: string) => {
   if (!validator.isEmail(email)) {
     throw new AppError('Invalid Email Format', 400);
   }
@@ -56,10 +62,13 @@ const forgotPass = async (email: string) => {
   newToken.createdAt = new Date();
 
   await newToken.save();
-
-  const link = `http://localhost:5173/reset_password/${user.id}/${resetToken}`;
-
-  sendEmail(user.email, 'Password Reset Request', user.username, link);
+  if (!user.isVerified) {
+    const link = `http://localhost:5173/auth/verify?token=${hash}`;
+    sendEmail(user.email, 'Password Reset Request', user.username, link);
+  } else {
+    const link = `http://localhost:5173/reset_password/${user.id}/${resetToken}`;
+    sendEmail(user.email, 'Password Reset Request', user.username, link);
+  }
 };
 
 function isExpired(createdAt) {
@@ -109,4 +118,4 @@ const confirmRequestResetPass = async ({ id, password, confirm_password }) => {
   await user.save();
 };
 
-export { loginUser, forgotPass, checkTokenForReset, confirmRequestResetPass };
+export { loginUser, verificationwithLink, checkTokenForReset, confirmRequestResetPass };

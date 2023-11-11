@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import axios from 'axios';
+import TwitterLoader from '../components/loaders/TwitterLoader';
 const ProtectedRoute = () => {
   const [authenticated, setAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -29,8 +30,7 @@ const ProtectedRoute = () => {
   }, []);
 
   if (loading) {
-    // Display a loading indicator, or you can return null
-    return <div>Loading...</div>;
+    return <TwitterLoader/>
   }
 
   return authenticated ? <Outlet /> : <Navigate to="/login" />;

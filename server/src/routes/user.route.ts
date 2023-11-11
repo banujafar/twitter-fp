@@ -1,13 +1,16 @@
-import bcrypt from 'bcrypt';
 import { Router, Request, Response, NextFunction } from 'express';
-import { registerUser, markEmailAsVerified } from '../services/user.service.ts';
-import { checkTokenForReset, confirmRequestResetPass, forgotPass, loginUser } from '../services/auth.service.ts';
+import { registerUser } from '../services/user.service.ts';
+import {
+  checkTokenForReset,
+  confirmRequestResetPass,
+  verificationwithLink,
+  loginUser
+} from '../services/auth.service.ts';
 import passport from 'passport';
-import sendEmail from '../utils/sendEmail.ts';
 import { User } from '../entity/user.entity.ts';
-import jwt, { JwtPayload } from 'jsonwebtoken';
 import tryCatch from '../utils/tryCatch.ts';
 import AppError from '../config/appError.ts';
+import { Token } from '../entity/token.entity.ts';
 
 const userRouter = Router();
 //Register router
@@ -16,84 +19,61 @@ userRouter.post(
   tryCatch(async (req: Request, res: Response) => {
     const { username, email, password } = req.body;
 
-    const token = await registerUser(username, email, password);
-
-    if (typeof token !== 'string') {
-      throw new AppError(token.error, 400);
-    }
-    try {
-      const verificationLink = `http://localhost:5173/auth/verify?token=${token}`;
-
-      const emailSentResult = await sendEmail(email, 'Email Verification', username, verificationLink);
-
-      if (emailSentResult.message === 'email sent successfully') {
-
-        return res.status(201).json({
-          user: req.body,
-          message: 'Check your email for verification instructions.',
+    await registerUser(username, email, password).then(async () => {
+      await verificationwithLink(email)
+        .then(() => {
+          return res.status(201).json({
+            user: req.body,
+            message: 'Check your email for verification instructions.',
+          });
+        })
+        .catch(() => {
+          return res.status(500).json({ message: 'Failed to send verification email' });
         });
-      } else {
-        return res.status(500).json({ message: 'Failed to send verification email' });
-      }
-    } catch (error) {
-      return res.status(500).json({ message: 'Internal server error' });
-    }
+    });
   }),
 );
 
-userRouter.get('/verify/:token', async (req: Request, res: Response) => {
-  try {
-    const { token } = req.params;
+userRouter.get(
+  '/verify',
+  tryCatch(async (req: Request, res: Response) => {
+    const token = String(req.query.token);
 
     if (!token) {
       return res.status(400).json({ message: 'Invalid or missing verification token' });
     }
-    const { email } = jwt.verify(token, process.env.SECRET_KEY) as JwtPayload;
+
+    const userToken = await Token.findOneBy({ token });
+
+    if (!userToken) {
+      return res.status(400).json({ message: 'Invalid or expired verification token' });
+    }
 
     const user = await User.findOne({
-      where: { email, token },
+      where: { id: userToken.userId },
     });
 
     if (user) {
       if (user.isVerified) {
         return res.status(200).json({ message: 'Email already verified. You can now log in.' });
       }
-
-      const verificationResult = markEmailAsVerified(token);
-
-      if (verificationResult) {
-        user.isVerified = true;
-        user.token = null;
-        await user.save();
-        const authToken = jwt.sign({ userId: user.id }, process.env.SECRET_KEY, {
-          expiresIn: '1h',
-        });
-
-        return res.status(200).json({ message: 'Email verified. You can now log in.', token: `Bearer ${authToken}` });
-      } else {
-        return res.status(500).json({ message: 'Failed to verify email' });
-      }
+      user.isVerified = true;
+      await user.save();
+      return res.status(200).json({ message: 'Email verified. You can now log in.' });
     } else {
-      return res.status(400).json({ message: 'Invalid or expired verification token' });
+      return res.status(500).json({ message: 'Failed to verify email' });
     }
-  } catch (error) {
-    return res.status(500).json({ message: 'Internal server error' });
-  }
-});
+  }),
+);
 
 //Login router
 userRouter.post('/login', loginUser);
 //Forgot password
 userRouter.post(
   '/forgotpass',
-  tryCatch((req: Request, res: Response, next) => {
+  tryCatch(async (req: Request, res: Response, next) => {
     const { email } = req.body;
-    const result = forgotPass(email);
-    if (result) {
-      return res.status(200).json({ message: 'Email sent successfully' });
-    } else {
-      return res.status(400).send({ message: 'No account found' });
-    }
+    await verificationwithLink(email).then(() => res.status(200).json({ message: 'Email sent successfully' }));
   }),
 );
 
@@ -104,7 +84,7 @@ userRouter.get(
     const id = +req.params.id;
 
     await checkTokenForReset({ id, token }).then(() => {
-      res.status(200).json('Password reset successful');
+      res.status(200).json('Password reset page has been retrieved successfully');
     });
   }),
 );
@@ -121,22 +101,23 @@ userRouter.post(
   }),
 );
 
-userRouter.get(
-  '/google',
+userRouter.get('/google',  (req, res, next) => {
   passport.authenticate('google', {
     scope: ['email', 'profile'],
     successRedirect: process.env.CLIENT_URL,
-    failureRedirect: '/login',
-  }),
-);
+    failureRedirect: `${process.env.CLIENT_URL}login`,
+  })(req, res, next);
+})
 
 userRouter.get(
   '/google/callback',
-  passport.authenticate('google', {
-    scope: ['email', 'profile'],
-    successRedirect: process.env.CLIENT_URL,
-    failureRedirect: '/login',
-  }),
+  (req, res, next) => {
+    passport.authenticate('google', {
+      scope: ['email', 'profile'],
+      successRedirect: process.env.CLIENT_URL,
+      failureRedirect: `${process.env.CLIENT_URL}login`,
+    })(req, res, next);
+  }
 );
 
 userRouter.post(

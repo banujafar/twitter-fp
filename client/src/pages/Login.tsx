@@ -3,12 +3,13 @@ import { Formik, Form, Field } from 'formik';
 import Aside from '../components/ui/Aside';
 import { BsTwitter } from 'react-icons/bs';
 import { FcGoogle } from 'react-icons/fc';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { openModal } from '../store/features/modal/modalSlice';
 import { loginUser } from '../store/features/auth/authSlice';
 import { AppDispatch, RootState } from '../store';
-import TwitterLoader from '../components/loaders/twitterLoader';
+import TwitterLoader from '../components/loaders/TwitterLoader';
+
 interface MyFormValues {
   password: string;
   email: string;
@@ -19,7 +20,8 @@ const Login: React.FC<object> = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const loading = useSelector((state: RootState) => state.auth.loading);
-
+  const [searchParams] = useSearchParams();
+  const googleErrorMsg = searchParams.get('error');
   const handleOpenModal = () => {
     dispatch(openModal());
   };
@@ -27,12 +29,11 @@ const Login: React.FC<object> = () => {
     //handle google login here
     window.open('http://localhost:3000/auth/google/callback'), '_self';
   };
+
   if (loading) {
-    return(
-     <TwitterLoader />
-    )
-     
+    return <TwitterLoader />;
   }
+
   return (
     <div className="flex">
       <Aside />
@@ -46,7 +47,7 @@ const Login: React.FC<object> = () => {
               initialValues={initialValues}
               onSubmit={async (values, actions) => {
                 const result = await dispatch(loginUser(values));
-                if (result) {
+                if (!result.payload.error) {
                   navigate('/');
                 } else {
                   actions.setFieldError('email', 'Email or Password is incorrect');
@@ -54,14 +55,18 @@ const Login: React.FC<object> = () => {
                 }
               }}
             >
+               
               <Form className="flex flex-col gap-4 w-3/4">
+              {googleErrorMsg && <span className="mt-20 text-red-500 px-4">{googleErrorMsg}</span>}
+
                 <Link
                   to="/"
-                  className="bg-white mt-20 py-2 px-3 rounded-2xl w-full focus:outline-none flex gap-2 items-center font-semibold"
+                  className="bg-white  py-2 px-3 rounded-2xl w-full focus:outline-none flex gap-2 items-center font-semibold"
                 >
                   <FcGoogle size={'25'} />
                   <span onClick={handleLoginwithGoogle}>Continue with Google</span>
                 </Link>
+                
                 <Field
                   id="email"
                   name="email"
@@ -90,6 +95,7 @@ const Login: React.FC<object> = () => {
                 >
                   Log in
                 </button>
+
                 <div className="flex gap-2 px-2">
                   <span className="text-primaryGray">Don't have an account? </span>
                   <Link to="/register" className=" text-blue-500">
