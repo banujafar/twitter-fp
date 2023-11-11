@@ -12,11 +12,10 @@ import AppError from '../config/appError.ts';
 const loginUser = async (req: Request, res: Response, next: NextFunction) => {
   passport.authenticate(
     ['local-email', 'local-username'],
-    async (err: {message:string,statusCode:number}, user: User, info: { message: string }) => {
+    async (err: { message: string; statusCode: number }, user: User, info: { message: string }) => {
       try {
-
         if (!user) {
-          throw new AppError(err.message,err.statusCode);
+          throw new AppError(err.message, err.statusCode);
         }
 
         req.logIn(user, async (err) => {
@@ -24,7 +23,7 @@ const loginUser = async (req: Request, res: Response, next: NextFunction) => {
             req.session.cookie.originalMaxAge = 7 * 24 * 60 * 60 * 1000;
           }
           if (err) {
-            throw new AppError(err.message,err.statusCode);
+            throw new AppError(err.message, err.statusCode);
           }
           return res.status(200).json({ message: 'Login Successful' });
         });
@@ -32,15 +31,13 @@ const loginUser = async (req: Request, res: Response, next: NextFunction) => {
         // Handle any errors here
         next(error);
       }
-    }
-   
+    },
   )(req, res, next);
 };
 
 export default loginUser;
 
-
-const forgotPass = async (email: string) => {
+const verificationwithLink = async (email: string) => {
   if (!validator.isEmail(email)) {
     throw new AppError('Invalid Email Format', 400);
   }
@@ -65,10 +62,13 @@ const forgotPass = async (email: string) => {
   newToken.createdAt = new Date();
 
   await newToken.save();
-
-  const link = `http://localhost:5173/reset_password/${user.id}/${resetToken}`;
-
-  sendEmail(user.email, 'Password Reset Request', user.username, link);
+  if (!user.isVerified) {
+    const link = `http://localhost:5173/auth/verify?token=${hash}`;
+    sendEmail(user.email, 'Password Reset Request', user.username, link);
+  } else {
+    const link = `http://localhost:5173/reset_password/${user.id}/${resetToken}`;
+    sendEmail(user.email, 'Password Reset Request', user.username, link);
+  }
 };
 
 function isExpired(createdAt) {
@@ -118,4 +118,4 @@ const confirmRequestResetPass = async ({ id, password, confirm_password }) => {
   await user.save();
 };
 
-export { loginUser, forgotPass, checkTokenForReset, confirmRequestResetPass };
+export { loginUser, verificationwithLink, checkTokenForReset, confirmRequestResetPass };

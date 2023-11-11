@@ -19,7 +19,8 @@ const ResetPassword = () => {
     const checkToken = async () => {
       try {
         const result = await dispatch(resetPass({ id, token }));
-        if (result.payload) {
+        console.log(result.payload)
+        if (!result.payload.error) {
           setLoading(false);
         } else {
           setLoading(false);

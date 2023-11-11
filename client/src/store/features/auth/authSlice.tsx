@@ -14,7 +14,7 @@ export const registerUser = createAsyncThunk('auth/registerUser', async (userDat
   return fetchWrapper(`${BASE_URL}/register`, 'POST', userData);
 });
 
-export const verifyEmail = createAsyncThunk('auth/verifyEmail', async (verificationToken: string) => {
+export const verifyEmail = createAsyncThunk('auth/verifyEmail', async (verificationToken: string|null) => {
   return fetchWrapper(`${BASE_URL}/verify?token=${verificationToken}`, 'GET');
 })
 
