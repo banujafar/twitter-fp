@@ -37,7 +37,7 @@ const loginUser = async (req: Request, res: Response, next: NextFunction) => {
 
 export default loginUser;
 
-const verificationwithLink = async (email: string) => {
+const verificationWithLink = async (email: string) => {
   if (!validator.isEmail(email)) {
     throw new AppError('Invalid Email Format', 400);
   }
@@ -64,7 +64,7 @@ const verificationwithLink = async (email: string) => {
   await newToken.save();
   if (!user.isVerified) {
     const link = `http://localhost:5173/auth/verify?token=${hash}`;
-    sendEmail(user.email, 'Password Reset Request', user.username, link);
+    sendEmail(user.email, 'Verify Email Address', user.username, link);
   } else {
     const link = `http://localhost:5173/reset_password/${user.id}/${resetToken}`;
     sendEmail(user.email, 'Password Reset Request', user.username, link);
@@ -118,4 +118,4 @@ const confirmRequestResetPass = async ({ id, password, confirm_password }) => {
   await user.save();
 };
 
-export { loginUser, verificationwithLink, checkTokenForReset, confirmRequestResetPass };
+export { loginUser, verificationWithLink, checkTokenForReset, confirmRequestResetPass };

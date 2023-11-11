@@ -3,8 +3,8 @@ import { registerUser } from '../services/user.service.ts';
 import {
   checkTokenForReset,
   confirmRequestResetPass,
-  verificationwithLink,
-  loginUser
+  verificationWithLink,
+  loginUser,
 } from '../services/auth.service.ts';
 import passport from 'passport';
 import { User } from '../entity/user.entity.ts';
@@ -20,7 +20,7 @@ userRouter.post(
     const { username, email, password } = req.body;
 
     await registerUser(username, email, password).then(async () => {
-      await verificationwithLink(email)
+      await verificationWithLink(email)
         .then(() => {
           return res.status(201).json({
             user: req.body,
@@ -46,6 +46,7 @@ userRouter.get(
     const userToken = await Token.findOneBy({ token });
 
     if (!userToken) {
+      console.log(userToken);
       return res.status(400).json({ message: 'Invalid or expired verification token' });
     }
 
@@ -73,7 +74,7 @@ userRouter.post(
   '/forgotpass',
   tryCatch(async (req: Request, res: Response, next) => {
     const { email } = req.body;
-    await verificationwithLink(email).then(() => res.status(200).json({ message: 'Email sent successfully' }));
+    await verificationWithLink(email).then(() => res.status(200).json({ message: 'Email sent successfully' }));
   }),
 );
 
@@ -101,24 +102,21 @@ userRouter.post(
   }),
 );
 
-userRouter.get('/google',  (req, res, next) => {
+userRouter.get('/google', (req, res, next) => {
   passport.authenticate('google', {
     scope: ['email', 'profile'],
     successRedirect: process.env.CLIENT_URL,
     failureRedirect: `${process.env.CLIENT_URL}login`,
   })(req, res, next);
-})
+});
 
-userRouter.get(
-  '/google/callback',
-  (req, res, next) => {
-    passport.authenticate('google', {
-      scope: ['email', 'profile'],
-      successRedirect: process.env.CLIENT_URL,
-      failureRedirect: `${process.env.CLIENT_URL}login`,
-    })(req, res, next);
-  }
-);
+userRouter.get('/google/callback', (req, res, next) => {
+  passport.authenticate('google', {
+    scope: ['email', 'profile'],
+    successRedirect: process.env.CLIENT_URL,
+    failureRedirect: `${process.env.CLIENT_URL}login`,
+  })(req, res, next);
+});
 
 userRouter.post(
   '/logout',
