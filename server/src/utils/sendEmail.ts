@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 
-const sendEmail = async (email:string, subject:string, username:string, link:string) => {
+const sendEmail = async (email:string, subject:string, username:string, link:string, text:string) => {
   console.log(email);
   try {
     const transporter = nodemailer.createTransport({
@@ -19,7 +19,7 @@ const sendEmail = async (email:string, subject:string, username:string, link:str
       from: process.env.EMAIL_USER,
       to: email,
       subject: subject,
-      html: `Hi ${username},<br/>Please click <a href="${link}">this link</a> to reset your password.`,
+      html: `Hi ${username},<br/>Please click <a href="${link}">this link</a> ${text}.`,
     });
     return { message: 'email sent successfully' };
   } catch (error) {
