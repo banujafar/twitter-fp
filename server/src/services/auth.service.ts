@@ -37,7 +37,7 @@ const loginUser = async (req: Request, res: Response, next: NextFunction) => {
 
 export default loginUser;
 
-const verificationwithLink = async (email: string) => {
+const verificationWithLink = async (email: string) => {
   if (!validator.isEmail(email)) {
     throw new AppError('Invalid Email Format', 400);
   }
@@ -118,4 +118,4 @@ const confirmRequestResetPass = async ({ id, password, confirm_password }) => {
   await user.save();
 };
 
-export { loginUser, verificationwithLink, checkTokenForReset, confirmRequestResetPass };
+export { loginUser, verificationWithLink, checkTokenForReset, confirmRequestResetPass };
