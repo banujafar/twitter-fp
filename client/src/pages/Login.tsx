@@ -77,6 +77,7 @@ const Login: React.FC<object> = () => {
                   id="password"
                   name="password"
                   placeholder="Password"
+                  type='password'
                   className="w-full px-3 py-2 border rounded-2xl focus:outline-none focus:border-blue-500"
                 />
                 <div className="text-white flex gap-2 xs:text-xs sm:text-sm  px-2">

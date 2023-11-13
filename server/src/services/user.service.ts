@@ -1,14 +1,12 @@
-import { User } from "../entity/user.entity.ts";
-import bcrypt from "bcrypt";
-import validator from "validator";
+import { User } from '../entity/user.entity.ts';
+import bcrypt from 'bcrypt';
+import validator from 'validator';
 //import jwt from "jsonwebtoken";
-import AppError from "../config/appError.ts";
+import AppError from '../config/appError.ts';
+import { Token } from '../entity/token.entity.ts';
 
-const registerUser = async (
-  username: string,
-  email: string,
-  password: string
-): Promise<string | { error: string }> => {
+//Register new user and save  to the database  with default not verified status
+const registerUser = async (username: string, email: string, password: string): Promise<string | { error: string }> => {
   if (!username || !email || !password) {
     throw new AppError('Missing credentials', 400);
   }
@@ -28,43 +26,49 @@ const registerUser = async (
   // const verificationToken = jwt.sign({ email }, process.env.SECRET_KEY, {
   //   expiresIn: "1h",
   // });
-  
+
   const user = new User();
   user.email = email;
   user.username = username;
   user.password = await bcrypt.hash(password, 10);
-  user.isVerified = false
+  user.isVerified = false;
   //user.token = verificationToken;
   await user.save();
   return 'Registration successful';
 
-
-
   //return user.token;
 };
 
+//Check if user email is verified after register
+async function markEmailAsVerified(token) {
+  if (!token) {
+    throw new AppError('Invalid or missing verification token', 400);
+  }
 
+  const userToken = await Token.findOneBy({ token });
 
-// async function markEmailAsVerified(verificationToken) {
-//   try {
-//     const user = await User.findOne({ where: { token: verificationToken }  });
-//     console.log(user)
-//     if (user) {
-//       user.isVerified = true;
-//       user.token = null;
-//       await user.save();
-      
-//       return user;
-//     }
-//   } catch (error) {
-//     console.error('Error while marking email as verified:', error);
-//     return error;
-//   }
-// }
+  if (!userToken) {
+    console.log(userToken);
+    throw new AppError('Invalid or expired verification token', 400);
+  }
 
+  const user = await User.findOne({
+    where: { id: userToken.userId },
+  });
 
+  if (user) {
+    if (user.isVerified) {
+      return { message: 'Email already verified. You can now log in.' };
+    }
+    user.isVerified = true;
+    await user.save();
+    return { message: 'Email verified. You can now log in.' };
+  } else {
+    throw new AppError('Failed to verify email', 500);
+  }
+}
 
 export {
   registerUser,
-  //markEmailAsVerified
+  markEmailAsVerified
 };

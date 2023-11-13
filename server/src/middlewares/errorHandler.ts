@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+//Error handler middleware
 const errorHandler = (error, req: Request, res: Response, next: NextFunction) => {
   console.log('Error handler middleware called:', error); 
   if (error.isOperational) {
@@ -15,7 +16,5 @@ const errorHandler = (error, req: Request, res: Response, next: NextFunction) =>
       message: 'Internal Server Error',
     });
   }
- 
- // return res.status(400).send(error.message)
 };
 export default errorHandler ;

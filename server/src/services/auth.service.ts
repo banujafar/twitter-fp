@@ -6,9 +6,9 @@ import validator from 'validator';
 import { Token } from '../entity/token.entity.ts';
 import crypto from 'crypto';
 import sendEmail from '../utils/sendEmail.ts';
-import tryCatch from '../utils/tryCatch.ts';
 import AppError from '../config/appError.ts';
 
+//Make a user's login attempt using the provided email and password or username and password
 const loginUser = async (req: Request, res: Response, next: NextFunction) => {
   passport.authenticate(
     ['local-email', 'local-username'],
@@ -28,16 +28,15 @@ const loginUser = async (req: Request, res: Response, next: NextFunction) => {
           return res.status(200).json({ message: 'Login Successful' });
         });
       } catch (error) {
-        // Handle any errors here
         next(error);
       }
     },
   )(req, res, next);
 };
 
-export default loginUser;
 
-const verificationwithLink = async (email: string) => {
+//handling verification and password reset processes
+const verificationWithLink = async (email: string) => {
   if (!validator.isEmail(email)) {
     throw new AppError('Invalid Email Format', 400);
   }
@@ -71,6 +70,7 @@ const verificationwithLink = async (email: string) => {
   }
 };
 
+//Check expiration status of Token for reset password process
 function isExpired(createdAt) {
   const currentTime = new Date().getTime() / 1000;
   const expiredTime = new Date(createdAt).getTime() / 1000 + 300;
@@ -102,6 +102,7 @@ const checkTokenForReset = async ({ id, token }) => {
   });
 };
 
+//Confirm reset password process with including password and confirm_password fields
 const confirmRequestResetPass = async ({ id, password, confirm_password }) => {
   const user = await User.findOneBy({ id });
 
@@ -118,4 +119,4 @@ const confirmRequestResetPass = async ({ id, password, confirm_password }) => {
   await user.save();
 };
 
-export { loginUser, verificationwithLink, checkTokenForReset, confirmRequestResetPass };
+export { loginUser, verificationWithLink, checkTokenForReset, confirmRequestResetPass };
