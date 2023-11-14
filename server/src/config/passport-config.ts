@@ -1,3 +1,4 @@
+import jwt from 'jsonwebtoken';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { User } from '../entity/user.entity.ts';
 import bcrypt from 'bcrypt';
@@ -23,7 +24,7 @@ const passportConfig = (passport: PassportStatic) => {
             if (!user || !user.isVerified) {
               return done({ isOperational: true, statusCode: 404, message: 'User not found' });
             }
-            
+
             bcrypt.compare(password, user.password, (err, result) => {
               if (err) {
                 return done(err);
@@ -81,7 +82,10 @@ const passportConfig = (passport: PassportStatic) => {
           if (!user) {
             return done(null, profile);
           } else {
-            throw new AppError('You have a registered address with this email.Please login with just email and password', 401);
+            throw new AppError(
+              'You have a registered address with this email.Please login with just email and password',
+              401,
+            );
           }
         } catch (error) {
           return request.res.redirect(`${process.env.CLIENT_URL}login?error=${encodeURIComponent(error.message)}`);
@@ -90,12 +94,20 @@ const passportConfig = (passport: PassportStatic) => {
     ),
   );
 
-  passport.serializeUser((user, done) => {
-    done(null, user);
+  passport.serializeUser((user: User, done) => {
+    const userId = user.id;
+    const token = jwt.sign({ userId }, process.env.SECRET_KEY, {
+      expiresIn: '1h',
+    });
+    done(null, { token });
   });
 
-  passport.deserializeUser((user, done) => {
-    done(null, user);
+  passport.deserializeUser((user: User, done) => {
+    const userId = user.id;
+    const token = jwt.sign({ userId }, process.env.SECRET_KEY, {
+      expiresIn: '1h',
+    });
+    done(null, { token });
   });
 };
 
