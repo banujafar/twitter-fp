@@ -1,5 +1,5 @@
-import { Entity, BaseEntity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { User } from './user.entity';
+import { Entity, BaseEntity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Relation } from 'typeorm';
+import { User } from './user.entity.ts';
 
 @Entity()
 export class LikedPost extends BaseEntity {
@@ -12,7 +12,7 @@ export class LikedPost extends BaseEntity {
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'user_id' })
-  user: User;
+  user: Relation<User>;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   liked_time: Date;

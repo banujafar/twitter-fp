@@ -1,7 +1,7 @@
 import { Column, PrimaryGeneratedColumn, Entity, BaseEntity, OneToMany, Like } from 'typeorm';
-import { LikedPost } from './LikedPost.entity';
-import { PostComment } from './PostComment.entity';
-import { PostRetweet } from './PostRetweet.entity';
+import { LikedPost } from './LikedPost.entity.ts';
+import { PostComment } from './PostComment.entity.ts';
+import { PostRetweet } from './PostRetweet.entity.ts';
 
 @Entity()
 export class User extends BaseEntity {
@@ -23,10 +23,10 @@ export class User extends BaseEntity {
   @Column({ nullable: true, type: 'boolean', default: false })
   isVerified: boolean;
 
-  @Column()
+  @Column({ nullable: true })
   country: string;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'date', nullable: true })
   dateOfBirth: Date;
 
   @Column({ nullable: true, type: 'bytea' })
