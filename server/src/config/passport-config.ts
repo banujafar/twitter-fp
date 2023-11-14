@@ -1,3 +1,4 @@
+import jwt from 'jsonwebtoken';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { User } from '../entity/user.entity.ts';
 import bcrypt from 'bcrypt';
@@ -5,6 +6,9 @@ import validator from 'validator';
 import { PassportStatic } from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth2';
 import { Request } from 'express';
+import AppError from './appError.ts';
+
+//Login user with email or username with using passport local strategy
 const passportConfig = (passport: PassportStatic) => {
   passport.use(
     'local-email',
@@ -13,12 +17,12 @@ const passportConfig = (passport: PassportStatic) => {
       (email: string, password: string, done) => {
         User.findOneBy({ email })
           .then((user) => {
-            if (!user) {
-              return done(null, false, { message: 'User not found' });
+            if (email && !validator.isEmail(email)) {
+              return done({ isOperational: true, statusCode: 400, message: 'Incorrect email' });
             }
 
-            if (email && !validator.isEmail(email)) {
-              return done(null, false, { message: 'Incorrect email' });
+            if (!user || !user.isVerified) {
+              return done({ isOperational: true, statusCode: 404, message: 'User not found' });
             }
 
             bcrypt.compare(password, user.password, (err, result) => {
@@ -28,7 +32,7 @@ const passportConfig = (passport: PassportStatic) => {
               if (result) {
                 return done(null, user);
               } else {
-                return done(null, false, { message: 'Wrong password' });
+                return done({ isOperational: true, statusCode: 401, message: 'Wrong password' });
               }
             });
           })
@@ -44,7 +48,7 @@ const passportConfig = (passport: PassportStatic) => {
       (username: string, password: string, done) => {
         User.findOneBy({ username })
           .then((user) => {
-            if (!user) {
+            if (!user || !user.isVerified) {
               return done(null, false, { message: 'User not found' });
             }
             bcrypt.compare(password, user.password, (err, result) => {
@@ -63,7 +67,7 @@ const passportConfig = (passport: PassportStatic) => {
     ),
   );
 
-  //Login with google
+  //Login with google strategy
   passport.use(
     new GoogleStrategy(
       {
@@ -72,18 +76,38 @@ const passportConfig = (passport: PassportStatic) => {
         callbackURL: process.env.CALLBACK_URL,
         passReqToCallback: true,
       },
-      (request: Request, accessToken: string, refreshToken: string, profile, done) => {
-        return done(null, profile);
+      async (request: Request, accessToken: string, refreshToken: string, profile, done) => {
+        try {
+          const user = await User.findOneBy({ email: profile.email });
+          if (!user) {
+            return done(null, profile);
+          } else {
+            throw new AppError(
+              'You have a registered address with this email.Please login with just email and password',
+              401,
+            );
+          }
+        } catch (error) {
+          return request.res.redirect(`${process.env.CLIENT_URL}login?error=${encodeURIComponent(error.message)}`);
+        }
       },
     ),
   );
 
-  passport.serializeUser((user, done) => {
-    done(null, user);
+  passport.serializeUser((user: User, done) => {
+    const userId = user.id;
+    const token = jwt.sign({ userId }, process.env.SECRET_KEY, {
+      expiresIn: '1h',
+    });
+    done(null, { token });
   });
 
-  passport.deserializeUser((user, done) => {
-    done(null, user);
+  passport.deserializeUser((user: User, done) => {
+    const userId = user.id;
+    const token = jwt.sign({ userId }, process.env.SECRET_KEY, {
+      expiresIn: '1h',
+    });
+    done(null, { token });
   });
 };
 

@@ -7,7 +7,8 @@ export interface IUserRegister {
 export interface AuthState {
   token: string | null;
   error: string | null;
-  user: IUserRegister | null;
+  loading: Boolean | null;
+  user?: IUserRegister | null
 }
 
 export interface IUserLogin {
