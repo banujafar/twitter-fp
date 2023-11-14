@@ -3,6 +3,7 @@ import { LikedPost } from './LikedPost.entity.ts';
 import { PostComment } from './PostComment.entity.ts';
 import { PostRetweet } from './PostRetweet.entity.ts';
 
+
 @Entity()
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
@@ -27,7 +28,6 @@ export class User extends BaseEntity {
   country: string;
 
   @Column({ type: 'date', nullable: true })
-  dateOfBirth: Date;
 
   @Column({ nullable: true, type: 'bytea' })
   profilePhoto: Buffer | null;
