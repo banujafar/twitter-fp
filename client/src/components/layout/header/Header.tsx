@@ -16,8 +16,7 @@ const Header = () => {
   const [logoutPopover, setLogoutPopover] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   const username = useSelector((state: RootState) => state.auth.user?.username);
-
-
+  
   const handleLogOut = async () => {
     //Handle logout
     const result=await dispatch(logoutUser());
@@ -77,7 +76,7 @@ const Header = () => {
     <header
       className={`${
         logoutPopover ? 'lg:overflow-y-auto md:overflow-hidden sm:overflow-hidden xs:overflow-hidden' : ''
-      } min-w-[275px] lg:min-w-[275px] md:w-[88px] sm:min-w-[88px] xs:min-w-[88px] xxs:min-w-[0] h-screen max-w-full sticky top-0 left-0 overflow-y-auto bg-white`}
+      } min-w-[275px] lg:min-w-[275px] md:w-[88px] sm:min-w-[75px] xs:min-w-[88px] xxs:min-w-[0] h-screen max-w-full sticky top-0 left-0 overflow-y-auto bg-white`}
     >
       <div className="w-full px-2 flex items-start justify-start flex-col lg:items-start md:items-center sm:items-center xs:items-center lg:justify-start md:justify-center sm:justify-center xs:justify-center">
         <div className="py-2 px-3 flex items-start">
