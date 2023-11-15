@@ -76,7 +76,12 @@ const authSlice = createSlice({
       .addCase(verifyEmail.fulfilled, setFulfilled)
       .addCase(verifyEmail.rejected, setError)
       .addCase(loginUser.pending, setPending)
-      .addCase(loginUser.fulfilled, setFulfilled)
+      .addCase(loginUser.fulfilled, (state, action) => {
+        setFulfilled(state, action);
+        if (!state.error) {
+          state.user = action.payload.user;
+        }
+      })
       .addCase(loginUser.rejected, setError)
       .addCase(forgotPass.fulfilled, setFulfilled)
       .addCase(forgotPass.rejected, setError)
