@@ -7,6 +7,7 @@ import { Token } from '../entity/token.entity.ts';
 import crypto from 'crypto';
 import sendEmail from '../utils/sendEmail.ts';
 import AppError from '../config/appError.ts';
+import {token} from '../config/passport-config.ts';
 
 //Make a user's login attempt using the provided email and password or username and password
 const loginUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -25,7 +26,8 @@ const loginUser = async (req: Request, res: Response, next: NextFunction) => {
           if (err) {
             throw new AppError(err.message, err.statusCode);
           }
-          return res.status(200).json({ message: 'Login Successful', user: user });
+
+          return res.status(200).json({ message: 'Login Successful', user: user, token:token });
         });
       } catch (error) {
         next(error);

@@ -27,3 +27,11 @@ export interface IConfirmReset {
   password: string;
   confirm_password: string;
 }
+
+
+export interface IDecodedToken {
+  exp: number,
+  iat: number,
+  userId: number | null,
+  username: string | null
+}
