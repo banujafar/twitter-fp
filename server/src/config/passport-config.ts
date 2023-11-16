@@ -8,6 +8,9 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth2';
 import { Request } from 'express';
 import AppError from './appError.ts';
 
+
+let token:string;
+
 //Login user with email or username with using passport local strategy
 const passportConfig = (passport: PassportStatic) => {
   passport.use(
@@ -94,9 +97,12 @@ const passportConfig = (passport: PassportStatic) => {
     ),
   );
 
+
   passport.serializeUser((user: User, done) => {
     const userId = user.id;
-    const token = jwt.sign({ userId }, process.env.SECRET_KEY, {
+    const username = user.username;
+
+    token = jwt.sign({ userId, username }, process.env.SECRET_KEY, {
       expiresIn: '1h',
     });
     done(null, { token });
@@ -104,7 +110,9 @@ const passportConfig = (passport: PassportStatic) => {
 
   passport.deserializeUser((user: User, done) => {
     const userId = user.id;
-    const token = jwt.sign({ userId }, process.env.SECRET_KEY, {
+    const username = user.username;
+
+    token = jwt.sign({ userId, username }, process.env.SECRET_KEY, {
       expiresIn: '1h',
     });
     done(null, { token });
@@ -112,3 +120,4 @@ const passportConfig = (passport: PassportStatic) => {
 };
 
 export default passportConfig;
+export {token}

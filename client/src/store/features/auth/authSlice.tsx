@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { AuthState, IConfirmReset, IResetParams, IUserLogin, IUserRegister } from '../../../models/auth';
 import fetchWrapper from '../../helpers/fetchWrapper.ts';
 const initialState: AuthState = {
-  token: null,
+  token: localStorage.getItem('token') || null,
   error: null,
   loading: null,
   user: null
@@ -19,7 +19,18 @@ export const verifyEmail = createAsyncThunk('auth/verifyEmail', async (verificat
 })
 
 export const loginUser = createAsyncThunk('auth/loginUser', async (userData: IUserLogin) => {
-  return await fetchWrapper(`${BASE_URL}/login`, 'POST', userData);
+  // return await fetchWrapper(`${BASE_URL}/login`, 'POST', userData);
+  try {
+    const response = await fetchWrapper(`${BASE_URL}/login`, 'POST', userData);
+    
+
+    localStorage.setItem('token', response.token);
+
+    return response;
+  } catch (error) {
+    console.error('Login failed:', error);
+    throw error; 
+  }
 });
 
 export const forgotPass = createAsyncThunk('auth/forgotPass', async (email: object) => {
@@ -80,6 +91,7 @@ const authSlice = createSlice({
         setFulfilled(state, action);
         if (!state.error) {
           state.user = action.payload.user;
+          state.token = action.payload.token
         }
       })
       .addCase(loginUser.rejected, setError)
