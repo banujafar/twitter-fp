@@ -10,6 +10,7 @@ import { Session } from './entity/session.entity.ts';
 import passportConfig from './config/passport-config.ts';
 import checkAuthMiddleware from './middlewares/checkAuth.ts';
 import errorHandler from './middlewares/errorHandler.ts';
+import postRouter from './routes/post.route.ts';
 
 const app = express();
 
@@ -54,6 +55,8 @@ AppDataSource.initialize()
   
 app.use('/checkAuth', checkAuthMiddleware);
 app.use('/auth', userRouter);
+app.use('/api/posts', postRouter);
+
 app.use(errorHandler)
 
 app.listen('3000', () => {

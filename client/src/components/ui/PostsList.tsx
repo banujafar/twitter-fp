@@ -1,6 +1,7 @@
+import { useSelector } from 'react-redux';
 import CreatePost from './CreatePost';
 import PostsItem from './PostsItem';
-import SearchBar from './SearchBar';
+import { RootState } from '../../store';
 
 const PostsList = () => {
     //TODO:THIS DATA WILL RETRIEVE FROM SERVER
@@ -69,14 +70,14 @@ const PostsList = () => {
   const userData = {
     username: '@inspirationhub',
   };
+
+  const posts = useSelector((state: RootState) => state.post.post);
+
+  console.log(posts)
+
   return (
-    <div className='sm:max-w-[80%] md:min-w-[50%] lg:w-[50%] mx-2'>
-        <div className='p-4 flex justify-between items-center'>
-            <span>Home</span>
-            <div className='xl:hidden sm:flex'>
-            <SearchBar/>
-            </div>
-        </div>
+    <div className='mx-2 sm:mx-0 xs:mx-0 border border-gray-200'>
+      
        
         <CreatePost userData={userData}/>
       {postsData.map((posts, index) => (
