@@ -30,7 +30,7 @@ const PostsList = () => {
   }, [dispatch]);
 
   return (
-    <div className="mx-2 sm:mx-0 xs:mx-0 border border-gray-200 w-full">
+    <div className="mx-2 sm:mx-0 xs:mx-0 border border-gray-200 w-full ">
       <CreatePost />
       {loading ? (
         <p>Loading posts...</p>
