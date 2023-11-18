@@ -69,6 +69,7 @@ const CreatePost = ()=> {
     e.target.style.height = `${e.target.scrollHeight}px`;
   };
 
+
   return (
     <div className="bg-white border-b border-gray-200 w-full p-4">
       <div className="flex flex-col sm:flex-row items-start gap-4 ">
