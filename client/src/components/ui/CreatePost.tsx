@@ -1,28 +1,67 @@
-import React, { useState, ChangeEvent } from 'react';
+import React, { useState, ChangeEvent, useRef, useEffect } from 'react';
 import { CgProfile } from 'react-icons/cg';
 import { CiImageOn } from 'react-icons/ci';
 import { FaRegSmile } from 'react-icons/fa';
 import { HiOutlineGif } from 'react-icons/hi2';
-import { useDispatch } from 'react-redux';
+import { MdClose } from 'react-icons/md';
+import { useDispatch, useSelector } from 'react-redux';
 import { addPost } from '../../store/features/post/postSlice';
+import { RootState } from '../../store';
+import { jwtDecode } from 'jwt-decode';
+import { IDecodedToken } from '../../models/auth';
 
-interface IUSER {
-  profile_image?: string;
-  username: string;
-}
-
-const CreatePost: React.FC<{ userData: IUSER }> = ({ userData }) => {
+const CreatePost = ()=> {
   const [text, setText] = useState('');
-  const dispatch = useDispatch()
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [decodedId, setDecodedId] = useState<number | null>(null);
+  const token = useSelector((state: RootState) => state.auth.token);
+  const userData = useSelector((state: RootState) => state.auth.user);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if(!text.length) {
-      return
+
+  useEffect(() => {
+    const getUsernameFromToken = (authToken: string) => {
+      try {
+        const decoded: IDecodedToken = jwtDecode(authToken);
+        const id = decoded.userId;
+        setDecodedId(id);
+      } catch (error) {
+        console.error('Error decoding token:', error);
+      }
+    };
+
+    if (token) {
+      getUsernameFromToken(token);
     }
-    dispatch(addPost({content: text}) as any);
+  }, [token]);
+
+  const dispatch = useDispatch();
+
+  const handleSubmit =async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!text.length) {
+      return;
+    }
+
+    await dispatch(addPost({ content: text, user_id: decodedId }) as any);
+    setText('')
   };
 
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const fileInput = event.target;
+
+    if (fileInput.files && fileInput.files.length > 0) {
+      const file = fileInput.files[0];
+      setSelectedFile(file);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value);
@@ -30,13 +69,14 @@ const CreatePost: React.FC<{ userData: IUSER }> = ({ userData }) => {
     e.target.style.height = `${e.target.scrollHeight}px`;
   };
 
+
   return (
     <div className="bg-white border-b border-gray-200 w-full p-4">
       <div className="flex flex-col sm:flex-row items-start gap-4 ">
         <div className="w-auto flex">
-          {userData.profile_image ? (
+          {userData?.profilePhoto ? (
             <img
-              src={userData.profile_image}
+              src={userData.profilePhoto}
               alt={`${userData.username}'s profile`}
               className="w-16 h-16 rounded-full mb-4 sm:mb-0"
             />
@@ -45,7 +85,7 @@ const CreatePost: React.FC<{ userData: IUSER }> = ({ userData }) => {
           )}
         </div>
         <div className="w-11/12 xl:w-11/12 lg:w-11/12 md:w-11/12 sm:w-11/12 xs:w-full">
-          <form className="flex-grow" onSubmit={handleSubmit}>
+          <form className="flex-grow" onSubmit={handleSubmit} encType="multipart/form-data">
             <div className="border-b border-b-[#eff3f4]">
               <textarea
                 value={text}
@@ -55,6 +95,19 @@ const CreatePost: React.FC<{ userData: IUSER }> = ({ userData }) => {
                 placeholder="What is happening?!"
                 className="resize-none h-12 w-full overflow-y-hidden py-1 focus:outline-none text-xl font-normal placeholder-[#536471] text-black"
               />
+              {selectedFile ? (
+                <div className="w-full relative">
+                  <img src={URL.createObjectURL(selectedFile)} alt="" className="max-w-full" />
+                  <span
+                    className="absolute top-0 right-0 cursor-pointer text-4xl p-2 bg-gray-700 text-white rounded-full"
+                    onClick={handleRemoveImage}
+                  >
+                    <MdClose />
+                  </span>
+                </div>
+              ) : (
+                ''
+              )}
             </div>
             <div className="flex items-center gap-4 justify-between mt-5">
               <div className="flex items-center">
@@ -63,7 +116,15 @@ const CreatePost: React.FC<{ userData: IUSER }> = ({ userData }) => {
                   className="rounded-full hover:bg-blue-100 p-2 flex items-center justify-center cursor-pointer"
                 >
                   <CiImageOn className="text-blue-500 text-xl" />
-                  <input type="file" id="imageInput" accept=".png, .jpg, .jpeg, .gif" className="hidden" />
+                  <input
+                    type="file"
+                    onChange={handleFileChange}
+                    id="imageInput"
+                    accept=".png, .jpg, .jpeg, .gif"
+                    className="hidden"
+                    ref={fileInputRef}
+                    name="imageInput"
+                  />
                 </label>
                 <label
                   htmlFor="emojiInput"

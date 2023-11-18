@@ -1,4 +1,4 @@
-import { Entity, BaseEntity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Relation, OneToMany } from 'typeorm';
+import { Entity, BaseEntity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Relation, CreateDateColumn } from 'typeorm';
 import { User } from './user.entity.ts';
 
 @Entity()
@@ -13,9 +13,9 @@ export class UserPost extends BaseEntity {
   @Column('varchar', { length: 280 })
   content: string | null;
 
-  @Column('text', { array: true, nullable: true })
-  img: Buffer[] | null;;
+  @Column('bytea', { nullable: true })
+  img: null;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  created_time: Date;
+  @CreateDateColumn()
+  created_date: Date;
 }
