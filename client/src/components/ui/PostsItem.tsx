@@ -1,13 +1,30 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AiOutlineRetweet } from 'react-icons/ai';
 import { BsFillShareFill } from 'react-icons/bs';
 import { FaRegComment, FaRegHeart } from 'react-icons/fa';
 import { CgProfile } from 'react-icons/cg';
 import { Link } from 'react-router-dom';
+import { CiEdit } from 'react-icons/ci';
 import { IUserPost } from '../../models/post';
 
 const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
-  const formattedDate = new Date(postData.created_date).toLocaleDateString()
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const formattedDate = new Date(postData.created_date).toLocaleDateString();
+
+  const handleRetweet = () => {
+    setIsDropdownOpen(true);
+  };
+
+  useEffect(() => {
+    const handleOutsideClick = (event: any) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('click', handleOutsideClick);
+  }, []);
 
   return (
     <div className="tweet-container bg-white  border-b  border-gray-200  w-full p-4">
@@ -42,10 +59,25 @@ const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
               <FaRegComment />
               <span className="ml-1">12</span>
             </div>
-            <div className="flex items-center text-gray-500 cursor-pointer hover:text-[#00ba7c]">
-              <AiOutlineRetweet />
-              <span className="ml-1">24</span>
+            <div className="relative cursor-pointer" onClick={handleRetweet} ref={dropdownRef}>
+              <div className="flex items-center text-gray-500 hover:text-green-500">
+                <AiOutlineRetweet className="text-xl" />
+                <span className="ml-1">24</span>
+              </div>
+              {isDropdownOpen && (
+                <ul className="absolute bg-white top-0 right-0 p-4 rounded-xl border border-gray-300">
+                  <li className="flex items-center gap-2 text-gray-700 hover:text-green-500 mb-2">
+                    <AiOutlineRetweet className="text-lg" />
+                    <span>Repost</span>
+                  </li>
+                  <li className="flex items-center gap-2 text-gray-700 hover:text-green-500">
+                    <CiEdit className="text-lg" />
+                    <span>Quote</span>
+                  </li>
+                </ul>
+              )}
             </div>
+
             <div className="flex items-center text-gray-500 cursor-pointer hover:text-[#f91880]">
               <FaRegHeart />
               <span className="ml-1">36</span>
