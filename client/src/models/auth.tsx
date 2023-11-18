@@ -2,6 +2,7 @@ export interface IUserRegister {
   username: string;
   email: string;
   password: string;
+  profilePhoto? : string
 }
 
 export interface AuthState {

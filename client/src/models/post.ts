@@ -1,8 +1,10 @@
+import { IUser } from './user';
+
 export interface IUserPost {
   id: number;
-  user_id: number;
+  user: IUser;
   content?: string | null;
-  img?: string | null;
+  img?: File | null;
   created_date: Date;
 }
 
