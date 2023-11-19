@@ -13,7 +13,7 @@ const Modal: React.FC<{ modal: IModal }> = ({ modal }) => {
     dispatch(setIsOpen({ id: modal.modalId, isOpen: false }));
   };
   return (
-    <div className='flex justify-center'>
+    <div className=' flex justify-center items-center'>
       <div className="z-50 max-w-lg w-2/3 bg-black rounded-lg px-8 pt-8 pb-16 border-gray-700 border-2 fixed top-24 ">
         <div className="flex justify-between items-center mb-4 text-gray-700">
           <span className="text-2xl text-gray-700 cursor-pointer" onClick={handleCloseModal}>

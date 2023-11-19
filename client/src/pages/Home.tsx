@@ -8,6 +8,7 @@ const Home = () => {
         <div className="sm:hidden xs:hidden xxs:hidden md:hidden lg:flex xl:flex">
           <SearchBar />
         </div>
+        
       </div>
     </>
   );

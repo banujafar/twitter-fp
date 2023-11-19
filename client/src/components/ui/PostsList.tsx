@@ -5,6 +5,8 @@ import CreatePost from './CreatePost';
 import { useEffect } from 'react';
 import { getPosts } from '../../store/features/post/postSlice';
 import { IUserPost } from '../../models/post';
+import { modalIsOpenSelector } from '../../store/features/modal/modalSlice';
+import QuoteModal from '../modals/QuoteModal';
 
 const PostsList = () => {
   const dispatch = useDispatch();
@@ -17,9 +19,9 @@ const PostsList = () => {
     const dateB = new Date(b.created_date);
 
     if (dateA < dateB) {
-      return 1; 
+      return 1;
     } else if (dateA > dateB) {
-      return -1; 
+      return -1;
     }
 
     return dateB.getHours() - dateA.getHours();
@@ -29,8 +31,9 @@ const PostsList = () => {
     dispatch(getPosts() as any);
   }, [dispatch]);
 
+  const isOpen = useSelector((state) => modalIsOpenSelector(state, 'modalQuote'));
   return (
-    <div className="mx-2 sm:mx-0 xs:mx-0 border border-gray-200 w-full ">
+    <div className="mx-2 sm:mx-0 xs:mx-0 border border-gray-200 w-full">
       <CreatePost />
       {loading ? (
         <p>Loading posts...</p>
@@ -39,6 +42,7 @@ const PostsList = () => {
       ) : (
         <p>No posts found</p>
       )}
+      {isOpen && <QuoteModal />}
     </div>
   );
 };

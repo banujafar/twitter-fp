@@ -1,22 +1,19 @@
 import Modal from './Modal';
-import { IUserPost } from '../../models/post';
 import { Link } from 'react-router-dom';
 import { CgProfile } from 'react-icons/cg';
-import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store';
 
-const QuoteModal: React.FC<{ quoteModalContent: IUserPost }> = ({ quoteModalContent }) => {
-  //console.log(quoteModalContent);
-  useEffect(() => {
-    console.log(quoteModalContent);
-  }, [quoteModalContent]);
-
+const QuoteModal = () => {
+  const quoteModalContent = useSelector((state: RootState) => state.modal.postData['modalQuote']);
+  console.log(quoteModalContent);
   return (
     <Modal
       modal={{
         modalId: 'modalQuote',
         modalContent: (
           <>
-            <div >
+            <div>
               <div className="flex gap-4 py-4">
                 <Link to={`/profile/${quoteModalContent.user?.username}`} className="flex">
                   {quoteModalContent.user?.profilePhoto ? (
@@ -55,7 +52,7 @@ const QuoteModal: React.FC<{ quoteModalContent: IUserPost }> = ({ quoteModalCont
 
                 <span className=" text-gray-400 ">{quoteModalContent.content}</span>
               </div>
-              <div className='flex justify-between items-center mt-2'>
+              <div className="flex justify-between items-center mt-2">
                 {/* //TODO:IMPROVE THIS LINE */}
                 <a href="#" className=" text-blue-600">
                   Everyone can reply

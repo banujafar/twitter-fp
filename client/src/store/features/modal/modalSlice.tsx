@@ -1,21 +1,33 @@
-import { createSelector, createSlice } from '@reduxjs/toolkit';
+import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../..';
+import { IUserPost } from '../../../models/post';
 
-export const initialState = {
+interface ModalState {
+  isOpen: { [key: string]: boolean };
+  postData: { [key: string]: IUserPost }; // Adjust the type based on your post data structure
+}
+
+export const initialState: ModalState = {
   isOpen: {},
+  postData: {},
 };
 
 const modalSlice = createSlice({
   name: 'modal',
   initialState,
   reducers: {
-    setIsOpen: (state: any, action: any) => {
-      state.isOpen[action.payload.id] = action.payload.isOpen;
+    setIsOpen: (state: ModalState, action: PayloadAction<{ id: string; isOpen: boolean; postData?: any }>) => {
+      const { id, isOpen, postData } = action.payload;
+      state.isOpen[id] = isOpen;
+      if (postData) {
+        state.postData[id] = postData;
+      }
     },
   },
 });
 
-export const setIsOpen = (payload: { id: string; isOpen: boolean }) => {
+
+export const setIsOpen = (payload: { id: string; isOpen: boolean,postData?:any }) => {
   return {
     type: 'modal/setIsOpen',
     payload,

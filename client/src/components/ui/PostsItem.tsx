@@ -6,25 +6,22 @@ import { CgProfile } from 'react-icons/cg';
 import { Link } from 'react-router-dom';
 import { CiEdit } from 'react-icons/ci';
 import { IUserPost } from '../../models/post';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../store';
-import { modalIsOpenSelector, setIsOpen } from '../../store/features/modal/modalSlice';
-import QuoteModal from '../modals/quoteModal';
+import { setIsOpen } from '../../store/features/modal/modalSlice';
 
 const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const formattedDate = new Date(postData.created_date).toLocaleDateString();
   const dispatch = useDispatch<AppDispatch>();
-  const [quoteModalContent, setQuoteModalContent] = useState<IUserPost | undefined>();
 
-  const isOpen = useSelector((state) => modalIsOpenSelector(state, 'modalQuote'));
   const handleRetweet = () => {
     setIsDropdownOpen(true);
   };
+
   const handleOpenQuoteModal = () => {
-    dispatch(setIsOpen({ id: 'modalQuote', isOpen: true }));
-    setQuoteModalContent(postData);
+    dispatch(setIsOpen({ id: 'modalQuote', isOpen: true, postData: postData }));
   };
 
   useEffect(() => {
@@ -33,7 +30,6 @@ const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
         setIsDropdownOpen(false);
       }
     };
-
     document.addEventListener('click', handleOutsideClick);
     return () => {
       document.removeEventListener('click', handleOutsideClick);
@@ -107,7 +103,7 @@ const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
           </div>
         </div>
       </div>
-      {isOpen && quoteModalContent && <QuoteModal quoteModalContent={quoteModalContent} />}
+     
     </>
   );
 };
