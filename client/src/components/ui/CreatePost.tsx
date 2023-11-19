@@ -12,12 +12,12 @@ import { IDecodedToken } from '../../models/auth';
 
 const CreatePost = ()=> {
   const [text, setText] = useState('');
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File[] | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [decodedId, setDecodedId] = useState<number | null>(null);
   const token = useSelector((state: RootState) => state.auth.token);
   const userData = useSelector((state: RootState) => state.auth.user);
-
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const getUsernameFromToken = (authToken: string) => {
@@ -35,29 +35,55 @@ const CreatePost = ()=> {
     }
   }, [token]);
 
-  const dispatch = useDispatch();
 
-  const handleSubmit =async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!text.length) {
+    if (!text.length && !selectedFile) {
       return;
     }
 
-    await dispatch(addPost({ content: text, user_id: decodedId }) as any);
-    setText('')
+    const formData = new FormData();
+    formData.append('content', text);
+
+    if (decodedId !== null && !isNaN(decodedId)) {
+      formData.append('user_id', decodedId.toString());
+    }
+
+    if (selectedFile) {
+      selectedFile.forEach((file) => {
+        formData.append('files', file);
+      });
+    }
+
+    try {
+      await dispatch(addPost(formData) as any);
+
+      setText('');
+      setSelectedFile(null);
+    } catch (error) {
+      console.error('Error submitting post:', error);
+    }
+   
   };
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const fileInput = event.target;
 
     if (fileInput.files && fileInput.files.length > 0) {
-      const file = fileInput.files[0];
-      setSelectedFile(file);
+      const files = Array.from(fileInput.files);
+      setSelectedFile(files);
     }
   };
 
-  const handleRemoveImage = () => {
-    setSelectedFile(null);
+  const handleRemoveImage = (index?: number) => {
+    if (index !== undefined && selectedFile !== null) {
+      const updatedFiles = [...selectedFile];
+      updatedFiles.splice(index, 1);
+      setSelectedFile(updatedFiles.length > 0 ? updatedFiles : null);
+    } else {
+      setSelectedFile(null);
+    }
+
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -68,7 +94,6 @@ const CreatePost = ()=> {
     e.target.style.height = 'auto';
     e.target.style.height = `${e.target.scrollHeight}px`;
   };
-
 
   return (
     <div className="bg-white border-b border-gray-200 w-full p-4">
@@ -95,19 +120,30 @@ const CreatePost = ()=> {
                 placeholder="What is happening?!"
                 className="resize-none h-12 w-full overflow-y-hidden py-1 focus:outline-none text-xl font-normal placeholder-[#536471] text-black"
               />
-              {selectedFile ? (
-                <div className="w-full relative">
-                  <img src={URL.createObjectURL(selectedFile)} alt="" className="max-w-full" />
-                  <span
-                    className="absolute top-0 right-0 cursor-pointer text-4xl p-2 bg-gray-700 text-white rounded-full"
-                    onClick={handleRemoveImage}
-                  >
-                    <MdClose />
-                  </span>
-                </div>
-              ) : (
-                ''
-              )}
+              {selectedFile &&
+                (Array.isArray(selectedFile) ? (
+                  selectedFile.map((file, index) => (
+                    <div key={index} className="w-full relative">
+                      <img src={URL.createObjectURL(file)} alt={`Image ${index + 1}`} className="max-w-full" />
+                      <span
+                        className="absolute top-0 right-0 cursor-pointer text-4xl p-2 bg-gray-700 text-white rounded-full"
+                        onClick={() => handleRemoveImage(index)}
+                      >
+                        <MdClose />
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="w-full relative">
+                    <img src={URL.createObjectURL(selectedFile)} alt="" className="max-w-full" />
+                    <span
+                      className="absolute top-0 right-0 cursor-pointer text-4xl p-2 bg-gray-700 text-white rounded-full"
+                      onClick={() => handleRemoveImage()}
+                    >
+                      <MdClose />
+                    </span>
+                  </div>
+                ))}
             </div>
             <div className="flex items-center gap-4 justify-between mt-5">
               <div className="flex items-center">
@@ -123,7 +159,8 @@ const CreatePost = ()=> {
                     accept=".png, .jpg, .jpeg, .gif"
                     className="hidden"
                     ref={fileInputRef}
-                    name="imageInput"
+                    multiple
+                    name="fileInput"
                   />
                 </label>
                 <label

@@ -13,8 +13,8 @@ export class UserPost extends BaseEntity {
   @Column('varchar', { length: 280 })
   content: string | null;
 
-  @Column('bytea', { nullable: true })
-  img: null;
+  @Column('simple-array', { nullable: true }) 
+  img: string[];
 
   @CreateDateColumn()
   created_date: Date;

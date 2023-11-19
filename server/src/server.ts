@@ -11,6 +11,8 @@ import passportConfig from './config/passport-config.ts';
 import checkAuthMiddleware from './middlewares/checkAuth.ts';
 import errorHandler from './middlewares/errorHandler.ts';
 import postRouter from './routes/post.route.ts';
+import { fileURLToPath } from 'url';
+import { join, dirname } from 'path';
 
 const app = express();
 
@@ -40,8 +42,13 @@ app.use(
   }),
 );
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const uploadDir = join(__dirname, '../../../client/src/assets/uploads');
+
 app.use(passport.initialize());
 app.use(passport.session());
+app.use('/api/posts', express.static(uploadDir));
 
 // Create a new connection to the database using TypeORM
 AppDataSource.initialize()
