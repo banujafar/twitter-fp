@@ -4,7 +4,7 @@ import { IUserPost } from '../../../models/post';
 
 interface ModalState {
   isOpen: { [key: string]: boolean };
-  postData: { [key: string]: IUserPost }; // Adjust the type based on your post data structure
+  postData: { [key: string]: IUserPost };
 }
 
 export const initialState: ModalState = {
@@ -16,7 +16,7 @@ const modalSlice = createSlice({
   name: 'modal',
   initialState,
   reducers: {
-    setIsOpen: (state: ModalState, action: PayloadAction<{ id: string; isOpen: boolean; postData?: any }>) => {
+    setIsOpen: (state: ModalState, action: PayloadAction<{ id: string; isOpen: boolean; postData?: IUserPost }>) => {
       const { id, isOpen, postData } = action.payload;
       state.isOpen[id] = isOpen;
       if (postData) {
