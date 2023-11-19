@@ -7,13 +7,11 @@ import ProtectedRoute from './utils/ProtectedRoute';
 import Layout from './components/layout/layout';
 import { useSelector } from 'react-redux';
 import { RootState } from './store';
-import Modal from './components/ui/ForgotPassModal';
 import ResetPassword from './pages/ResetPassword';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import VerificationPage from './pages/VerificationPage';
 function App() {
-  const { isOpen } = useSelector((state: RootState) => state.modal);
   const error = useSelector((state: RootState) => state.auth.error);
 
   useEffect(() => {
@@ -27,7 +25,6 @@ function App() {
 
   return (
     <>
-      {isOpen && <Modal />}
       <Routes>
         <Route element={<ProtectedRoute />}>
           <Route
