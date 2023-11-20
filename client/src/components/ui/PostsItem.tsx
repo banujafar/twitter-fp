@@ -64,6 +64,22 @@ const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
               </div>
 
               <p className="text-gray-800">{postData.content}</p>
+              {Array.isArray(postData.img)
+                ? postData.img.map((imgUrl) => (
+                    <img
+                      key={postData.id}
+                      src={`/src/assets/uploads/${imgUrl}`}
+                      alt="post img"
+                      className="mt-4 w-full max-w-full"
+                    />
+                  ))
+                : postData.img && (
+                    <img
+                      src={`/src/assets/uploads/${postData.img}`}
+                      alt="post img"
+                      className="mt-4 w-full max-w-full"
+                    />
+                  )}
             </div>
             <div className="flex items-center justify-between gap-4 mt-4">
               <div className="flex items-center  text-gray-500 cursor-pointer hover:text-twitterColor">
@@ -103,7 +119,6 @@ const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
           </div>
         </div>
       </div>
-     
     </>
   );
 };

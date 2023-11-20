@@ -2,7 +2,7 @@
     "compilerOptions":
       {
         "target": "ES2018",
-        "module": "ES6",
+        "module": "ESNext",
         "outDir": "dist",
         "sourceMap": true,
         "esModuleInterop": true,
@@ -13,6 +13,7 @@
         "emitDecoratorMetadata": true,
         "types": ["typeorm"],
         "allowSyntheticDefaultImports": true,
+        "resolveJsonModule": true,
       },
     "include": ["src/**/*.ts"],
     "exclude": ["node_modules"],

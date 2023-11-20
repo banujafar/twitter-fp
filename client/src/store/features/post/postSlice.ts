@@ -23,14 +23,14 @@ export const getPosts = createAsyncThunk('post/getPosts', async () => {
 
 export const addPost = createAsyncThunk(
   'post/addPost',
-  async (post: { content: string | null; user_id: number | null }) => {
+  async (formData: FormData) => {
     try {
       const response = await fetch(`http://localhost:3000/api/posts`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(post),
+        // headers: {
+        //   'Content-Type': 'application/json',
+        // },
+        body: formData,
       });
 
       if (!response.ok) {
