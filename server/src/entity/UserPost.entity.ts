@@ -16,6 +16,6 @@ export class UserPost extends BaseEntity {
   @Column('simple-array', { nullable: true }) 
   img: string[];
 
-  @CreateDateColumn()
+  @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP AT TIME ZONE \'UTC+4\''  })
   created_date: Date;
 }
