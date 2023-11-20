@@ -8,6 +8,7 @@ import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
 
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -18,7 +19,7 @@ const storage = multer.diskStorage({
     return callback(null, uploadDir);
   },
   filename: (req, file, callback) => {
-     const uniqueImgId = uuidv4();
+    const uniqueImgId = uuidv4();
     const originalName = file.originalname;
     const filename = `${uniqueImgId}_${originalName}`;
     callback(null, filename);
