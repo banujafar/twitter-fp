@@ -6,6 +6,8 @@ export interface IUserPost {
   content?: string | null;
   img?: File | null;
   created_date: Date;
+  retweets?: IUserPost[] | null;
+  retweetFrom?: any;//TODO
 }
 
 export interface IPostInitialState {

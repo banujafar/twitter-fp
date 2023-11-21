@@ -5,12 +5,13 @@ import { FaRegSmile } from 'react-icons/fa';
 import { HiOutlineGif } from 'react-icons/hi2';
 import { MdClose } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
-import { addPost } from '../../store/features/post/postSlice';
+import { addPost, getPosts } from '../../store/features/post/postSlice';
 import { RootState } from '../../store';
 import { jwtDecode } from 'jwt-decode';
 import { IDecodedToken } from '../../models/auth';
+import { setIsOpen } from '../../store/features/modal/modalSlice';
 
-const CreatePost = ()=> {
+const CreatePost: React.FC<{ content?: any }> = ({ content }) => {
   const [text, setText] = useState('');
   const [selectedFile, setSelectedFile] = useState<File[] | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -18,7 +19,7 @@ const CreatePost = ()=> {
   const token = useSelector((state: RootState) => state.auth.token);
   const userData = useSelector((state: RootState) => state.auth.user);
   const dispatch = useDispatch();
-
+  const quoteModalContent = useSelector((state: RootState) => state.modal.postData['modalQuote']);
   useEffect(() => {
     const getUsernameFromToken = (authToken: string) => {
       try {
@@ -34,7 +35,6 @@ const CreatePost = ()=> {
       getUsernameFromToken(token);
     }
   }, [token]);
-
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -54,18 +54,21 @@ const CreatePost = ()=> {
         formData.append('files', file);
       });
     }
+    if (quoteModalContent) {
+      formData.append('retweeted_id', quoteModalContent.id.toString());
+    }
 
     try {
+      console.log(quoteModalContent);
       await dispatch(addPost(formData) as any);
-
       setText('');
       setSelectedFile(null);
+      await dispatch(getPosts() as any);
+      dispatch(setIsOpen({ id: 'modalQuote', isOpen: false}));
     } catch (error) {
       console.error('Error submitting post:', error);
     }
-   
   };
-
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const fileInput = event.target;
 
@@ -96,7 +99,7 @@ const CreatePost = ()=> {
   };
 
   return (
-    <div className="bg-white border-b border-gray-200 w-full p-4">
+    <div className={`${content ? 'bg-black' : 'bg-white'} border-b border-gray-200 w-full p-4`}>
       <div className="flex flex-col sm:flex-row items-start gap-4 ">
         <div className="w-auto flex">
           {userData?.profilePhoto ? (
@@ -111,14 +114,16 @@ const CreatePost = ()=> {
         </div>
         <div className="w-11/12 xl:w-11/12 lg:w-11/12 md:w-11/12 sm:w-11/12 xs:w-full">
           <form className="flex-grow" onSubmit={handleSubmit} encType="multipart/form-data">
-            <div className="border-b border-b-[#eff3f4]">
+            <div className={content ? 'border-none' : 'border-b border-b-[#eff3f4]'}>
               <textarea
                 value={text}
                 onChange={handleChange}
                 style={{ minHeight: '3rem' }}
                 maxLength={280}
-                placeholder="What is happening?!"
-                className="resize-none h-12 w-full overflow-y-hidden py-1 focus:outline-none text-xl font-normal placeholder-[#536471] text-black"
+                placeholder={content ? 'Add a comment' : 'What is happening?!'}
+                className={`text-black resize-none h-12 w-full overflow-y-hidden py-1 focus:outline-none text-xl font-normal placeholder-[#536471]  bg-transparent ${
+                  content ? 'text-white' : 'text-black'
+                }`}
               />
               {selectedFile &&
                 (Array.isArray(selectedFile) ? (
@@ -145,6 +150,7 @@ const CreatePost = ()=> {
                   </div>
                 ))}
             </div>
+            {content && <div>{content}</div>}
             <div className="flex items-center gap-4 justify-between mt-5">
               <div className="flex items-center">
                 <label

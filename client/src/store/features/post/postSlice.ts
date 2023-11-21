@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { IPostInitialState } from '../../../models/post';
-
 export const getPosts = createAsyncThunk('post/getPosts', async () => {
   try {
     const response = await fetch(`http://localhost:3000/api/posts`, {
@@ -45,6 +44,7 @@ export const addPost = createAsyncThunk(
   },
 );
 
+
 const initialState: IPostInitialState = {
   post: [],
   error: null,
@@ -82,7 +82,8 @@ const postSlice = createSlice({
       .addCase(getPosts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || null;
-      });
+      })
+     
   },
 });
 
