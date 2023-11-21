@@ -1,5 +1,6 @@
-import { Entity, BaseEntity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Relation, CreateDateColumn } from 'typeorm';
+import { Entity, BaseEntity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Relation, CreateDateColumn, OneToMany } from 'typeorm';
 import { User } from './user.entity.ts';
+import { PostRetweet } from './PostRetweet.entity.ts';
 
 @Entity()
 export class UserPost extends BaseEntity {
@@ -18,4 +19,5 @@ export class UserPost extends BaseEntity {
 
   @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   created_date: Date;
+  
 }
