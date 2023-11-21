@@ -9,11 +9,11 @@ import { IUserPost } from '../../models/post';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../store';
 import { setIsOpen } from '../../store/features/modal/modalSlice';
+import { formattedDate } from '../../utils/FormatDate';
 
 const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
-  const formattedDate = new Date(postData.created_date).toLocaleDateString();
   const dispatch = useDispatch<AppDispatch>();
 
   const handleRetweet = () => {
@@ -60,7 +60,7 @@ const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
                   {postData.user?.username}
                 </Link>
                 <p className="text-gray-500 overflow-hidden max-w-maxW16">{postData.user?.username}</p>
-                <span className="text-gray-500">{formattedDate}</span>
+                <span className="text-gray-500">{formattedDate(postData.created_date)}</span>
               </div>
 
               <p className="text-gray-800">{postData.content}</p>
