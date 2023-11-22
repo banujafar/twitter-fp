@@ -13,7 +13,7 @@ import errorHandler from './middlewares/errorHandler.ts';
 import postRouter from './routes/post.route.ts';
 import { fileURLToPath } from 'url';
 import { join, dirname } from 'path';
-
+import cookieParser from 'cookie-parser';
 const app = express();
 
 app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
@@ -21,7 +21,7 @@ app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
+app.use(cookieParser());
 passportConfig(passport);
 app.set('trust proxy', 1);
 
@@ -32,7 +32,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      maxAge: 36000 || 7 * 24 * 60 * 60 * 1000,
+      maxAge: 60 * 60 * 1000 || 7 * 24 * 60 * 60 * 1000,
       httpOnly: true,
       secure: app.get('env') === 'production' ? true : false,
       sameSite: 'lax',
@@ -59,12 +59,12 @@ AppDataSource.initialize()
     console.log(err);
     console.log('There is an error with connection');
   });
-  
+
 app.use('/checkAuth', checkAuthMiddleware);
 app.use('/auth', userRouter);
 app.use('/api/posts', postRouter);
 
-app.use(errorHandler)
+app.use(errorHandler);
 
 app.listen('3000', () => {
   console.log('Server is up on 3000');

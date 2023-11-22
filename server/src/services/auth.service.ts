@@ -26,8 +26,9 @@ const loginUser = async (req: Request, res: Response, next: NextFunction) => {
           if (err) {
             throw new AppError(err.message, err.statusCode);
           }
+          res.cookie('auth_token',token)
 
-          return res.status(200).json({ message: 'Login Successful', user: user, token:token });
+           res.status(200).json({ message: 'Login Successful'});
         });
       } catch (error) {
         next(error);

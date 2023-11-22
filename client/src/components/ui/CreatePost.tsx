@@ -7,34 +7,34 @@ import { MdClose } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import { addPost, getPosts } from '../../store/features/post/postSlice';
 import { RootState } from '../../store';
-import { jwtDecode } from 'jwt-decode';
-import { IDecodedToken } from '../../models/auth';
+// import { jwtDecode } from 'jwt-decode';
+// import { IDecodedToken } from '../../models/auth';
 import { setIsOpen } from '../../store/features/modal/modalSlice';
 
 const CreatePost: React.FC<{ content?: any }> = ({ content }) => {
   const [text, setText] = useState('');
   const [selectedFile, setSelectedFile] = useState<File[] | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [decodedId, setDecodedId] = useState<number | null>(null);
-  const token = useSelector((state: RootState) => state.auth.token);
+  // const [decodedId, setDecodedId] = useState<number | null>(null);
+  // const token = useSelector((state: RootState) => state.auth.token);
   const userData = useSelector((state: RootState) => state.auth.user);
   const dispatch = useDispatch();
   const quoteModalContent = useSelector((state: RootState) => state.modal.postData['modalQuote']);
-  useEffect(() => {
-    const getUsernameFromToken = (authToken: string) => {
-      try {
-        const decoded: IDecodedToken = jwtDecode(authToken);
-        const id = decoded.userId;
-        setDecodedId(id);
-      } catch (error) {
-        console.error('Error decoding token:', error);
-      }
-    };
+  // useEffect(() => {
+  //   const getUsernameFromToken = (authToken: string) => {
+  //     try {
+  //       const decoded: IDecodedToken = jwtDecode(authToken);
+  //       const id = decoded.userId;
+  //       setDecodedId(id);
+  //     } catch (error) {
+  //       console.error('Error decoding token:', error);
+  //     }
+  //   };
 
-    if (token) {
-      getUsernameFromToken(token);
-    }
-  }, [token]);
+  //   if (token) {
+  //     getUsernameFromToken(token);
+  //   }
+  // }, [token]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -45,8 +45,11 @@ const CreatePost: React.FC<{ content?: any }> = ({ content }) => {
     const formData = new FormData();
     formData.append('content', text);
 
-    if (decodedId !== null && !isNaN(decodedId)) {
-      formData.append('user_id', decodedId.toString());
+    // if (decodedId !== null && !isNaN(decodedId)) {
+    //   formData.append('user_id', decodedId.toString());
+    // }
+    if (userData?.user_id) {
+      formData.append('user_id', userData.user_id.toString());
     }
 
     if (selectedFile) {
@@ -64,7 +67,7 @@ const CreatePost: React.FC<{ content?: any }> = ({ content }) => {
       setText('');
       setSelectedFile(null);
       await dispatch(getPosts() as any);
-      dispatch(setIsOpen({ id: 'modalQuote', isOpen: false}));
+      dispatch(setIsOpen({ id: 'modalQuote', isOpen: false }));
     } catch (error) {
       console.error('Error submitting post:', error);
     }
