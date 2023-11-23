@@ -2,10 +2,10 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { AuthState, IConfirmReset, IResetParams, IUserLogin, IUserRegister } from '../../../models/auth';
 import fetchWrapper from '../../helpers/fetchWrapper.ts';
 const initialState: AuthState = {
-  token: localStorage.getItem('token') || null,
   error: null,
   loading: null,
-  user: null
+  user: null,
+  isAuth: null,
 };
 
 const BASE_URL = 'http://localhost:3000/auth';
@@ -14,22 +14,24 @@ export const registerUser = createAsyncThunk('auth/registerUser', async (userDat
   return fetchWrapper(`${BASE_URL}/register`, 'POST', userData);
 });
 
-export const verifyEmail = createAsyncThunk('auth/verifyEmail', async (verificationToken: string|null) => {
+export const verifyEmail = createAsyncThunk('auth/verifyEmail', async (verificationToken: string | null) => {
   return fetchWrapper(`${BASE_URL}/verify?token=${verificationToken}`, 'GET');
-})
+});
 
+export const checkAuth = createAsyncThunk('auth/checkAuth', async () => {
+  return fetchWrapper('http://localhost:3000/checkAuth', 'GET');
+});
 export const loginUser = createAsyncThunk('auth/loginUser', async (userData: IUserLogin) => {
   // return await fetchWrapper(`${BASE_URL}/login`, 'POST', userData);
   try {
     const response = await fetchWrapper(`${BASE_URL}/login`, 'POST', userData);
-    
 
     localStorage.setItem('token', response.token);
 
     return response;
   } catch (error) {
     console.error('Login failed:', error);
-    throw error; 
+    throw error;
   }
 });
 
@@ -59,16 +61,18 @@ const authSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    const setPending = (state:any) => {
+    const setPending = (state: any) => {
       state.loading = true;
+      console.log(state.loading);
     };
 
-    const setError = (state:any, action:any) => {
+    const setError = (state: any, action: any) => {
       state.error = action.error.message || null;
       state.loading = false;
+      console.log(state.error);
     };
 
-    const setFulfilled = (state:any, action:any) => {
+    const setFulfilled = (state: any, action: any) => {
       state.error = action.payload?.error?.message || null;
       state.loading = false;
     };
@@ -78,7 +82,7 @@ const authSlice = createSlice({
       .addCase(registerUser.fulfilled, (state, action) => {
         setFulfilled(state, action);
         if (!state.error) {
-          state.token = action.payload.token;
+          console.log(action.payload)
           state.user = action.payload.user;
         }
       })
@@ -87,28 +91,26 @@ const authSlice = createSlice({
       .addCase(verifyEmail.fulfilled, setFulfilled)
       .addCase(verifyEmail.rejected, setError)
       .addCase(loginUser.pending, setPending)
-      .addCase(loginUser.fulfilled, (state, action) => {
-        setFulfilled(state, action);
-        if (!state.error) {
-          state.user = action.payload.user;
-          state.token = action.payload.token
-        }
-      })
+      .addCase(loginUser.fulfilled, setFulfilled)
       .addCase(loginUser.rejected, setError)
       .addCase(forgotPass.fulfilled, setFulfilled)
       .addCase(forgotPass.rejected, setError)
       .addCase(resetPass.pending, setPending)
       .addCase(resetPass.fulfilled, setFulfilled)
-      .addCase(resetPass.rejected, (state, action) => {
-        setError(state, action);
-        state.token = null;
-      })
+      .addCase(resetPass.rejected, setError)
       .addCase(confirmResetPassword.pending, setPending)
       .addCase(confirmResetPassword.fulfilled, setFulfilled)
       .addCase(confirmResetPassword.rejected, setError)
       .addCase(logoutUser.pending, setPending)
       .addCase(logoutUser.fulfilled, setFulfilled)
-      .addCase(logoutUser.rejected, setError);
+      .addCase(logoutUser.rejected, setError)
+      .addCase(checkAuth.pending, setPending)
+      .addCase(checkAuth.fulfilled, (state, action) => {
+        setFulfilled(state, action);
+        state.user = action.payload.user;
+        state.isAuth = action.payload.isAuth;
+      })
+      .addCase(checkAuth.rejected, setError);
   },
 });
 
