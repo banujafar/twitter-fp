@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, current } from '@reduxjs/toolkit';
 import { IPostInitialState } from '../../../models/post';
 
 export const getPosts = createAsyncThunk('post/getPosts', async () => {
@@ -51,18 +51,37 @@ export const likePost = createAsyncThunk(
         body: JSON.stringify({ postId, userId }),
       });
 
-      if (!response.ok) {
-        throw new Error('Error');
-      }
-
-      const responseData = await response.json();
-      return responseData;
-    } catch (error) {
-      throw error;
+    if (!response.ok) {
+      throw new Error('Error');
     }
-  },
-);
 
+    const responseData = await response.json();
+    return responseData;
+  } catch (error) {
+    throw error;
+  }
+});
+export const addComment = createAsyncThunk('post/addComment', async (formData: any) => {
+  console.log(formData);
+  try {
+    const response = await fetch(`http://localhost:3000/api/posts/comment`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
+    });
+
+    if (!response.ok) {
+      throw new Error('Error');
+    }
+
+    const responseData = await response.json();
+    return responseData;
+  } catch (error) {
+    throw error;
+  }
+});
 export const removeLike = createAsyncThunk(
   'like/removeLike',
   async ({ postId, userId }: { postId: number; userId: number }) => {
@@ -173,6 +192,28 @@ const postSlice = createSlice({
         state.error = null;
       })
       .addCase(removeLike.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || null;
+      })
+      .addCase(addComment.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(addComment.fulfilled, (state, action) => {
+        const updatedPosts=current(state.post).map((singlePost)=>{
+         if(singlePost.id===action.payload.post?.id){
+          return{
+            ...singlePost,
+            comments:singlePost.comments?[...singlePost.comments,action.payload]:[action.payload]
+          }
+         }
+         return singlePost
+        })
+        state.post = updatedPosts;
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(addComment.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || null;
       });

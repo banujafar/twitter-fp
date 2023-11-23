@@ -1,3 +1,4 @@
+import { PostComment } from './../entity/PostComment.entity.ts';
 import { Router, Request, Response } from 'express';
 import tryCatch from '../utils/tryCatch.ts';
 import AppError from '../config/appError.ts';
@@ -47,7 +48,8 @@ postRouter.get(
         where: { post: { id: post.id } },
         relations: ['post', 'user'],
       });
-
+      const comments = await PostComment.find({ where: { post: { id: post.id } }, relations: ['user', 'post'] });
+      console.log(comments);
       const retweetsForPost = retweets.filter((retweet) => retweet.retweetedFromPost?.id === post.id);
       return {
         ...post,
@@ -56,6 +58,13 @@ postRouter.get(
           liked_time: like.liked_time,
           post: like.post,
           user: like.user,
+        })),
+        comments:comments.map((r)=>({
+          id: r.id,
+          comment: r.comment_text,
+          postId:r.post.id,
+          userId:r.user.id
+
         })),
         retweets: retweetsForPost.map((r) => r.post),
         retweetFrom: retweets.filter((retweet) => retweet.post?.id === post.id),
@@ -102,7 +111,7 @@ postRouter.post(
       retweetedPost.retweetedFromPost = retweetFromPost;
       retweetedPost.user = retweetedFromUser;
       await retweetedPost.save();
-
+      console.log(retweetedPost);
       return res.status(201).json(retweetedPost);
     }
     return res.status(201).json(post);
@@ -114,6 +123,7 @@ postRouter.post(
   '/like',
   tryCatch(async (req: Request, res: Response) => {
     const { postId, userId } = req.body;
+    console.log(postId, userId);
     const post = await UserPost.findOne({ where: { id: postId }, relations: ['likes'] });
     const user = await User.findOne({ where: { id: userId } });
 
@@ -155,13 +165,46 @@ postRouter.delete(
       where: { post: { id: postId }, user: { id: userId } },
       relations: ['post', 'user'],
     });
-      console.log(existingLike.id)
+    console.log(existingLike.id);
     if (!existingLike) {
       return res.status(404).json({ error: 'Like not found' });
     }
 
-    await LikedPost.delete(existingLike.id); 
+    await LikedPost.delete(existingLike.id);
     res.status(200).json(existingLike.id);
+  }),
+);
+
+postRouter.post(
+  '/comment',
+  tryCatch(async (req: Request, res: Response) => {
+    const { comment, user_id, post_id } = req.body;
+
+    const post = (await UserPost.find({ where: { id: post_id } })) || [];
+    if (post.length === 0) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
+    const user = (await User.find({ where: { id: user_id } })) || [];
+    if (user.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const postComment = new PostComment();
+    postComment.comment_text = comment;
+    postComment.post = post[0];
+    postComment.user = user[0];
+    await postComment.save();
+
+    const { id, username } = user[0];
+    const postWithComment = {
+      id: postComment.id,
+      comment_text: postComment.comment_text,
+      user: { id, username },
+      post: { id: post[0].id },
+    };
+
+    return res.status(201).json(postWithComment);
   }),
 );
 

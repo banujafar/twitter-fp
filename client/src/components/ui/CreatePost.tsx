@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, useRef, useEffect } from 'react';
+import React, { useState, ChangeEvent, useRef } from 'react';
 import { CgProfile } from 'react-icons/cg';
 import { CiImageOn } from 'react-icons/ci';
 import { FaRegSmile } from 'react-icons/fa';
@@ -48,8 +48,8 @@ const CreatePost: React.FC<{ content?: any }> = ({ content }) => {
     // if (decodedId !== null && !isNaN(decodedId)) {
     //   formData.append('user_id', decodedId.toString());
     // }
-    if (userData?.user_id) {
-      formData.append('user_id', userData.user_id.toString());
+    if (userData?.userId) {
+      formData.append('user_id', userData.userId.toString());
     }
 
     if (selectedFile) {

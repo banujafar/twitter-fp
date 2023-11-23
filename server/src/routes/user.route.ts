@@ -36,13 +36,16 @@ userRouter.post(
 );
 
 //Get Request route for confirm email
-userRouter.get('/verify', tryCatch(async (req: Request, res: Response) => {
-  const token = String(req.query.token);
-  await markEmailAsVerified(token).then(async (result) => {
-    res.status(200).json('email verified');
-    await Token.delete({ token: token });
-  });
-}));
+userRouter.get(
+  '/verify',
+  tryCatch(async (req: Request, res: Response) => {
+    const token = String(req.query.token);
+    await markEmailAsVerified(token).then(async (result) => {
+      res.status(200).json('email verified');
+      await Token.delete({ token: token });
+    });
+  }),
+);
 
 //Login router
 userRouter.post('/login', loginUser);
@@ -109,6 +112,7 @@ userRouter.post(
       }
 
       res.clearCookie('connect.sid');
+      res.clearCookie('auth_token');
       req.session.destroy(function (err) {
         if (err) {
           throw new AppError('Session destruction failed', 500);
