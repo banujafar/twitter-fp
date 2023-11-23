@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { AuthState, IConfirmReset, IResetParams, IUserLogin, IUserRegister } from '../../../models/auth';
 import fetchWrapper from '../../helpers/fetchWrapper.ts';
+
 const initialState: AuthState = {
   error: null,
   loading: null,
@@ -109,6 +110,7 @@ const authSlice = createSlice({
         setFulfilled(state, action);
         state.user = action.payload.user;
         state.isAuth = action.payload.isAuth;
+        console.log(state.user)
       })
       .addCase(checkAuth.rejected, setError);
   },
