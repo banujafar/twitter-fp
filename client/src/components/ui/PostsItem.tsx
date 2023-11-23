@@ -2,44 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { AiOutlineRetweet } from 'react-icons/ai';
 import { BsFillShareFill } from 'react-icons/bs';
 import { FaHeart, FaRegComment, FaRegHeart } from 'react-icons/fa';
-import { CgProfile } from 'react-icons/cg';
-import { Link } from 'react-router-dom';
 import { CiEdit } from 'react-icons/ci';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store';
 import { setIsOpen } from '../../store/features/modal/modalSlice';
-import { formattedDate } from '../../utils/FormatDate';
 import { IUserPost } from '../../models/post';
-import { IUser } from '../../models/user';
 import { likePost, removeLike } from '../../store/features/post/postSlice';
-import { jwtDecode } from 'jwt-decode';
-import { IDecodedToken } from '../../models/auth';
 import SinglePost from './SinglePost';
 
-const UserAvatar: React.FC<{ user: IUser; size: number }> = ({ user, size }) => (
-  <Link to={`/profile/${user?.username}`} className="flex">
-    {user?.profilePhoto ? (
-      <img
-        src={user?.profilePhoto}
-        alt={`${user?.username}'s profile`}
-        className={`w-16 h-16 rounded-full mb-4 sm:mb-0`}
-      />
-    ) : (
-      <CgProfile size={size} className="text-gray-500" />
-    )}
-  </Link>
-);
-
-const renderImages = (img: any, id: number) => {
-  if (Array.isArray(img)) {
-    return img.map((imgUrl) => (
-      <img key={id} src={`/src/assets/uploads/${imgUrl}`} alt="post img" className="mt-4 w-full max-w-full" />
-    ));
-  } else if (img) {
-    return <img src={`/src/assets/uploads/${img}`} alt="post img" className="mt-4 w-full max-w-full" />;
-  }
-  return null;
-};
 
 const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -114,19 +84,19 @@ const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
       console.log(err);
     }
   };
-
+console.log(postData)
   return (
     <div className="tweet-container bg-white border-b border-gray-200 w-full p-4">
       <SinglePost postData={postData} />
       <div className="flex items-center justify-between gap-4 mt-4 px-12">
         <div className="flex items-center text-gray-500 cursor-pointer hover:text-twitterColor"  onClick={handleOpenCommentModal}>
           <FaRegComment />
-          <span className="ml-1">12</span>
+          <span className="ml-1">{postData.comments?.length}</span>
         </div>
         <div className="relative cursor-pointer" onClick={handleRetweet} ref={dropdownRef}>
           <div className="flex items-center text-gray-500 hover:text-green-500">
             <AiOutlineRetweet className="text-xl" />
-            <span className="ml-1">24</span>
+            <span className="ml-1">{postData.retweets?.length}</span>
           </div>
           {isDropdownOpen && (
             <ul className="absolute bg-white top-0 right-0 p-4 rounded-xl border border-gray-300">

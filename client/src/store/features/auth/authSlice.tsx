@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { AuthState, IConfirmReset, IResetParams, IUserLogin, IUserRegister } from '../../../models/auth';
 import fetchWrapper from '../../helpers/fetchWrapper.ts';
+
 const initialState: AuthState = {
   error: null,
   loading: null,

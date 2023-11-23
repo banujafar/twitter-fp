@@ -4,22 +4,27 @@ import { AppDispatch, RootState } from '../../store';
 import { useState } from 'react';
 import SinglePost from '../ui/SinglePost';
 import { addComment } from '../../store/features/post/postSlice';
+import { setIsOpen } from '../../store/features/modal/modalSlice';
 const CommentModal = () => {
   const quoteModalContent = useSelector((state: RootState) => state.modal.postData['modalComment']);
   const [text, setText] = useState('');
-  const user=useSelector((state:RootState)=>state.auth.user);
-  console.log(user)
+  const user = useSelector((state: RootState) => state.auth.user);
+  console.log(user);
   const dispatch = useDispatch<AppDispatch>();
   const handleChange = (e: any) => {
     setText(e.target.value);
   };
   const handleSendComment = async (e: any) => {
     e.preventDefault();
-    const formData = { comment: text, user_id: quoteModalContent.user.id, post_id: quoteModalContent.id };
+    const formData = { comment: text, user_id: user?.userId, post_id: quoteModalContent.id };
     console.log(formData);
-    await dispatch(addComment(formData));
+    await dispatch(addComment(formData)).then((res) => {
+      if (res.payload) {
+        dispatch(setIsOpen({ id: 'modalComment', isOpen: false }));
+      }
+    });
   };
- 
+
   return (
     <Modal
       modal={{

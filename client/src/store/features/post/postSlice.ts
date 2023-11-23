@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, current } from '@reduxjs/toolkit';
 import { IPostInitialState } from '../../../models/post';
 
 export const getPosts = createAsyncThunk('post/getPosts', async () => {
@@ -64,7 +64,7 @@ export const likePost = createAsyncThunk(
 export const addComment = createAsyncThunk('post/addComment', async (formData: any) => {
   console.log(formData);
   try {
-    const response = await fetch(`http://localhost:3000/api/posts/comments/${formData.post_id}`, {
+    const response = await fetch(`http://localhost:3000/api/posts/comment`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -200,7 +200,16 @@ const postSlice = createSlice({
         state.error = null;
       })
       .addCase(addComment.fulfilled, (state, action) => {
-        state.post = action.payload;
+        const updatedPosts=current(state.post).map((singlePost)=>{
+         if(singlePost.id===action.payload.post?.id){
+          return{
+            ...singlePost,
+            comments:singlePost.comments?[...singlePost.comments,action.payload]:[action.payload]
+          }
+         }
+         return singlePost
+        })
+        state.post = updatedPosts;
         state.loading = false;
         state.error = null;
       })
