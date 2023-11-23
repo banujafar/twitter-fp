@@ -15,6 +15,6 @@ export class LikedPost extends BaseEntity {
   @JoinColumn({ name: 'user_id' })
   user: Relation<User>;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   liked_time: Date;
 }
