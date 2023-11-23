@@ -63,6 +63,32 @@ export const likePost = createAsyncThunk(
   },
 );
 
+export const removeLike = createAsyncThunk(
+  'like/removeLike',
+  async ({ postId, userId }: { postId: number; userId: number }) => {
+    try {
+      const response = await fetch('http://localhost:3000/api/posts/like', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ postId, userId }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error');
+      }
+
+      const responseData = await response.json();
+      console.log(responseData)
+      return responseData;
+
+    } catch (error) {
+      throw error;
+    }
+  },
+);
+
 const initialState: IPostInitialState = {
   post: [],
   error: null,
@@ -121,8 +147,32 @@ const postSlice = createSlice({
         state.loading = false;
         state.error = null;
       })
-
       .addCase(likePost.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || null;
+      })
+      .addCase(removeLike.pending, (state) => {
+        state.error = null;
+        state.loading = true;
+      })
+      .addCase(removeLike.fulfilled, (state, action) => {
+        console.log(action.payload)
+        const removedLikeId = action.payload;
+
+        const updatedPosts = state.post.map((p) => {
+          if (p.likes.some((like) => like.id === removedLikeId)) {
+            return {
+              ...p,
+              likes: p.likes.filter((like) => like.id !== removedLikeId),
+            };
+          }
+          return p;
+        });
+        state.post = updatedPosts;
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(removeLike.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || null;
       });

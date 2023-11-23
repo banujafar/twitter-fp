@@ -11,7 +11,7 @@ import { setIsOpen } from '../../store/features/modal/modalSlice';
 import { formattedDate } from '../../utils/FormatDate';
 import { IUserPost } from '../../models/post';
 import { IUser } from '../../models/user';
-import { likePost } from '../../store/features/post/postSlice';
+import { likePost, removeLike } from '../../store/features/post/postSlice';
 import { jwtDecode } from 'jwt-decode';
 import { IDecodedToken } from '../../models/auth';
 
@@ -68,7 +68,7 @@ const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
   const handleRetweet = () => {
     setIsDropdownOpen(true);
   };
-  console.log(postData);
+  // console.log(postData);
   const handleOpenQuoteModal = () => {
     dispatch(setIsOpen({ id: 'modalQuote', isOpen: true, postData: postData }));
   };
@@ -98,7 +98,12 @@ const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
         postId: postId,
         userId: decodedUserId,
       };
-      await dispatch(likePost(data));
+
+      if (userLikedPosts) {
+        await dispatch(removeLike(data));
+      } else {
+        await dispatch(likePost(data));
+      }
 
       console.log('liked');
     } catch (err) {
@@ -192,7 +197,7 @@ const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
                 <span className="ml-1">{postData.likes.length}</span>
               </div>
             )}
-          
+
             <div className="flex items-center text-gray-500 cursor-pointer">
               <BsFillShareFill />
             </div>

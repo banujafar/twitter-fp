@@ -42,7 +42,6 @@ postRouter.get(
     if (!posts || posts.length === 0) {
       throw new AppError('No posts found', 404);
     }
-   
     const filteredPostsWithRetweets = posts.map(async (post) => {
       const likes = await LikedPost.find({
         where: { post: { id: post.id } },
@@ -50,7 +49,6 @@ postRouter.get(
       });
 
       const retweetsForPost = retweets.filter((retweet) => retweet.retweetedFromPost?.id === post.id);
-      
       return {
         ...post,
         likes: likes.map((like) => ({
@@ -69,7 +67,6 @@ postRouter.get(
     return res.status(200).json(result);
   }),
 );
-
 
 // add new post
 postRouter.post(
@@ -112,13 +109,12 @@ postRouter.post(
   }),
 );
 
-
 // like post
 postRouter.post(
   '/like',
   tryCatch(async (req: Request, res: Response) => {
     const { postId, userId } = req.body;
-    const post = await UserPost.findOne({ where: { id: postId }, relations: ['likes']});
+    const post = await UserPost.findOne({ where: { id: postId }, relations: ['likes'] });
     const user = await User.findOne({ where: { id: userId } });
 
     if (!user || !post) {
@@ -132,11 +128,6 @@ postRouter.post(
     if (existingLike) {
       return res.status(400).json({ message: 'Post already liked by the user' });
     }
-    
-    // const likedPost = new LikedPost();
-    // likedPost.post = post; 
-    // likedPost.user = user; 
-    // await likedPost.save();
 
     const likedPost = await LikedPost.create({
       post: await UserPost.findOne({ where: { id: postId }, relations: ['user'] }),
@@ -148,8 +139,29 @@ postRouter.post(
       where: { id: likedPost.id },
       relations: ['user', 'post'],
     });
-  
     res.status(200).json(completeLikedPost);
+  }),
+);
+
+// remove like
+postRouter.delete(
+  '/like',
+  tryCatch(async (req: Request, res: Response) => {
+    const { postId, userId } = req.body;
+    if (!postId || !userId) {
+      return res.status(400).json({ error: 'Invalid request' });
+    }
+    const existingLike = await LikedPost.findOne({
+      where: { post: { id: postId }, user: { id: userId } },
+      relations: ['post', 'user'],
+    });
+      console.log(existingLike.id)
+    if (!existingLike) {
+      return res.status(404).json({ error: 'Like not found' });
+    }
+
+    await LikedPost.delete(existingLike.id); 
+    res.status(200).json(existingLike.id);
   }),
 );
 
