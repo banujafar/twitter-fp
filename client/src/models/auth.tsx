@@ -1,15 +1,15 @@
 export interface IUserRegister {
   username: string;
   email: string;
-  password: string;
-  profilePhoto? : string
+  user_id: number;
+  profilePhoto?: string;
 }
 
 export interface AuthState {
-  token: string | null;
   error: string | null;
   loading: Boolean | null;
-  user?: IUserRegister | null
+  user?: IUserRegister | null;
+  isAuth?: Boolean | null;
 }
 
 export interface IUserLogin {
@@ -29,10 +29,9 @@ export interface IConfirmReset {
   confirm_password: string;
 }
 
-
 export interface IDecodedToken {
-  exp: number,
-  iat: number,
-  userId: number | null,
-  username: string | null
+  exp: number;
+  iat: number;
+  userId: number | null;
+  username: string | null;
 }

@@ -1,39 +1,32 @@
-import { useEffect, useState } from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
-import axios from 'axios';
+import { useEffect } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
 import TwitterLoader from '../components/loaders/TwitterLoader';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../store';
+import { checkAuth } from '../store/features/auth/authSlice';
+import Login from '../pages/Login';
+
 const ProtectedRoute = () => {
-  const [authenticated, setAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const { loading, isAuth, error } = useSelector((state: RootState) => state.auth);
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await axios.get('http://localhost:3000/checkAuth', {
-          withCredentials: true,
-        });
-
-        if (response.status === 200) {
-          const { isAuth } = response.data;
-          if (isAuth ) {
-            setAuthenticated(true);
-          }
+    const fetchData = async () => {
+      await dispatch(checkAuth()).then((res) => {
+        if (res.payload?.error) {
+          navigate('/login');
         }
-      } catch (error) {
-        console.error('Error checking authentication:', error);
-      } finally {
-        setLoading(false);
-      }
+      });
     };
 
-    checkAuth();
-  }, []);
-
+    fetchData();
+  }, [isAuth, error]);
   if (loading) {
-    return <TwitterLoader/>
+    return <TwitterLoader />;
   }
 
-  return authenticated ? <Outlet /> : <Navigate to="/login" />;
+  return isAuth ? <Outlet /> : <Login />;
 };
 
 export default ProtectedRoute;

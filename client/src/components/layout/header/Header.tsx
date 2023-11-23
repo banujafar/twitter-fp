@@ -6,35 +6,32 @@ import { IoSearchOutline, IoSearch } from 'react-icons/io5';
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 import { BiEnvelope, BiSolidEnvelope, BiSolidUser, BiUser } from 'react-icons/bi';
 import userImage from '../../../assets/images/user.jpg';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../store';
 import { logoutUser } from '../../../store/features/auth/authSlice';
-import { jwtDecode } from 'jwt-decode';
-import { IDecodedToken } from '../../../models/auth';
 
 const Header = () => {
   const [notifications, setNotifications] = useState(true);
   const [logoutPopover, setLogoutPopover] = useState(false);
-  const [decodedUsername, setDecodedUsername] = useState<string | null>(null);
-  const dispatch = useDispatch<AppDispatch>();
-  const token = useSelector((state: RootState) => state.auth.token);
+  // const [decodedUsername, setDecodedUsername] = useState<string | null>(null);
+   const dispatch = useDispatch<AppDispatch>();
+   const user = useSelector((state: RootState) => state.auth.user);
+  // useEffect(() => {
+  //   const getUsernameFromToken = (authToken: string) => {
+  //     try {
+  //       const decoded: IDecodedToken = jwtDecode(authToken);
+  //       const username = decoded.username;
+  //       setDecodedUsername(username);
+  //     } catch (error) {
+  //       console.error('Error decoding token:', error);
+  //     }
+  //   };
 
-  useEffect(() => {
-    const getUsernameFromToken = (authToken: string) => {
-      try {
-        const decoded: IDecodedToken = jwtDecode(authToken);
-        const username = decoded.username;
-        setDecodedUsername(username);
-      } catch (error) {
-        console.error('Error decoding token:', error);
-      }
-    };
-
-    if (token) {
-      getUsernameFromToken(token);
-    }
-  }, [token]);
+  //   if (token) {
+  //     getUsernameFromToken(token);
+  //   }
+  // }, [token]);
 
   const handleLogOut = async () => {
     //Handle logout
@@ -136,7 +133,7 @@ const Header = () => {
               <div className="lg:-bottom-14 md:fixed md:bottom-16 sm:fixed sm:bottom-16 xs:fixed xs:bottom-16 lg:absolute rounded-md -bottom-14 bg-white shadow-logout absolute flex justify-center items-center min-w-[225px]">
                 <button type="button" className="flex items-center justify-center py-3 w-full font-bold text-base">
                   <div onClick={handleLogOut} className="w-full py-1 hover:bg-navHoverColor cursor-pointer">
-                    Log out &#64;{decodedUsername}
+                    Log out &#64;{user?.username}
                   </div>
                 </button>
               </div>
@@ -160,8 +157,8 @@ const Header = () => {
                 <img src={userImage} alt="profile" />
               </div>
               <div className="ml-2 mr-8 lg:flex flex-col md:hidden sm:hidden xs:hidden xxs:hidden">
-                <h3 className="font-bold text-base">{decodedUsername}</h3>
-                <span className="text-[#536471] text-base">&#64;{decodedUsername}</span>
+                <h3 className="font-bold text-base">{user?.username}</h3>
+                <span className="text-[#536471] text-base">&#64; {user?.username}</span>
               </div>
             </div>
           </div>
