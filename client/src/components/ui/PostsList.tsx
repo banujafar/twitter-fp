@@ -7,12 +7,16 @@ import { getPosts } from '../../store/features/post/postSlice';
 import { IUserPost } from '../../models/post';
 import { modalIsOpenSelector } from '../../store/features/modal/modalSlice';
 import QuoteModal from '../modals/QuoteModal';
+import CommentModal from '../modals/CommentModal';
 
 const PostsList = () => {
   const dispatch = useDispatch();
 
   const posts = useSelector((state: RootState) => state.post.post) as IUserPost[];
   const loading = useSelector((state: RootState) => state.post.loading);
+
+  const isOpenQuote= useSelector((state) => modalIsOpenSelector(state, 'modalQuote'));
+  const isOpenComment= useSelector((state) => modalIsOpenSelector(state, 'modalComment'));
 
   const sortedPosts = [...posts].sort((a, b) => {
     const dateA = new Date(a.created_date);
@@ -31,7 +35,7 @@ const PostsList = () => {
     dispatch(getPosts() as any);
     
   }, [dispatch]);
-  const isOpen = useSelector((state) => modalIsOpenSelector(state, 'modalQuote'));
+ 
   return (
     <div className="mx-2 sm:mx-0 xs:mx-0 border border-gray-200 w-full">
       <CreatePost />
@@ -42,7 +46,8 @@ const PostsList = () => {
       ) : (
         <p>No posts found</p>
       )}
-      {isOpen && <QuoteModal />}
+      {isOpenQuote && <QuoteModal />}
+      {isOpenComment && <CommentModal />}
     </div>
   );
 };

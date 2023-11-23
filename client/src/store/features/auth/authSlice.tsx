@@ -109,6 +109,7 @@ const authSlice = createSlice({
         setFulfilled(state, action);
         state.user = action.payload.user;
         state.isAuth = action.payload.isAuth;
+        console.log(state.user)
       })
       .addCase(checkAuth.rejected, setError);
   },

@@ -14,6 +14,7 @@ import { IUser } from '../../models/user';
 import { likePost, removeLike } from '../../store/features/post/postSlice';
 import { jwtDecode } from 'jwt-decode';
 import { IDecodedToken } from '../../models/auth';
+import SinglePost from './SinglePost';
 
 const UserAvatar: React.FC<{ user: IUser; size: number }> = ({ user, size }) => (
   <Link to={`/profile/${user?.username}`} className="flex">
@@ -43,27 +44,26 @@ const renderImages = (img: any, id: number) => {
 const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
-  const [decodedId, setDecodedId] = useState<number | null>(null);
+  //const [decodedId, setDecodedId] = useState<number | null>(null);
   const dispatch = useDispatch<AppDispatch>();
-  const token = useSelector((state: RootState) => state.auth.token);
+  const user = useSelector((state: RootState) => state.auth.user);
 
-  const userLikedPosts = postData.likes?.some((like) => like?.user?.id === decodedId);
+  const userLikedPosts = postData.likes?.some((like) => like?.user?.id === user?.userId);
+  // useEffect(() => {
+  //   const getUsernameFromToken = (authToken: string) => {
+  //     try {
+  //       const decoded: IDecodedToken = jwtDecode(authToken);
+  //       const id = decoded.userId;
+  //       setDecodedId(id);
+  //     } catch (error) {
+  //       console.error('Error decoding token:', error);
+  //     }
+  //   };
 
-  useEffect(() => {
-    const getUsernameFromToken = (authToken: string) => {
-      try {
-        const decoded: IDecodedToken = jwtDecode(authToken);
-        const id = decoded.userId;
-        setDecodedId(id);
-      } catch (error) {
-        console.error('Error decoding token:', error);
-      }
-    };
-
-    if (token) {
-      getUsernameFromToken(token);
-    }
-  }, [token]);
+  //   if (token) {
+  //     getUsernameFromToken(token);
+  //   }
+  // }, [token]);
 
   const handleRetweet = () => {
     setIsDropdownOpen(true);
@@ -71,6 +71,9 @@ const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
   // console.log(postData);
   const handleOpenQuoteModal = () => {
     dispatch(setIsOpen({ id: 'modalQuote', isOpen: true, postData: postData }));
+  };
+  const handleOpenCommentModal = () => {
+    dispatch(setIsOpen({ id: 'modalComment', isOpen: true, postData: postData }));
   };
 
   useEffect(() => {
@@ -91,8 +94,9 @@ const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
 
     try {
       let decodedUserId: number = 0;
-      if (decodedId !== null && !isNaN(decodedId)) {
-        decodedUserId = decodedId;
+      console.log(user)
+      if (user?.userId) {
+        decodedUserId = user.userId;
       }
       const data = {
         postId: postId,
@@ -113,95 +117,47 @@ const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
 
   return (
     <div className="tweet-container bg-white border-b border-gray-200 w-full p-4">
-      <div className="flex sm:flex-row items-start gap-4">
-        <div className="w-auto">
-          <UserAvatar user={postData.user} size={44} />
+      <SinglePost postData={postData} />
+      <div className="flex items-center justify-between gap-4 mt-4 px-12">
+        <div className="flex items-center text-gray-500 cursor-pointer hover:text-twitterColor"  onClick={handleOpenCommentModal}>
+          <FaRegComment />
+          <span className="ml-1">12</span>
         </div>
-        <div className="w-11/12 xl:w-11/12 lg:w-11/12 md:w-11/12 sm:w-11/12 xs:w-full">
-          <div className="flex flex-col flex-grow mb-2">
-            <div className="flex items-center gap-2 mb-2">
-              <Link to={`/profile/${postData.user?.username}`} className="font-bold text-lg hover:underline">
-                {postData.user?.username}
-              </Link>
-              <p className="text-gray-500">{formattedDate(postData.created_date)}</p>
-            </div>
-            <p className="text-gray-800">{postData.content}</p>
-            {renderImages(postData.img, postData.id)}
+        <div className="relative cursor-pointer" onClick={handleRetweet} ref={dropdownRef}>
+          <div className="flex items-center text-gray-500 hover:text-green-500">
+            <AiOutlineRetweet className="text-xl" />
+            <span className="ml-1">24</span>
           </div>
-          {postData.retweetFrom && !!postData.retweetFrom.length && (
-            <div className="border-gray-200 border p-2 rounded-2xl">
-              <div className=" flex gap-2">
-                <UserAvatar user={postData.retweetFrom[0].retweetedFromPost?.user} size={30} />
-                <div className="flex items-center gap-2 mb-2">
-                  <Link
-                    to={`/profile/${postData.retweetFrom[0].retweetedFromPost?.user?.username}`}
-                    className="font-bold text-lg hover:underline"
-                  >
-                    {postData.retweetFrom[0].user?.username}
-                  </Link>
-                  <p className="text-gray-500">{formattedDate(postData.created_date)}</p>
-                </div>
-              </div>
-              <div className="w-11/12 xl:w-11/12 lg:w-11/12 md:w-11/12 sm:w-11/12 xs:w-full">
-                <div className="flex flex-col flex-grow">
-                  <p className="text-gray-800">{postData.retweetFrom[0].retweetedFromPost?.content}</p>
-                  {renderImages(
-                    postData.retweetFrom[0].retweetedFromPost?.img,
-                    postData.retweetFrom[0].retweetedFromPost?.id,
-                  )}
-                </div>
-              </div>
-            </div>
+          {isDropdownOpen && (
+            <ul className="absolute bg-white top-0 right-0 p-4 rounded-xl border border-gray-300">
+              <li className="flex items-center gap-2 text-gray-700 hover:text-green-500 mb-2">
+                <AiOutlineRetweet className="text-lg" />
+                <span>Repost</span>
+              </li>
+              <li className="flex items-center gap-2 text-gray-700 hover:text-green-500" onClick={handleOpenQuoteModal}>
+                <CiEdit className="text-lg" />
+                <span>Quote</span>
+              </li>
+            </ul>
           )}
-
-          <div className="flex items-center justify-between gap-4 mt-4">
-            <div className="flex items-center text-gray-500 cursor-pointer hover:text-twitterColor">
-              <FaRegComment />
-              <span className="ml-1">12</span>
-            </div>
-            <div className="relative cursor-pointer" onClick={handleRetweet} ref={dropdownRef}>
-              <div className="flex items-center text-gray-500 hover:text-green-500">
-                <AiOutlineRetweet className="text-xl" />
-                <span className="ml-1">24</span>
-              </div>
-              {isDropdownOpen && (
-                <ul className="absolute bg-white top-0 right-0 p-4 rounded-xl border border-gray-300">
-                  <li className="flex items-center gap-2 text-gray-700 hover:text-green-500 mb-2">
-                    <AiOutlineRetweet className="text-lg" />
-                    <span>Repost</span>
-                  </li>
-                  <li
-                    className="flex items-center gap-2 text-gray-700 hover:text-green-500"
-                    onClick={handleOpenQuoteModal}
-                  >
-                    <CiEdit className="text-lg" />
-                    <span>Quote</span>
-                  </li>
-                </ul>
-              )}
-            </div>
-            {userLikedPosts ? (
-              <div
-                className="flex items-center  cursor-pointer text-[#f91880]"
-                onClick={(e) => handleLike(postData.id, e)}
-              >
-                <FaHeart />
-                <span className="ml-1">{postData.likes.length}</span>
-              </div>
-            ) : (
-              <div
-                className="flex items-center text-gray-500 cursor-pointer hover:text-[#f91880]"
-                onClick={(e) => handleLike(postData.id, e)}
-              >
-                <FaRegHeart />
-                <span className="ml-1">{postData.likes.length}</span>
-              </div>
-            )}
-
-            <div className="flex items-center text-gray-500 cursor-pointer">
-              <BsFillShareFill />
-            </div>
+        </div>
+        {userLikedPosts ? (
+          <div className="flex items-center  cursor-pointer text-[#f91880]" onClick={(e) => handleLike(postData.id, e)}>
+            <FaHeart />
+            <span className="ml-1">{postData.likes.length}</span>
           </div>
+        ) : (
+          <div
+            className="flex items-center text-gray-500 cursor-pointer hover:text-[#f91880]"
+            onClick={(e) => handleLike(postData.id, e)}
+          >
+            <FaRegHeart />
+            <span className="ml-1">{postData.likes?.length}</span>
+          </div>
+        )}
+
+        <div className="flex items-center text-gray-500 cursor-pointer">
+          <BsFillShareFill />
         </div>
       </div>
     </div>

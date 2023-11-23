@@ -7,7 +7,7 @@ import { Token } from '../entity/token.entity.ts';
 import crypto from 'crypto';
 import sendEmail from '../utils/sendEmail.ts';
 import AppError from '../config/appError.ts';
-import {token} from '../config/passport-config.ts';
+import { token } from '../config/passport-config.ts';
 
 //Make a user's login attempt using the provided email and password or username and password
 const loginUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -26,9 +26,9 @@ const loginUser = async (req: Request, res: Response, next: NextFunction) => {
           if (err) {
             throw new AppError(err.message, err.statusCode);
           }
-          res.cookie('auth_token',token)
+          res.cookie('auth_token', token);
 
-           res.status(200).json({ message: 'Login Successful'});
+          res.status(200).json({ message: 'Login Successful' });
         });
       } catch (error) {
         next(error);
@@ -36,7 +36,6 @@ const loginUser = async (req: Request, res: Response, next: NextFunction) => {
     },
   )(req, res, next);
 };
-
 
 //handling verification and password reset processes
 const verificationWithLink = async (email: string) => {

@@ -1,7 +1,7 @@
 export interface IUserRegister {
   username: string;
   email: string;
-  user_id: number;
+  userId: number;
   profilePhoto?: string;
 }
 

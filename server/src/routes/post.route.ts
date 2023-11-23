@@ -1,3 +1,4 @@
+import { PostComment } from './../entity/PostComment.entity.ts';
 import { Router, Request, Response } from 'express';
 import tryCatch from '../utils/tryCatch.ts';
 import AppError from '../config/appError.ts';
@@ -114,6 +115,7 @@ postRouter.post(
   '/like',
   tryCatch(async (req: Request, res: Response) => {
     const { postId, userId } = req.body;
+    console.log(postId,userId)
     const post = await UserPost.findOne({ where: { id: postId }, relations: ['likes'] });
     const user = await User.findOne({ where: { id: userId } });
 
@@ -165,4 +167,22 @@ postRouter.delete(
   }),
 );
 
+
+postRouter.post(
+  '/comments/:id',
+  tryCatch(async (req: Request, res: Response) => {
+    const { comment, user_id, post_id } = req.body;
+    const post = await UserPost.find({ where: { id: post_id } });
+    console.log(post)
+    const user = await User.find({ where: { id: user_id } });
+    const postComment = new PostComment();
+    console.log(postComment);
+    postComment.comment_text = comment;
+    postComment.post = post[0];
+    postComment.user = user[0];
+    await postComment.save()
+    return res.status(201).json('success');
+   
+  }),
+);
 export default postRouter;
