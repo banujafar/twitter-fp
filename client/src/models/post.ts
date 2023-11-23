@@ -1,5 +1,12 @@
 import { IUser } from './user';
 
+export interface ILike {
+  id: number;
+  user: IUser;
+  post: IUserPost;
+  liked_time: Date;
+}
+
 export interface IUserPost {
   id: number;
   user: IUser;
@@ -7,11 +14,18 @@ export interface IUserPost {
   img?: File | null;
   created_date: Date;
   retweets?: IUserPost[] | null;
-  retweetFrom?: any;//TODO
+  retweetFrom?: any; //TODO
+  likes: ILike[]
 }
 
 export interface IPostInitialState {
-  post: IUserPost[] | null;
+  post: IUserPost[];
+  error: string | null;
+  loading: boolean | null;
+}
+
+export interface ILikeInitialState {
+  likes: ILike[];
   error: string | null;
   loading: boolean | null;
 }

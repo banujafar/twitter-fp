@@ -6,7 +6,7 @@ import postSlice from "./features/post/postSlice";
 const rootReducer = combineReducers({
     auth: authSlice,
     modal:modalSlice,
-    post: postSlice
+    post: postSlice,
 })
 
 

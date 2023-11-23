@@ -1,6 +1,7 @@
 import { Entity, BaseEntity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Relation, CreateDateColumn, OneToMany } from 'typeorm';
 import { User } from './user.entity.ts';
 import { PostRetweet } from './PostRetweet.entity.ts';
+import { LikedPost } from './LikedPost.entity.ts';
 
 @Entity()
 export class UserPost extends BaseEntity {
@@ -19,5 +20,7 @@ export class UserPost extends BaseEntity {
 
   @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   created_date: Date;
-  
+
+  @OneToMany(() => LikedPost, (likedPost) => likedPost.post,  { cascade: true })
+  likes: LikedPost[];
 }
