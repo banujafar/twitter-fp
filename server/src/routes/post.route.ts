@@ -59,14 +59,16 @@ postRouter.get(
           post: like.post,
           user: like.user,
         })),
-        comments:comments.map((r)=>({
+        comments: comments.map((r) => ({
           id: r.id,
           comment: r.comment_text,
-          postId:r.post.id,
-          userId:r.user.id
-
+          postId: r.post.id,
+          userId: r.user.id,
         })),
-        retweets: retweetsForPost.map((r) => r.post),
+        retweets: retweetsForPost.map((r) => ({
+          post: r.post,
+          user: r.user,
+        })),
         retweetFrom: retweets.filter((retweet) => retweet.post?.id === post.id),
       };
     });
@@ -111,7 +113,6 @@ postRouter.post(
       retweetedPost.retweetedFromPost = retweetFromPost;
       retweetedPost.user = retweetedFromUser;
       await retweetedPost.save();
-      console.log(retweetedPost);
       return res.status(201).json(retweetedPost);
     }
     return res.status(201).json(post);
@@ -123,7 +124,6 @@ postRouter.post(
   '/like',
   tryCatch(async (req: Request, res: Response) => {
     const { postId, userId } = req.body;
-    console.log(postId, userId);
     const post = await UserPost.findOne({ where: { id: postId }, relations: ['likes'] });
     const user = await User.findOne({ where: { id: userId } });
 
@@ -175,6 +175,7 @@ postRouter.delete(
   }),
 );
 
+// add comment
 postRouter.post(
   '/comment',
   tryCatch(async (req: Request, res: Response) => {
@@ -205,6 +206,36 @@ postRouter.post(
     };
 
     return res.status(201).json(postWithComment);
+  }),
+);
+
+// retweet post
+postRouter.post(
+  '/retweet',
+  tryCatch(async (req: Request, res: Response) => {
+    const { userId, rtwId } = req.body;
+
+    const user = await User.findOne({ where: { id: userId } });
+
+    if (!user) {
+      throw new AppError('User not found', 404);
+    }
+
+    const post = new UserPost();
+    post.user = user;
+    await post.save();
+
+    if (rtwId) {
+      const retweetFromPost = await UserPost.findOne({ where: { id: rtwId }, relations: ['user'] });
+      const retweetedFromUser = await User.findOne({ where: { id: retweetFromPost['user'].id } });
+      const retweetedPost = new PostRetweet();
+      retweetedPost.post = post;
+      retweetedPost.retweetedFromPost = retweetFromPost;
+      retweetedPost.user = retweetedFromUser;
+      await retweetedPost.save();
+      return res.status(201).json(retweetedPost);
+    }
+    return res.status(201).json(post);
   }),
 );
 
