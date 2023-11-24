@@ -7,9 +7,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store';
 import { setIsOpen } from '../../store/features/modal/modalSlice';
 import { IUserPost } from '../../models/post';
-import { likePost, removeLike } from '../../store/features/post/postSlice';
+import { getPosts, likePost, removeLike, retweetPost } from '../../store/features/post/postSlice';
 import SinglePost from './SinglePost';
-
 
 const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -19,21 +18,6 @@ const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
   const user = useSelector((state: RootState) => state.auth.user);
 
   const userLikedPosts = postData.likes?.some((like) => like?.user?.id === user?.userId);
-  // useEffect(() => {
-  //   const getUsernameFromToken = (authToken: string) => {
-  //     try {
-  //       const decoded: IDecodedToken = jwtDecode(authToken);
-  //       const id = decoded.userId;
-  //       setDecodedId(id);
-  //     } catch (error) {
-  //       console.error('Error decoding token:', error);
-  //     }
-  //   };
-
-  //   if (token) {
-  //     getUsernameFromToken(token);
-  //   }
-  // }, [token]);
 
   const handleRetweet = () => {
     setIsDropdownOpen(true);
@@ -64,7 +48,7 @@ const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
 
     try {
       let decodedUserId: number = 0;
-      console.log(user)
+      // console.log(user)
       if (user?.userId) {
         decodedUserId = user.userId;
       }
@@ -84,12 +68,37 @@ const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
       console.log(err);
     }
   };
-console.log(postData)
+
+  const handlePostRetweet = async (postId: number, e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    e.preventDefault();
+
+    try {
+      let decodedUserId: number = 0;
+      if (user?.userId) {
+        decodedUserId = user.userId;
+      }
+      const retweetData = {
+        userId: decodedUserId,
+        rtwId: postId
+      };
+      
+      await dispatch(retweetPost(retweetData))
+      await dispatch(getPosts())
+      console.log('retweeted');
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  console.log(postData);
   return (
     <div className="tweet-container bg-white border-b border-gray-200 w-full p-4">
       <SinglePost postData={postData} />
       <div className="flex items-center justify-between gap-4 mt-4 px-12">
-        <div className="flex items-center text-gray-500 cursor-pointer hover:text-twitterColor"  onClick={handleOpenCommentModal}>
+        <div
+          className="flex items-center text-gray-500 cursor-pointer hover:text-twitterColor"
+          onClick={handleOpenCommentModal}
+        >
           <FaRegComment />
           <span className="ml-1">{postData.comments?.length}</span>
         </div>
@@ -100,7 +109,10 @@ console.log(postData)
           </div>
           {isDropdownOpen && (
             <ul className="absolute bg-white top-0 right-0 p-4 rounded-xl border border-gray-300">
-              <li className="flex items-center gap-2 text-gray-700 hover:text-green-500 mb-2">
+              <li
+                className="flex items-center gap-2 text-gray-700 hover:text-green-500 mb-2"
+                onClick={(e) => handlePostRetweet(postData.id, e)}
+              >
                 <AiOutlineRetweet className="text-lg" />
                 <span>Repost</span>
               </li>

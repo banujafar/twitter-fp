@@ -12,7 +12,7 @@ export class UserPost extends BaseEntity {
   @JoinColumn({ name: 'user_id' })
   user: Relation<User>;
   
-  @Column('varchar', { length: 280 })
+  @Column('varchar', { length: 280,  nullable: true })
   content: string | null;
 
   @Column('simple-array', { nullable: true }) 

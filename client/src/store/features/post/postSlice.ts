@@ -51,16 +51,17 @@ export const likePost = createAsyncThunk(
         body: JSON.stringify({ postId, userId }),
       });
 
-    if (!response.ok) {
-      throw new Error('Error');
-    }
+      if (!response.ok) {
+        throw new Error('Error');
+      }
 
-    const responseData = await response.json();
-    return responseData;
-  } catch (error) {
-    throw error;
-  }
-});
+      const responseData = await response.json();
+      return responseData;
+    } catch (error) {
+      throw error;
+    }
+  },
+);
 export const addComment = createAsyncThunk('post/addComment', async (formData: any) => {
   console.log(formData);
   try {
@@ -99,9 +100,33 @@ export const removeLike = createAsyncThunk(
       }
 
       const responseData = await response.json();
-      console.log(responseData)
+      console.log(responseData);
       return responseData;
+    } catch (error) {
+      throw error;
+    }
+  },
+);
 
+export const retweetPost = createAsyncThunk(
+  'post/retweetPost',
+  async ({ userId, rtwId }: { userId: number; rtwId: number }) => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/posts/retweet`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId, rtwId }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error');
+      }
+
+      const responseData = await response.json();
+      console.log(responseData);
+      return responseData;
     } catch (error) {
       throw error;
     }
@@ -175,7 +200,7 @@ const postSlice = createSlice({
         state.loading = true;
       })
       .addCase(removeLike.fulfilled, (state, action) => {
-        console.log(action.payload)
+        console.log(action.payload);
         const removedLikeId = action.payload;
 
         const updatedPosts = state.post.map((p) => {
@@ -200,20 +225,34 @@ const postSlice = createSlice({
         state.error = null;
       })
       .addCase(addComment.fulfilled, (state, action) => {
-        const updatedPosts=current(state.post).map((singlePost)=>{
-         if(singlePost.id===action.payload.post?.id){
-          return{
-            ...singlePost,
-            comments:singlePost.comments?[...singlePost.comments,action.payload]:[action.payload]
+        const updatedPosts = current(state.post).map((singlePost) => {
+          if (singlePost.id === action.payload.post?.id) {
+            return {
+              ...singlePost,
+              comments: singlePost.comments ? [...singlePost.comments, action.payload] : [action.payload],
+            };
           }
-         }
-         return singlePost
-        })
+          return singlePost;
+        });
         state.post = updatedPosts;
         state.loading = false;
         state.error = null;
       })
       .addCase(addComment.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || null;
+      })
+      .addCase(retweetPost.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(retweetPost.fulfilled, (state, action) => {
+        console.log(action.payload);
+        // state.post = state.post ? [...state.post, action.payload] : [action.payload];
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(retweetPost.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || null;
       });
