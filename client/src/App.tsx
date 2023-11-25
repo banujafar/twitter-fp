@@ -11,6 +11,8 @@ import ResetPassword from './pages/ResetPassword';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import VerificationPage from './pages/VerificationPage';
+import Post from './pages/Post';
+
 function App() {
   const error = useSelector((state: RootState) => state.auth.error);
 
@@ -35,6 +37,11 @@ function App() {
               </Layout>
             }
           />
+          <Route path="/post/:userid/:postid" element={
+              <Layout>
+                <Post />
+              </Layout>
+            } />
         </Route>
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<Login />} />
