@@ -4,9 +4,10 @@ import { RootState } from '../../store';
 import { FaRegComment, FaRegHeart } from 'react-icons/fa';
 import { AiOutlineRetweet } from 'react-icons/ai';
 import { BsFillShareFill } from 'react-icons/bs';
-import SinglePost from './SinglePost';
+import SinglePost, { UserAvatar } from './SinglePost';
 import { IoMdArrowBack } from 'react-icons/io';
 import { formattedDate } from '../../utils/FormatDate';
+import { IUserPost } from '../../models/post';
 
 const PostsDetail = () => {
   const { userid, postid } = useParams<{ userid?: string | undefined; postid?: string | undefined }>();
@@ -14,7 +15,7 @@ const PostsDetail = () => {
   const userId = parseInt(userid ?? '0', 10);
   const postId = parseInt(postid ?? '0', 10);
 
-  const selectedData = posts.filter((post) => post.user.id === userId && post.id === postId);
+  const selectedData = posts.filter((post:IUserPost) => post.user.id === userId && post.id === postId);
 
   return (
     <>
@@ -68,7 +69,7 @@ const PostsDetail = () => {
 
                   <div className="flex gap-2">
                     <div className="w-auto">
-                      {/* <UserAvatar user={data.user} size={44} /> */}
+                      <UserAvatar user={data.user} size={44} />
                     </div>
                     <div className="w-11/12 xl:w-11/12 lg:w-11/12 md:w-11/12 sm:w-11/12 xs:w-full">
                       <div className="flex flex-col flex-grow mb-2">

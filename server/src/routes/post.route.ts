@@ -65,9 +65,11 @@ postRouter.get(
           userId: r.user.id,
         })),
         retweets: retweetsForPost.map((r) => ({
+          id: r.id,
+          retweeted_time: r.retweeted_time,
           post: r.post,
           mainPost: r.mainPost,
-          user: { userId: r.user.id, username: r.user.username, userPhoto: r.user.profilePhoto },
+          user: { id: r.user.id, username: r.user.username, userPhoto: r.user.profilePhoto },
         })),
       };
     });
@@ -201,7 +203,7 @@ postRouter.post(
 postRouter.post(
   '/retweet',
   tryCatch(async (req: Request, res: Response) => {
-    const { content,userId, rtwId } = req.body;
+    const { content, userId, rtwId } = req.body;
 
     const user = await User.findOne({ where: { id: userId } });
 
@@ -210,8 +212,8 @@ postRouter.post(
     }
 
     const post = new UserPost();
-    if(content){
-      post.content=content
+    if (content) {
+      post.content = content;
     }
     post.user = user;
     await post.save();
@@ -221,7 +223,7 @@ postRouter.post(
       const retweetedPost = new PostRetweet();
       retweetedPost.post = post;
       retweetedPost.mainPost = mainPost;
-      retweetedPost.user = user;
+      retweetedPost.user=user
       await retweetedPost.save();
       return res.status(201).json(retweetedPost);
     }

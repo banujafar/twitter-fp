@@ -15,8 +15,8 @@ const PostsList = () => {
   const posts = useSelector((state: RootState) => state.post.post) as IUserPost[];
   const loading = useSelector((state: RootState) => state.post.loading);
 
-  const isOpenQuote= useSelector((state) => modalIsOpenSelector(state, 'modalQuote'));
-  const isOpenComment= useSelector((state) => modalIsOpenSelector(state, 'modalComment'));
+  const isOpenQuote = useSelector((state) => modalIsOpenSelector(state, 'modalQuote'));
+  const isOpenComment = useSelector((state) => modalIsOpenSelector(state, 'modalComment'));
 
   const sortedPosts = [...posts].sort((a, b) => {
     const dateA = new Date(a.created_date);
@@ -33,9 +33,8 @@ const PostsList = () => {
 
   useEffect(() => {
     dispatch(getPosts() as any);
-    
   }, [dispatch]);
-  console.log(sortedPosts)
+
   return (
     <div className="mx-2 sm:mx-0 xs:mx-0 border border-gray-200 w-full">
       <CreatePost />

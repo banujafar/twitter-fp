@@ -1,7 +1,7 @@
 export interface IUserRegister {
   username: string;
   email: string;
-  userId: number;
+  userId?: number;
   profilePhoto?: string;
 }
 
@@ -29,9 +29,3 @@ export interface IConfirmReset {
   confirm_password: string;
 }
 
-export interface IDecodedToken {
-  exp: number;
-  iat: number;
-  userId: number | null;
-  username: string | null;
-}

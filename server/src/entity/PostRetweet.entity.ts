@@ -19,7 +19,6 @@ export class PostRetweet extends BaseEntity {
   @JoinColumn({ name: 'post_id' })
   post: Relation<UserPost>;
 
-
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   retweeted_time: Date;
 }

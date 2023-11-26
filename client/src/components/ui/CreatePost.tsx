@@ -45,7 +45,6 @@ const CreatePost: React.FC<{ content?: any }> = ({ content }) => {
     // }
 
     try {
-      console.log(quoteModalContent);
       if (quoteModalContent && userData?.userId && text) {
         const { id } = quoteModalContent;
         const userId = userData?.userId;

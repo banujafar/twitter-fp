@@ -19,7 +19,7 @@ export class UserPost extends BaseEntity {
   @Column('simple-array', { nullable: true }) 
   img: string[];
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   created_date: Date;
 
   @OneToMany(() => LikedPost, (likedPost) => likedPost.post,  { cascade: true })

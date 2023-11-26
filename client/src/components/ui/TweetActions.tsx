@@ -2,23 +2,23 @@ import React, { useEffect, useRef, useState } from 'react';
 import { AiOutlineRetweet } from 'react-icons/ai';
 import { FaHeart, FaRegComment, FaRegHeart } from 'react-icons/fa';
 import { IUserPost } from '../../models/post';
-import { getPosts, likePost, removeLike, retweetPost } from '../../store/features/post/postSlice';
+import { likePost, removeLike, retweetPost } from '../../store/features/post/postSlice';
 import { setIsOpen } from '../../store/features/modal/modalSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store';
 import { CiEdit } from 'react-icons/ci';
 import { BsFillShareFill } from 'react-icons/bs';
 
-const TweetActions: React.FC<{ postData: IUserPost}> = ({ postData }) => {
-  console.log(postData)
+const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user);
 
   const userLikedPosts = postData.likes?.some((like) => like?.user?.id === user?.userId);
-  const isRetweeted = postData.retweets?.some((rt:any) => rt?.user?.userId === user?.userId);
-
+  const isRetweeted = postData.retweets?.some((rt: any) => rt?.user?.id === user?.userId);
+console.log(isRetweeted)
+console.log(postData)
   const handleRetweet = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsDropdownOpen(true);
@@ -26,14 +26,12 @@ const TweetActions: React.FC<{ postData: IUserPost}> = ({ postData }) => {
 
   const handleOpenQuoteModal = (e: React.MouseEvent) => {
     e.stopPropagation();
-    dispatch(setIsOpen({ id: 'modalQuote', isOpen: true, postData: postData,}));
-    console.log(postData);
+    dispatch(setIsOpen({ id: 'modalQuote', isOpen: true, postData: postData }));
   };
 
   const handleOpenCommentModal = (e: React.MouseEvent) => {
     e.stopPropagation();
-    dispatch(setIsOpen({ id: 'modalComment', isOpen: true, postData: postData, }));
-    console.log(postData);
+    dispatch(setIsOpen({ id: 'modalComment', isOpen: true, postData: postData }));
   };
 
   useEffect(() => {
@@ -55,7 +53,6 @@ const TweetActions: React.FC<{ postData: IUserPost}> = ({ postData }) => {
 
     try {
       let decodedUserId: number = 0;
-      // console.log(user)
       if (user?.userId) {
         decodedUserId = user.userId;
       }
@@ -90,8 +87,9 @@ const TweetActions: React.FC<{ postData: IUserPost}> = ({ postData }) => {
         rtwId: postId,
       };
 
-      await dispatch(retweetPost(retweetData));
-      await dispatch(getPosts());
+      await dispatch(retweetPost(retweetData)).then(() => {
+        setIsDropdownOpen(false);
+      });
       console.log('retweeted');
     } catch (err) {
       console.log(err);
@@ -109,8 +107,12 @@ const TweetActions: React.FC<{ postData: IUserPost}> = ({ postData }) => {
       </div>
       <div className="relative cursor-pointer" onClick={handleRetweet} ref={dropdownRef}>
         <div className="flex items-center text-gray-500 hover:text-green-500">
-          {!isRetweeted?<AiOutlineRetweet className="text-xl" />:<AiOutlineRetweet className="text-2xl text-green-500"  />}
-          <span className={`ml-1 ${!isRetweeted?'text-black':'text-green-500'}`}>{postData.retweets?.length}</span>
+          {!isRetweeted ? (
+            <AiOutlineRetweet className="text-xl" />
+          ) : (
+            <AiOutlineRetweet className="text-2xl text-green-500" />
+          )}
+          <span className={`ml-1 ${!isRetweeted ? 'text-black' : 'text-green-500'}`}>{postData.retweets?.length}</span>
         </div>
         {isDropdownOpen && (
           <ul className="absolute bg-white top-0 right-0 p-4 rounded-xl border border-gray-300">
