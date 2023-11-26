@@ -1,5 +1,5 @@
-import { useSelector } from "react-redux";
-import { RootState } from "../../store";
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store';
 
 const Verification = () => {
   const email = useSelector((state: RootState) => state.auth.user?.email);

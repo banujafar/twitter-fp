@@ -64,13 +64,11 @@ const authSlice = createSlice({
   extraReducers: (builder) => {
     const setPending = (state: any) => {
       state.loading = true;
-      console.log(state.loading);
     };
 
     const setError = (state: any, action: any) => {
       state.error = action.error.message || null;
       state.loading = false;
-      console.log(state.error);
     };
 
     const setFulfilled = (state: any, action: any) => {
@@ -83,7 +81,6 @@ const authSlice = createSlice({
       .addCase(registerUser.fulfilled, (state, action) => {
         setFulfilled(state, action);
         if (!state.error) {
-          console.log(action.payload)
           state.user = action.payload.user;
         }
       })
@@ -110,7 +107,6 @@ const authSlice = createSlice({
         setFulfilled(state, action);
         state.user = action.payload.user;
         state.isAuth = action.payload.isAuth;
-        console.log(state.user)
       })
       .addCase(checkAuth.rejected, setError);
   },

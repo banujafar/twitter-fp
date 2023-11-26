@@ -12,14 +12,12 @@ export interface ILike {
 //   "comment": "test",
 //   "postId": 245,
 //   "userId": 151
-// } 
+// }
 export interface IComment {
   id: number;
-  user: IUser;
-  comment?: string,
-  comment_text: string;
-  post: IUserPost;
-  created_time: Date;
+  comment?: string;
+  userId: number;
+  postId: number;
 }
 
 export interface IUserPost {
@@ -29,7 +27,6 @@ export interface IUserPost {
   img?: File | null;
   created_date: Date;
   retweets?: IUserPost[] | null;
-  retweetFrom?: any; //TODO
   likes: ILike[];
   comments: IComment[];
 }

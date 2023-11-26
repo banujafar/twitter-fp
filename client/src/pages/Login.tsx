@@ -24,7 +24,6 @@ const Login: React.FC<object> = () => {
   const [searchParams] = useSearchParams();
   const googleErrorMsg = searchParams.get('error');
   const isOpen = useSelector((state) => modalIsOpenSelector(state, 'modalForgotPass'));
-  console.log(isOpen);
   const handleOpenModal = () => {
     dispatch(
       setIsOpen({

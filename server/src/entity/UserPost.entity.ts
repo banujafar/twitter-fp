@@ -2,6 +2,7 @@ import { Entity, BaseEntity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColu
 import { User } from './user.entity.ts';
 import { PostRetweet } from './PostRetweet.entity.ts';
 import { LikedPost } from './LikedPost.entity.ts';
+import { PostComment } from './PostComment.entity.ts';
 
 @Entity()
 export class UserPost extends BaseEntity {
@@ -23,4 +24,8 @@ export class UserPost extends BaseEntity {
 
   @OneToMany(() => LikedPost, (likedPost) => likedPost.post,  { cascade: true })
   likes: LikedPost[];
+
+  
+  @OneToMany(() => PostComment, (commentedPost) => commentedPost.post,  { cascade: true })
+  comments: PostComment[];
 }

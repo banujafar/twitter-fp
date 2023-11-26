@@ -100,7 +100,6 @@ export const removeLike = createAsyncThunk(
       }
 
       const responseData = await response.json();
-      console.log(responseData);
       return responseData;
     } catch (error) {
       throw error;
@@ -110,14 +109,14 @@ export const removeLike = createAsyncThunk(
 
 export const retweetPost = createAsyncThunk(
   'post/retweetPost',
-  async ({ userId, rtwId }: { userId: number; rtwId: number }) => {
+  async ({ content, userId, rtwId }: { content?: string; userId: number; rtwId: number }) => {
     try {
       const response = await fetch(`http://localhost:3000/api/posts/retweet`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId, rtwId }),
+        body: JSON.stringify({ content, userId, rtwId }),
       });
 
       if (!response.ok) {
@@ -125,7 +124,6 @@ export const retweetPost = createAsyncThunk(
       }
 
       const responseData = await response.json();
-      console.log(responseData);
       return responseData;
     } catch (error) {
       throw error;
@@ -200,9 +198,7 @@ const postSlice = createSlice({
         state.loading = true;
       })
       .addCase(removeLike.fulfilled, (state, action) => {
-        console.log(action.payload);
         const removedLikeId = action.payload;
-
         const updatedPosts = state.post.map((p) => {
           if (p.likes.some((like) => like.id === removedLikeId)) {
             return {
@@ -243,12 +239,22 @@ const postSlice = createSlice({
         state.error = action.error.message || null;
       })
       .addCase(retweetPost.pending, (state) => {
-        state.loading = true;
+        //state.loading = true;
         state.error = null;
       })
       .addCase(retweetPost.fulfilled, (state, action) => {
-        console.log(action.payload);
-        // state.post = state.post ? [...state.post, action.payload] : [action.payload];
+        const { mainPost } = action.payload;
+        const updatedPosts = current(state.post).map((singlePost) => {
+          if (singlePost.id === mainPost.id) {
+            return {
+              ...singlePost,
+              retweets: [...(singlePost.retweets || []), action.payload],
+            };
+          }
+          return singlePost;
+        });
+        console.log(action.payload)
+        state.post = updatedPosts;
         state.loading = false;
         state.error = null;
       })

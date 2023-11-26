@@ -7,6 +7,7 @@ import { BsFillShareFill } from 'react-icons/bs';
 import SinglePost, { UserAvatar } from './SinglePost';
 import { IoMdArrowBack } from 'react-icons/io';
 import { formattedDate } from '../../utils/FormatDate';
+import { IUserPost } from '../../models/post';
 
 const PostsDetail = () => {
   const { userid, postid } = useParams<{ userid?: string | undefined; postid?: string | undefined }>();
@@ -14,7 +15,7 @@ const PostsDetail = () => {
   const userId = parseInt(userid ?? '0', 10);
   const postId = parseInt(postid ?? '0', 10);
 
-  const selectedData = posts.filter((post) => post.user.id === userId && post.id === postId);
+  const selectedData = posts.filter((post:IUserPost) => post.user.id === userId && post.id === postId);
 
   return (
     <>
@@ -36,7 +37,7 @@ const PostsDetail = () => {
               key={data.id}
               className="tweet-container cursor-pointer bg-white border-b border-gray-200 w-full p-4 transition ease-in hover:bg-[#f7f7f7]"
             >
-              <SinglePost postData={data} />
+              <SinglePost postData={data} size={44}/>
               <div className="flex items-center justify-between gap-4 mt-4 px-12">
                 <div className="flex items-center text-gray-500 cursor-pointer hover:text-twitterColor">
                   <FaRegComment />

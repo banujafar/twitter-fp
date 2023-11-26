@@ -26,8 +26,7 @@ const modalSlice = createSlice({
   },
 });
 
-
-export const setIsOpen = (payload: { id: string; isOpen: boolean,postData?:any }) => {
+export const setIsOpen = (payload: { id: string; isOpen: boolean; postData?: IUserPost }) => {
   return {
     type: 'modal/setIsOpen',
     payload,
