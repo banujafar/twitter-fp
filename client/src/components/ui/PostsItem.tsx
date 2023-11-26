@@ -20,14 +20,17 @@ const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
   const userLikedPosts = postData.likes?.some((like) => like?.user?.id === user?.userId);
   const navigate = useNavigate()
 
-  const handleRetweet = () => {
+  const handleRetweet = (e: React.MouseEvent) => {
+    e.stopPropagation()
     setIsDropdownOpen(true);
   };
   // console.log(postData);
-  const handleOpenQuoteModal = () => {
+  const handleOpenQuoteModal = (e: React.MouseEvent) => {
+    e.stopPropagation();
     dispatch(setIsOpen({ id: 'modalQuote', isOpen: true, postData: postData }));
   };
-  const handleOpenCommentModal = () => {
+  const handleOpenCommentModal = (e: React.MouseEvent) => {
+    e.stopPropagation();
     dispatch(setIsOpen({ id: 'modalComment', isOpen: true, postData: postData }));
   };
 
@@ -46,6 +49,7 @@ const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
 
   const handleLike = async (postId: number, e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     e.preventDefault();
+    e.stopPropagation()
 
     try {
       let decodedUserId: number = 0;
