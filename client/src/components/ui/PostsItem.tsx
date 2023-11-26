@@ -7,7 +7,6 @@ import TweetActions from './TweetActions';
 
 const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
   const posts = useSelector((state: RootState) => state.post.post) as IUserPost[];
-  postData.retweets?.map((retweet: any) => console.log(retweet.post.id));
   const isRetweet = posts.some((post) => post.retweets?.some((retweet: any) => retweet.post.id === postData.id));
 
   return (
