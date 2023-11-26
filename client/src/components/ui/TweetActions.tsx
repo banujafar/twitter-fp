@@ -17,6 +17,7 @@ const TweetActions: React.FC<{ postData: IUserPost}> = ({ postData }) => {
   const user = useSelector((state: RootState) => state.auth.user);
 
   const userLikedPosts = postData.likes?.some((like) => like?.user?.id === user?.userId);
+  const isRetweeted = postData.retweets?.some((rt:any) => rt?.user?.userId === user?.userId);
 
   const handleRetweet = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -108,8 +109,8 @@ const TweetActions: React.FC<{ postData: IUserPost}> = ({ postData }) => {
       </div>
       <div className="relative cursor-pointer" onClick={handleRetweet} ref={dropdownRef}>
         <div className="flex items-center text-gray-500 hover:text-green-500">
-          <AiOutlineRetweet className="text-xl" />
-          <span className="ml-1">{postData.retweets?.length}</span>
+          {!isRetweeted?<AiOutlineRetweet className="text-xl" />:<AiOutlineRetweet className="text-2xl text-green-500"  />}
+          <span className={`ml-1 ${!isRetweeted?'text-black':'text-green-500'}`}>{postData.retweets?.length}</span>
         </div>
         {isDropdownOpen && (
           <ul className="absolute bg-white top-0 right-0 p-4 rounded-xl border border-gray-300">
