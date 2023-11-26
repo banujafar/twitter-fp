@@ -103,17 +103,6 @@ postRouter.post(
     post.img = files.map((file) => file.filename);
 
     await post.save();
-
-    // if (retweeted_id) {
-    //   const mainPost = await UserPost.findOne({ where: { id: retweeted_id }, relations: ['user'] });
-    //   const retweetedPost = new PostRetweet();
-    //   retweetedPost.post = post;
-    //   retweetedPost.mainPost = mainPost;
-    //   retweetedPost.user = user;
-    //   await retweetedPost.save();
-    //   console.log(retweetedPost)
-    //   return res.status(201).json(retweetedPost);
-    // }
     return res.status(201).json(post);
   }),
 );
