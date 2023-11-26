@@ -5,8 +5,8 @@ import { FaRegSmile } from 'react-icons/fa';
 import { HiOutlineGif } from 'react-icons/hi2';
 import { MdClose } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
-import { addPost, getPosts } from '../../store/features/post/postSlice';
-import { RootState } from '../../store';
+import { addPost, getPosts, retweetPost } from '../../store/features/post/postSlice';
+import { AppDispatch, RootState } from '../../store';
 // import { jwtDecode } from 'jwt-decode';
 // import { IDecodedToken } from '../../models/auth';
 import { setIsOpen } from '../../store/features/modal/modalSlice';
@@ -15,26 +15,9 @@ const CreatePost: React.FC<{ content?: any }> = ({ content }) => {
   const [text, setText] = useState('');
   const [selectedFile, setSelectedFile] = useState<File[] | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  // const [decodedId, setDecodedId] = useState<number | null>(null);
-  // const token = useSelector((state: RootState) => state.auth.token);
   const userData = useSelector((state: RootState) => state.auth.user);
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const quoteModalContent = useSelector((state: RootState) => state.modal.postData['modalQuote']);
-  // useEffect(() => {
-  //   const getUsernameFromToken = (authToken: string) => {
-  //     try {
-  //       const decoded: IDecodedToken = jwtDecode(authToken);
-  //       const id = decoded.userId;
-  //       setDecodedId(id);
-  //     } catch (error) {
-  //       console.error('Error decoding token:', error);
-  //     }
-  //   };
-
-  //   if (token) {
-  //     getUsernameFromToken(token);
-  //   }
-  // }, [token]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -57,13 +40,19 @@ const CreatePost: React.FC<{ content?: any }> = ({ content }) => {
         formData.append('files', file);
       });
     }
-    if (quoteModalContent) {
-      formData.append('retweeted_id', quoteModalContent.id.toString());
-    }
+    // if (quoteModalContent) {
+    //   formData.append('retweeted_id', quoteModalContent.id.toString());
+    // }
 
     try {
       console.log(quoteModalContent);
-      await dispatch(addPost(formData) as any);
+      if (quoteModalContent && userData?.userId && text) {
+        const { id } = quoteModalContent;
+        const userId = userData?.userId;
+        await dispatch(retweetPost({ content: text, rtwId: id, userId }));
+      } else {
+        await dispatch(addPost(formData) as any);
+      }
       setText('');
       setSelectedFile(null);
       await dispatch(getPosts() as any);

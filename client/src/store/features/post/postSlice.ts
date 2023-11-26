@@ -51,9 +51,9 @@ export const likePost = createAsyncThunk(
         body: JSON.stringify({ postId, userId }),
       });
 
-    if (!response.ok) {
-      throw new Error('Error');
-    }
+      if (!response.ok) {
+        throw new Error('Error');
+      }
 
       const responseData = await response.json();
       return responseData;

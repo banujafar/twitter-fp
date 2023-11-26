@@ -9,7 +9,8 @@ import { AppDispatch, RootState } from '../../store';
 import { CiEdit } from 'react-icons/ci';
 import { BsFillShareFill } from 'react-icons/bs';
 
-const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
+const TweetActions: React.FC<{ postData: IUserPost}> = ({ postData }) => {
+  console.log(postData)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const dispatch = useDispatch<AppDispatch>();
@@ -17,16 +18,21 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
 
   const userLikedPosts = postData.likes?.some((like) => like?.user?.id === user?.userId);
 
-  const handleRetweet = () => {
+  const handleRetweet = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setIsDropdownOpen(true);
   };
 
-  const handleOpenQuoteModal = () => {
-    dispatch(setIsOpen({ id: 'modalQuote', isOpen: true, postData: postData }));
+  const handleOpenQuoteModal = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    dispatch(setIsOpen({ id: 'modalQuote', isOpen: true, postData: postData,}));
+    console.log(postData);
   };
 
-  const handleOpenCommentModal = () => {
-    dispatch(setIsOpen({ id: 'modalComment', isOpen: true, postData: postData }));
+  const handleOpenCommentModal = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    dispatch(setIsOpen({ id: 'modalComment', isOpen: true, postData: postData, }));
+    console.log(postData);
   };
 
   useEffect(() => {
@@ -43,6 +49,7 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
   }, []);
 
   const handleLike = async (postId: number, e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    e.stopPropagation();
     e.preventDefault();
 
     try {
@@ -69,6 +76,7 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
   };
 
   const handlePostRetweet = async (postId: number, e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    e.stopPropagation();
     e.preventDefault();
 
     try {
