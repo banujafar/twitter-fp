@@ -8,19 +8,18 @@ export class PostRetweet extends BaseEntity {
   id: number;
 
   @ManyToOne(() => UserPost)
-  @JoinColumn({ name: 'post_id' })
-  post: Relation<UserPost>;
+  @JoinColumn({ name: 'mainPost_id' })
+  mainPost: Relation<UserPost>;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'user_id' })
   user: Relation<User>;
 
   @ManyToOne(() => UserPost)
-  @JoinColumn({ name: 'retweeted_from' })
-  retweetedFromPost: Relation<UserPost>;
+  @JoinColumn({ name: 'post_id' })
+  post: Relation<UserPost>;
 
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   retweeted_time: Date;
-  retweetedPost: UserPost[];
 }

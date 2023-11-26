@@ -35,7 +35,7 @@ const PostsList = () => {
     dispatch(getPosts() as any);
     
   }, [dispatch]);
- 
+  console.log(sortedPosts)
   return (
     <div className="mx-2 sm:mx-0 xs:mx-0 border border-gray-200 w-full">
       <CreatePost />

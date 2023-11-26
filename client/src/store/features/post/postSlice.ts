@@ -51,9 +51,9 @@ export const likePost = createAsyncThunk(
         body: JSON.stringify({ postId, userId }),
       });
 
-    if (!response.ok) {
-      throw new Error('Error');
-    }
+      if (!response.ok) {
+        throw new Error('Error');
+      }
 
       const responseData = await response.json();
       return responseData;
@@ -110,14 +110,14 @@ export const removeLike = createAsyncThunk(
 
 export const retweetPost = createAsyncThunk(
   'post/retweetPost',
-  async ({ userId, rtwId }: { userId: number; rtwId: number }) => {
+  async ({ content, userId, rtwId }: { content?: string; userId: number; rtwId: number }) => {
     try {
       const response = await fetch(`http://localhost:3000/api/posts/retweet`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId, rtwId }),
+        body: JSON.stringify({ content, userId, rtwId }),
       });
 
       if (!response.ok) {

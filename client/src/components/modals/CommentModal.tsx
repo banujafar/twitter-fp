@@ -2,9 +2,9 @@ import Modal from './Modal';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store';
 import { useState } from 'react';
-import SinglePost from '../ui/SinglePost';
 import { addComment } from '../../store/features/post/postSlice';
 import { setIsOpen } from '../../store/features/modal/modalSlice';
+import SinglePost from '../ui/SinglePost';
 const CommentModal = () => {
   const quoteModalContent = useSelector((state: RootState) => state.modal.postData['modalComment']);
   const [text, setText] = useState('');
@@ -31,9 +31,9 @@ const CommentModal = () => {
         modalId: 'modalComment',
         modalContent: (
           <div className=" bg-transparent">
-            <SinglePost postData={quoteModalContent} />
+            <SinglePost postData={quoteModalContent} size={44} />
             <div className=" text-gray-500 px-14 py-2">
-              Replying to <span className=" text-twitterColor">@{quoteModalContent.user?.username}</span>
+              Replying to <span className=" text-twitterColor">@{quoteModalContent.user.username}</span>
             </div>
             <form onSubmit={handleSendComment} className=" flex justify-between items-center mt-2">
               <textarea
