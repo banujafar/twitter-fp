@@ -3,7 +3,7 @@ import { IUserPost } from "../../models/post"
 import { CgProfile } from "react-icons/cg";
 import { IUser } from "../../models/user";
 import { formattedDate } from "../../utils/FormatDate";
-const UserAvatar: React.FC<{ user: IUser; size: number }> = ({ user, size }) => (
+export const UserAvatar: React.FC<{ user: IUser; size: number }> = ({ user, size }) => (
     <Link to={`/profile/${user?.username}`} className="flex">
       {user?.profilePhoto ? (
         <img

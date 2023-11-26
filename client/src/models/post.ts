@@ -6,9 +6,17 @@ export interface ILike {
   post: IUserPost;
   liked_time: Date;
 }
+// TODO: it should be fixed, comment returns:
+// {
+//   "id": 39,
+//   "comment": "test",
+//   "postId": 245,
+//   "userId": 151
+// } 
 export interface IComment {
   id: number;
   user: IUser;
+  comment?: string,
   comment_text: string;
   post: IUserPost;
   created_time: Date;

@@ -9,6 +9,7 @@ import { setIsOpen } from '../../store/features/modal/modalSlice';
 import { IUserPost } from '../../models/post';
 import { getPosts, likePost, removeLike, retweetPost } from '../../store/features/post/postSlice';
 import SinglePost from './SinglePost';
+import { useNavigate } from 'react-router-dom';
 
 const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -16,17 +17,20 @@ const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
   //const [decodedId, setDecodedId] = useState<number | null>(null);
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user);
-
   const userLikedPosts = postData.likes?.some((like) => like?.user?.id === user?.userId);
+  const navigate = useNavigate()
 
-  const handleRetweet = () => {
+  const handleRetweet = (e: React.MouseEvent) => {
+    e.stopPropagation()
     setIsDropdownOpen(true);
   };
   // console.log(postData);
-  const handleOpenQuoteModal = () => {
+  const handleOpenQuoteModal = (e: React.MouseEvent) => {
+    e.stopPropagation();
     dispatch(setIsOpen({ id: 'modalQuote', isOpen: true, postData: postData }));
   };
-  const handleOpenCommentModal = () => {
+  const handleOpenCommentModal = (e: React.MouseEvent) => {
+    e.stopPropagation();
     dispatch(setIsOpen({ id: 'modalComment', isOpen: true, postData: postData }));
   };
 
@@ -45,6 +49,7 @@ const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
 
   const handleLike = async (postId: number, e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     e.preventDefault();
+    e.stopPropagation()
 
     try {
       let decodedUserId: number = 0;
@@ -91,8 +96,13 @@ const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
   };
 
   console.log(postData);
+  const postid = postData.id;
+  const userid = postData.user.id;
+
   return (
-    <div className="tweet-container bg-white border-b border-gray-200 w-full p-4">
+    <div
+    onClick={()=>navigate(`/post/${userid}/${postid}`)}
+    className="tweet-container cursor-pointer bg-white border-b border-gray-200 w-full p-4 transition ease-in hover:bg-[#f7f7f7]">
       <SinglePost postData={postData} />
       <div className="flex items-center justify-between gap-4 mt-4 px-12">
         <div
