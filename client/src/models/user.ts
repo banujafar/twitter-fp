@@ -7,3 +7,9 @@ export interface IUser {
     profilePhoto?: null,
     token?: string | null  
 }
+
+export interface IUserInitial {
+    users: IUser[],
+    error: string | null;
+    loading: boolean | null;
+}

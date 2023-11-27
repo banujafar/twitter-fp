@@ -43,7 +43,7 @@ function App() {
                 <Post />
               </Layout>
             } />
-          <Route path="/profile/:userid/" element={
+          <Route path="/profile/:username/" element={
               <Layout>
                 <UserProfile />
               </Layout>
