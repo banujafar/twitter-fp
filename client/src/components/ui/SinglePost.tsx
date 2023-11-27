@@ -5,7 +5,9 @@ import { IUser } from '../../models/user';
 import { formattedDate } from '../../utils/FormatDate';
 
 export const UserAvatar: React.FC<{ user: IUser; size: number }> = ({ user, size }) => (
-  <Link to={`/profile/${user?.username}`} className="flex">
+  <Link to={`/profile/${user?.username}`} 
+  onClick={(e) => e.stopPropagation()}
+  className="flex">
     {user?.profilePhoto ? (
       <img
         src={user?.profilePhoto}
@@ -42,6 +44,7 @@ const SinglePost: React.FC<{ postData: IUserPost; size: number }> = ({ postData,
             <Link
               to={`/profile/${postData.user?.username}`}
               className="font-bold text-lg hover:underline text-gray-600"
+              onClick={(e) => e.stopPropagation()}
             >
               {postData.user?.username}
             </Link>

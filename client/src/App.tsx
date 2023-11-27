@@ -12,6 +12,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import VerificationPage from './pages/VerificationPage';
 import Post from './pages/Post';
+import UserProfile from './pages/UserProfile';
 
 function App() {
   const error = useSelector((state: RootState) => state.auth.error);
@@ -42,7 +43,13 @@ function App() {
                 <Post />
               </Layout>
             } />
+          <Route path="/profile/:userid/" element={
+              <Layout>
+                <UserProfile />
+              </Layout>
+            } />
         </Route>
+        
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/reset_password/:id/:token" element={<ResetPassword />} />
