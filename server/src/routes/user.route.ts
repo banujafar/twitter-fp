@@ -123,4 +123,20 @@ userRouter.post(
   }),
 );
 
+
+userRouter.get(
+  '/',
+  tryCatch(async (req: Request, res: Response) => {
+
+    const user = await User.find();
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    return res.status(200).json(user);
+  }),
+);
+
+
 export default userRouter;
