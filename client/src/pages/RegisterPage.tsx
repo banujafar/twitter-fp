@@ -8,7 +8,7 @@ import { registerUser } from '../store/features/auth/authSlice';
 import { AppDispatch, RootState } from '../store';
 import TwitterLoader from '../components/loaders/TwitterLoader';
 import { useState } from 'react';
-import Verification from '../components/ui/Verification';
+import Verification from '../components/ui/auth/Verification';
 
 const RegisterPage = () => {
   const dispatch = useDispatch<AppDispatch>();

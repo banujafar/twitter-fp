@@ -1,5 +1,5 @@
-import SearchBar from '../components/ui/SearchBar';
-import PostsDetail from '../components/ui/PostsDetail';
+import SearchBar from '../components/ui/Timeline/SearchBar';
+import PostsDetail from '../components/ui/Posts/PostsDetail';
 
 const Post = () => {
   return (

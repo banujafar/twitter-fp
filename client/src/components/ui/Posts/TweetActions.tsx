@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AiOutlineRetweet } from 'react-icons/ai';
 import { FaHeart, FaRegComment, FaRegHeart } from 'react-icons/fa';
-import { IUserPost } from '../../models/post';
-import { likePost, removeLike, retweetPost } from '../../store/features/post/postSlice';
-import { setIsOpen } from '../../store/features/modal/modalSlice';
+import { IUserPost } from '../../../models/post';
+import { likePost, removeLike, retweetPost } from '../../../store/features/post/postSlice';
+import { setIsOpen } from '../../../store/features/modal/modalSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../../store';
+import { AppDispatch, RootState } from '../../../store';
 import { CiEdit } from 'react-icons/ci';
 import { BsFillShareFill } from 'react-icons/bs';
 
@@ -17,8 +17,8 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
 
   const userLikedPosts = postData.likes?.some((like) => like?.user?.id === user?.userId);
   const isRetweeted = postData.retweets?.some((rt: any) => rt?.user?.id === user?.userId);
-console.log(isRetweeted)
-console.log(postData)
+  console.log(isRetweeted);
+  console.log(postData);
   const handleRetweet = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsDropdownOpen(true);

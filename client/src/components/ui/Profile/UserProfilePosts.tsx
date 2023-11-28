@@ -1,8 +1,8 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
-import PostsItem from '../PostsItem';
 import { useEffect } from 'react';
 import { getPosts } from '../../../store/features/post/postSlice';
+import PostsItem from '../Posts/PostsItem';
 
 const UserProfilePosts = ({ username }: { username: string | undefined }) => {
   const dispatch = useDispatch();

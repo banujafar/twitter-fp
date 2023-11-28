@@ -1,13 +1,13 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../store';
+import { RootState } from '../../../store';
 import PostsItem from './PostsItem';
 import CreatePost from './CreatePost';
 import { useEffect } from 'react';
-import { getPosts } from '../../store/features/post/postSlice';
-import { IUserPost } from '../../models/post';
-import { modalIsOpenSelector } from '../../store/features/modal/modalSlice';
-import QuoteModal from '../modals/QuoteModal';
-import CommentModal from '../modals/CommentModal';
+import { getPosts } from '../../../store/features/post/postSlice';
+import { IUserPost } from '../../../models/post';
+import { modalIsOpenSelector } from '../../../store/features/modal/modalSlice';
+import QuoteModal from '../../modals/QuoteModal';
+import CommentModal from '../../modals/CommentModal';
 
 const PostsList = () => {
   const dispatch = useDispatch();

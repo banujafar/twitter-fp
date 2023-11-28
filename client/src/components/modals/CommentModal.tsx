@@ -4,7 +4,7 @@ import { AppDispatch, RootState } from '../../store';
 import { useState } from 'react';
 import { addComment } from '../../store/features/post/postSlice';
 import { setIsOpen } from '../../store/features/modal/modalSlice';
-import SinglePost from '../ui/SinglePost';
+import SinglePost from '../ui/Posts/SinglePost';
 const CommentModal = () => {
   const quoteModalContent = useSelector((state: RootState) => state.modal.postData['modalComment']);
   const [text, setText] = useState('');
