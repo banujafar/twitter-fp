@@ -1,13 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { IUserPost } from '../../models/post';
+import { IUserPost } from '../../../models/post';
 import { CgProfile } from 'react-icons/cg';
-import { IUser } from '../../models/user';
-import { formattedDate } from '../../utils/FormatDate';
+import { IUser } from '../../../models/user';
+import { formattedDate } from '../../../utils/FormatDate';
 
 export const UserAvatar: React.FC<{ user: IUser; size: number }> = ({ user, size }) => (
-  <Link to={`/profile/${user?.username}`} 
-  onClick={(e) => e.stopPropagation()}
-  className="flex">
+  <Link to={`/profile/${user?.username}`} onClick={(e) => e.stopPropagation()} className="flex">
     {user?.profilePhoto ? (
       <img
         src={user?.profilePhoto}

@@ -1,5 +1,5 @@
-import PostsList from '../components/ui/PostsList';
-import SearchBar from '../components/ui/SearchBar';
+import PostsList from '../components/ui/Posts/PostsList';
+import SearchBar from '../components/ui/Timeline/SearchBar';
 const Home = () => {
   return (
     <>
@@ -8,7 +8,6 @@ const Home = () => {
         <div className="sm:hidden xs:hidden xxs:hidden md:hidden lg:flex xl:flex">
           <SearchBar />
         </div>
-        
       </div>
     </>
   );

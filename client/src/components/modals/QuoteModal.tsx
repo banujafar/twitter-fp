@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { CgProfile } from 'react-icons/cg';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
-import CreatePost from '../ui/CreatePost';
+import CreatePost from '../ui/Posts/CreatePost';
 
 const QuoteModal = () => {
   const quoteModalContent = useSelector((state: RootState) => state.modal.postData['modalQuote']);
