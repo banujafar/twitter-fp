@@ -5,13 +5,15 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
 import { getUsers } from '../../../store/features/user/userSlice';
+import UserProfileFavorites from './UserProfileFavorites';
+import UserProfilePosts from './UserProfilePosts';
 
 const UserProfileHeader = ({ username }: { username: string | undefined }) => {
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.auth.user);
   const isCurrentUser = user?.username == username;
   const users = useSelector((state: RootState) => state.user.users);
-  const userInfo = users.find((user)=>user.username == username)
+  const userInfo = users.find((user) => user.username == username);
   const loading = useSelector((state: RootState) => state.user.loading);
 
   const [activeBtn, setActiveBtn] = useState<string>('posts');
@@ -117,6 +119,12 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
               </nav>
             </div>
           </div>
+
+          {activeBtn === 'likes' ? (
+            <UserProfileFavorites username={username} />
+          ) : (
+            <UserProfilePosts username={username} />
+          )}
         </>
       ) : (
         <p>User not exists</p>
