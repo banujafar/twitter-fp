@@ -38,6 +38,7 @@ postRouter.get(
   tryCatch(async (req: Request, res: Response) => {
     const posts = await UserPost.find({
       relations: ['user', 'likes', 'comments'],
+      select: { user: { id: true, username: true, email: true } },
     });
     const retweets = await PostRetweet.find({ relations: ['post', 'user', 'mainPost'] });
     if (!posts || posts.length === 0) {
@@ -47,6 +48,7 @@ postRouter.get(
       const likes = await LikedPost.find({
         where: { post: { id: post.id } },
         relations: ['post', 'user'],
+        select: { user: { id: true, username: true, email: true } },
       });
       const comments = await PostComment.find({ where: { post: { id: post.id } }, relations: ['user', 'post'] });
       const retweetsForPost = retweets.filter((retweet) => retweet.mainPost.id === post.id);
@@ -86,13 +88,20 @@ postRouter.post(
   uploads.array('files'),
   tryCatch(async (req: Request, res: Response) => {
     const files = (req.files as Express.Multer.File[]) || [];
-    const { content, user_id, retweeted_id } = req.body;
+    const { content, user_id } = req.body;
 
     if (!content && !files) {
       throw new AppError('Cannot be empty', 400);
     }
 
-    const user = await User.findOne({ where: { id: user_id } });
+    const user = await User.findOne({
+      where: { id: user_id },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+      },
+    });
 
     if (!user) {
       throw new AppError('User not found', 404);
@@ -115,7 +124,9 @@ postRouter.post(
   tryCatch(async (req: Request, res: Response) => {
     const { postId, userId } = req.body;
     const post = await UserPost.findOne({ where: { id: postId }, relations: ['likes'] });
-    const user = await User.findOne({ where: { id: userId } });
+    const user = await User.findOne({
+      where: { id: userId },
+    });
 
     if (!user || !post) {
       return res.status(404).json({ error: 'User or post not found' });
@@ -132,12 +143,14 @@ postRouter.post(
     const likedPost = await LikedPost.create({
       post: await UserPost.findOne({ where: { id: postId }, relations: ['user'] }),
       user: await User.findOne({ where: { id: userId } }),
+
       liked_time: new Date(),
     }).save();
 
     const completeLikedPost = await LikedPost.findOne({
       where: { id: likedPost.id },
       relations: ['user', 'post'],
+      select: { user: { id: true, username: true, email: true } },
     });
     res.status(200).json(completeLikedPost);
   }),
@@ -154,6 +167,7 @@ postRouter.delete(
     const existingLike = await LikedPost.findOne({
       where: { post: { id: postId }, user: { id: userId } },
       relations: ['post', 'user'],
+      select: { user: { id: true, username: true, email: true } },
     });
     console.log(existingLike.id);
     if (!existingLike) {
@@ -176,7 +190,15 @@ postRouter.post(
       return res.status(404).json({ error: 'Post not found' });
     }
 
-    const user = (await User.find({ where: { id: user_id } })) || [];
+    const user =
+      (await User.find({
+        where: { id: user_id },
+        select: {
+          id: true,
+          username: true,
+          email: true,
+        },
+      })) || [];
     if (user.length === 0) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -205,7 +227,14 @@ postRouter.post(
   tryCatch(async (req: Request, res: Response) => {
     const { content, userId, rtwId } = req.body;
 
-    const user = await User.findOne({ where: { id: userId } });
+    const user = await User.findOne({
+      where: { id: userId },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+      },
+    });
 
     if (!user) {
       throw new AppError('User not found', 404);
@@ -223,11 +252,30 @@ postRouter.post(
       const retweetedPost = new PostRetweet();
       retweetedPost.post = post;
       retweetedPost.mainPost = mainPost;
-      retweetedPost.user=user
+      retweetedPost.user = user;
       await retweetedPost.save();
       return res.status(201).json(retweetedPost);
     }
     return res.status(201).json(post);
+  }),
+);
+
+//Delete retweet
+postRouter.delete(
+  '/retweet/:rtwId',
+  tryCatch(async (req: Request, res: Response) => {
+    const rtwId = +req.params.rtwId;
+    const retweeted = await PostRetweet.findOne({ where: { id: rtwId }, relations: ['user', 'post'] });
+    if (!retweeted) {
+      return res.status(404).json({ error: 'Retweet not found' });
+    }
+    const postId = retweeted.post.id;
+    const retweetedPost = await UserPost.findOne({ where: { id: postId } });
+    if (!retweetedPost) {
+      return res.status(404).json({ error: 'Retweeted post not found' });
+    }
+    await Promise.allSettled([PostRetweet.delete(retweeted.id), UserPost.delete(retweetedPost.id)]);
+    return res.status(204).json('deleted successfully');
   }),
 );
 
