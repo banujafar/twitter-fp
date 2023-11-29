@@ -10,10 +10,7 @@ const UserProfileFavorites: React.FC<{ username: string | undefined }> = ({ user
   const favData = posts.filter((post) => post.likes?.some((like) => like.user.username === username));
   const dispatch = useDispatch<AppDispatch>();
   useEffect(() => {
-    const getAllPosts = async () => {
-      await dispatch(getPosts());
-    };
-    getAllPosts();
+    dispatch(getPosts());
   }, [dispatch]);
 
   console.log(favData)

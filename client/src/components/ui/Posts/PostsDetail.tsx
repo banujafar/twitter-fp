@@ -1,7 +1,7 @@
 import { Link, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store';
-import { FaRegComment, FaRegHeart } from 'react-icons/fa';
+import { FaHeart, FaRegComment, FaRegHeart } from 'react-icons/fa';
 import { AiOutlineRetweet } from 'react-icons/ai';
 import { BsFillShareFill } from 'react-icons/bs';
 import SinglePost, { UserAvatar } from './SinglePost';
@@ -16,6 +16,10 @@ const PostsDetail = () => {
   const postId = parseInt(postid ?? '0', 10);
 
   const selectedData = posts.filter((post: IUserPost) => post.user.id === userId && post.id === postId);
+
+  const user = useSelector((state: RootState) => state.auth.user);
+  const isRetweeted = posts.map((post) => post.retweets?.some((rt: any) => rt?.user?.id === user?.userId));
+  const userLikedPosts = posts.map((post) => post.likes?.some((like) => like?.user?.id === user?.userId));
 
   return (
     <>
@@ -45,15 +49,32 @@ const PostsDetail = () => {
                 </div>
                 <div className="relative cursor-pointer">
                   <div className="flex items-center text-gray-500 hover:text-green-500">
-                    <AiOutlineRetweet className="text-xl" />
-                    <span className="ml-1">{data.retweets?.length}</span>
+                    {!isRetweeted ? (
+                      <AiOutlineRetweet className="text-xl" />
+                    ) : (
+                      <AiOutlineRetweet className="text-2xl text-green-500" />
+                    )}
+                    <span className={`ml-1 ${!isRetweeted ? 'text-black' : 'text-green-500'}`}>
+                      {data.retweets?.length}
+                    </span>
                   </div>
                 </div>
 
-                <div className="flex items-center text-gray-500 cursor-pointer hover:text-[#f91880]">
-                  <FaRegHeart />
-                  <span className="ml-1">{data.likes?.length}</span>
-                </div>
+                {userLikedPosts ? (
+                  <div
+                    className="flex items-center  cursor-pointer text-[#f91880]"
+                  >
+                    <FaHeart />
+                    <span className="ml-1">{data.likes.length}</span>
+                  </div>
+                ) : (
+                  <div
+                    className="flex items-center text-gray-500 cursor-pointer hover:text-[#f91880]"
+                  >
+                    <FaRegHeart />
+                    <span className="ml-1">{data.likes?.length}</span>
+                  </div>
+                )}
 
                 <div className="flex items-center text-gray-500 cursor-pointer">
                   <BsFillShareFill />
