@@ -17,6 +17,7 @@ const Header = () => {
   // const [decodedUsername, setDecodedUsername] = useState<string | null>(null);
    const dispatch = useDispatch<AppDispatch>();
    const user = useSelector((state: RootState) => state.auth.user);
+   const currentUser = user?.username
   // useEffect(() => {
   //   const getUsernameFromToken = (authToken: string) => {
   //     try {
@@ -83,7 +84,7 @@ const Header = () => {
       icon: BsPeople,
       activeIcon: BsPeopleFill,
     },
-    { to: '/profile', label: 'Profile', icon: BiUser, activeIcon: BiSolidUser },
+    { to: `/profile/${currentUser}`, label: 'Profile', icon: BiUser, activeIcon: BiSolidUser },
   ];
 
   const location = useLocation();
