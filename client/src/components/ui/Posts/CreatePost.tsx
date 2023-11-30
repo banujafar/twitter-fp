@@ -40,15 +40,15 @@ const CreatePost: React.FC<{ content?: any }> = ({ content }) => {
         formData.append('files', file);
       });
     }
-    // if (quoteModalContent) {
-    //   formData.append('retweeted_id', quoteModalContent.id.toString());
-    // }
+    if (quoteModalContent) {
+      formData.append('retweeted_id', quoteModalContent.id.toString());
+    }
 
     try {
       if (quoteModalContent && userData?.userId && text) {
-        const { id } = quoteModalContent;
-        const userId = userData?.userId;
-        await dispatch(retweetPost({ content: text, rtwId: id, userId }));
+        // const { id } = quoteModalContent;
+        // const userId = userData?.userId;
+        await dispatch(addPost(formData));
       } else {
         await dispatch(addPost(formData) as any);
       }

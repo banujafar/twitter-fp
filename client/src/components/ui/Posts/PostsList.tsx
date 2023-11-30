@@ -1,40 +1,44 @@
 import { useDispatch, useSelector } from 'react-redux';
+import {useEffect} from 'react'
 import { RootState } from '../../../store';
 import PostsItem from './PostsItem';
-import CreatePost from './CreatePost';
-import { useEffect } from 'react';
-import { getPosts } from '../../../store/features/post/postSlice';
 import { IUserPost } from '../../../models/post';
 import { modalIsOpenSelector } from '../../../store/features/modal/modalSlice';
 import QuoteModal from '../../modals/QuoteModal';
 import CommentModal from '../../modals/CommentModal';
+//import { useGetPostsQuery } from '../../../store/features/post/postsApi';
+import CreatePost from './CreatePost';
+import { getPosts } from '../../../store/features/post/postSlice';
 
 const PostsList = () => {
   const dispatch = useDispatch();
 
-  const posts = useSelector((state: RootState) => state.post.post) as IUserPost[];
+  // const { data } = useGetPostsQuery();
   const loading = useSelector((state: RootState) => state.post.loading);
-
+  const posts = useSelector((state: RootState) => state.post.post);
+  let sortedPosts: IUserPost[];
   const isOpenQuote = useSelector((state) => modalIsOpenSelector(state, 'modalQuote'));
   const isOpenComment = useSelector((state) => modalIsOpenSelector(state, 'modalComment'));
+  if (posts) {
+    sortedPosts = [...posts].sort((a, b) => {
+      const dateA = new Date(a.created_date);
+      const dateB = new Date(b.created_date);
 
-  const sortedPosts = [...posts].sort((a, b) => {
-    const dateA = new Date(a.created_date);
-    const dateB = new Date(b.created_date);
+      if (dateA < dateB) {
+        return 1;
+      } else if (dateA > dateB) {
+        return -1;
+      }
 
-    if (dateA < dateB) {
-      return 1;
-    } else if (dateA > dateB) {
-      return -1;
-    }
-
-    return dateB.getHours() - dateA.getHours();
-  });
+      return dateB.getHours() - dateA.getHours();
+    });
+  } else {
+    sortedPosts = [];
+  }
 
   useEffect(() => {
     dispatch(getPosts() as any);
   }, [dispatch]);
-
   return (
     <div className="mx-2 sm:mx-0 xs:mx-0 border border-gray-200 w-full">
       <CreatePost />
