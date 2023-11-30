@@ -15,7 +15,7 @@ import {
   useGetPostsQuery,
   useRemoveLikeMutation,
 } from '../../../store/features/post/postsApi';
-import { likePost, removeLike, retweetPost } from '../../../store/features/post/postSlice';
+import { getPosts, likePost, removeLike, retweetPost } from '../../../store/features/post/postSlice';
 
 const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -101,6 +101,7 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
         await dispatch(retweetPost(retweetData)).then(() => {
           setIsDropdownOpen(false);
         });
+        await dispatch(getPosts() as any)
         // } else {
         //   const findedpost = postData.retweets?.find(
         //     (retweet: any) => retweet.user.id === user?.userId && !retweet.post.content,
