@@ -5,12 +5,13 @@ import { useState } from 'react';
 //import { addComment } from '../../store/features/post/postSlice';
 import { setIsOpen } from '../../store/features/modal/modalSlice';
 import SinglePost from '../ui/Posts/SinglePost';
-import { useAddCommentMutation } from '../../store/features/post/postsApi';
+//import { useAddCommentMutation } from '../../store/features/post/postsApi';
+import { addComment } from '../../store/features/post/postSlice';
 const CommentModal = () => {
   const quoteModalContent = useSelector((state: RootState) => state.modal.postData['modalComment']);
   const [text, setText] = useState('');
   const user = useSelector((state: RootState) => state.auth.user);
-  const [addComment] = useAddCommentMutation();
+  //const [addComment] = useAddCommentMutation();
   const dispatch = useDispatch<AppDispatch>();
   const handleChange = (e: any) => {
     setText(e.target.value);
@@ -18,7 +19,7 @@ const CommentModal = () => {
   const handleSendComment = async (e: any) => {
     e.preventDefault();
     if (user?.userId) {
-      await addComment({ comment: text, userId: user?.userId, postId: quoteModalContent.id }).then(() => {
+      await dispatch(addComment({ comment: text, userId: user?.userId, postId: quoteModalContent.id })).then(() => {
         dispatch(setIsOpen({ id: 'modalComment', isOpen: false }));
       });
     }

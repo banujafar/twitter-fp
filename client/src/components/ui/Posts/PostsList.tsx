@@ -1,23 +1,26 @@
-import {  useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import {useEffect} from 'react'
 import { RootState } from '../../../store';
 import PostsItem from './PostsItem';
 import { IUserPost } from '../../../models/post';
 import { modalIsOpenSelector } from '../../../store/features/modal/modalSlice';
 import QuoteModal from '../../modals/QuoteModal';
 import CommentModal from '../../modals/CommentModal';
-import { useGetPostsQuery } from '../../../store/features/post/postsApi';
+//import { useGetPostsQuery } from '../../../store/features/post/postsApi';
 import CreatePost from './CreatePost';
+import { getPosts } from '../../../store/features/post/postSlice';
 
 const PostsList = () => {
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
-  const { data,isLoading } = useGetPostsQuery();
-  //const loading = useSelector((state: RootState) => state.post.loading);
+  // const { data } = useGetPostsQuery();
+  const loading = useSelector((state: RootState) => state.post.loading);
+  const posts = useSelector((state: RootState) => state.post.post);
   let sortedPosts: IUserPost[];
   const isOpenQuote = useSelector((state) => modalIsOpenSelector(state, 'modalQuote'));
   const isOpenComment = useSelector((state) => modalIsOpenSelector(state, 'modalComment'));
-  if (data) {
-    sortedPosts = [...data].sort((a, b) => {
+  if (posts) {
+    sortedPosts = [...posts].sort((a, b) => {
       const dateA = new Date(a.created_date);
       const dateB = new Date(b.created_date);
 
@@ -33,12 +36,15 @@ const PostsList = () => {
     sortedPosts = [];
   }
 
+  useEffect(() => {
+    dispatch(getPosts() as any);
+  }, [dispatch]);
   return (
     <div className="mx-2 sm:mx-0 xs:mx-0 border border-gray-200 w-full">
       <CreatePost />
-      {isLoading ? (
+      {loading ? (
         <p>Loading posts...</p>
-      ) : data && data.length > 0 ? (
+      ) : posts && posts.length > 0 ? (
         sortedPosts.map((post) => <PostsItem postData={post} key={post.id} />)
       ) : (
         <p>No posts found</p>
