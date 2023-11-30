@@ -15,19 +15,20 @@ import {
   useGetPostsQuery,
   useRemoveLikeMutation,
 } from '../../../store/features/post/postsApi';
+import { likePost, removeLike, retweetPost } from '../../../store/features/post/postSlice';
 
 const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user);
-  const { data } = useGetPostsQuery();
+  // const { data } = useGetPostsQuery();
   const userLikedPosts = postData.likes?.some((like) => like?.user?.id === user?.userId);
   const isRetweeted = postData.retweets?.some((rt: any) => rt?.user?.id === user?.userId);
-  const [deleteRetweet] = useDeleteRetweetMutation();
-  const [addRetweet] = useAddRetweetMutation();
-  const [addLike]=useAddLikeMutation();
-  const [removeLike]=useRemoveLikeMutation()
+  // const [deleteRetweet] = useDeleteRetweetMutation();
+  // const [addRetweet] = useAddRetweetMutation();
+  // const [addLike]=useAddLikeMutation();
+  // const [removeLike]=useRemoveLikeMutation()
   const handleRetweet = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsDropdownOpen(true);
@@ -71,9 +72,9 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
       };
 
       if (userLikedPosts) {
-        await removeLike(data)
+        await dispatch(removeLike(data));
       } else {
-        await addLike(data);
+        await dispatch(likePost(data));
       }
 
       console.log('liked');
@@ -97,19 +98,18 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
       };
 
       if (!isRetweeted) {
-        console.log(data);
-        await addRetweet(retweetData).then(() => {
+        await dispatch(retweetPost(retweetData)).then(() => {
           setIsDropdownOpen(false);
         });
-      } else {
-        const findedpost = postData.retweets?.find(
-          (retweet: any) => retweet.user.id === user?.userId && !retweet.post.content,
-        );
-        if (findedpost) {
-          await deleteRetweet(findedpost.id).then(() => {
-            setIsDropdownOpen(false);
-          });
-        }
+        // } else {
+        //   const findedpost = postData.retweets?.find(
+        //     (retweet: any) => retweet.user.id === user?.userId && !retweet.post.content,
+        //   );
+        //   if (findedpost) {
+        //     await deleteRetweet(findedpost.id).then(() => {
+        //       setIsDropdownOpen(false);
+        //     });
+        //   }
       }
     } catch (err) {
       console.log(err);
