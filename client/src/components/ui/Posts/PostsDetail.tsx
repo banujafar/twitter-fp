@@ -18,9 +18,9 @@ const PostsDetail = () => {
   const selectedData = posts.filter((post: IUserPost) => post.user.id === userId && post.id === postId);
 
   const user = useSelector((state: RootState) => state.auth.user);
-  const isRetweeted = posts.map((post) => post.retweets?.some((rt: any) => rt?.user?.id === user?.userId));
-  const userLikedPosts = posts.map((post) => post.likes?.some((like) => like?.user?.id === user?.userId));
-
+  const isRetweeted = selectedData.map((d)=>d.retweets?.some((rt)=>rt.user.id === user?.userId))[0]
+  const isLiked = selectedData.map((d)=>d.likes?.some((lk)=>lk.user.id === user?.userId))[0]
+  
   return (
     <>
       <div className="border-b border-gray-200 w-full p-4 bg-white">
@@ -49,18 +49,18 @@ const PostsDetail = () => {
                 </div>
                 <div className="relative cursor-pointer">
                   <div className="flex items-center text-gray-500 hover:text-green-500">
-                    {!isRetweeted ? (
-                      <AiOutlineRetweet className="text-xl" />
-                    ) : (
+                    {isRetweeted ? (
                       <AiOutlineRetweet className="text-2xl text-green-500" />
+                      ) : (
+                      <AiOutlineRetweet className="text-xl" />
                     )}
-                    <span className={`ml-1 ${!isRetweeted ? 'text-black' : 'text-green-500'}`}>
+                    <span className={`ml-1 ${isRetweeted ? 'text-green-500' : 'text-black'}`}>
                       {data.retweets?.length}
                     </span>
                   </div>
                 </div>
 
-                {userLikedPosts ? (
+                {isLiked ? (
                   <div
                     className="flex items-center  cursor-pointer text-[#f91880]"
                   >
@@ -100,8 +100,7 @@ const PostsDetail = () => {
                           >
                             {data.user?.username}
                           </Link>
-                          {/* TODO: Will be comment's created date */}
-                          <p className="text-gray-500">{formattedDate(new Date())}</p>
+                          <p className="text-gray-500">{formattedDate(comment.created_time)}</p>
                         </div>
                         <p className="text-gray-800">{comment.comment}</p>
                       </div>
