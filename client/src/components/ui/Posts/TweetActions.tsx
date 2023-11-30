@@ -15,7 +15,7 @@ import { BsFillShareFill } from 'react-icons/bs';
 //   useGetPostsQuery,
 //   useRemoveLikeMutation,
 // } from '../../../store/features/post/postsApi';
-import { likePost, removeLike, retweetPost } from '../../../store/features/post/postSlice';
+import { getPosts, likePost, removeLike, retweetPost } from '../../../store/features/post/postSlice';
 
 const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
