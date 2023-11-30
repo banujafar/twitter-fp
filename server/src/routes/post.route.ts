@@ -78,7 +78,6 @@ postRouter.get(
     });
 
     const result = await Promise.all(filteredPostsWithRetweets);
-
     return res.status(200).json(result);
   }),
 );
@@ -89,8 +88,8 @@ postRouter.post(
   uploads.array('files'),
   tryCatch(async (req: Request, res: Response) => {
     const files = (req.files as Express.Multer.File[]) || [];
-    const { content, user_id } = req.body;
-
+    const { content, user_id, retweeted_id } = req.body;
+    console.log(content, user_id);
     if (!content && !files) {
       throw new AppError('Cannot be empty', 400);
     }
@@ -115,6 +114,15 @@ postRouter.post(
     post.img = files.map((file) => file.filename);
 
     await post.save();
+    if (retweeted_id) {
+      const mainPost = await UserPost.findOne({ where: { id: retweeted_id }, relations: ['user'] });
+      const retweetedPost = new PostRetweet();
+      retweetedPost.post = post;
+      retweetedPost.mainPost = mainPost;
+      retweetedPost.user = user;
+      await retweetedPost.save();
+      return res.status(201).json(retweetedPost);
+    }
     return res.status(201).json(post);
   }),
 );
@@ -184,16 +192,16 @@ postRouter.delete(
 postRouter.post(
   '/comment',
   tryCatch(async (req: Request, res: Response) => {
-    const { comment, user_id, post_id } = req.body;
-
-    const post = (await UserPost.find({ where: { id: post_id } })) || [];
+    const { comment, userId, postId } = req.body;
+console.log(comment,userId,postId)
+    const post = (await UserPost.find({ where: { id: postId } })) || [];
     if (post.length === 0) {
       return res.status(404).json({ error: 'Post not found' });
     }
 
     const user =
       (await User.find({
-        where: { id: user_id },
+        where: { id: userId },
         select: {
           id: true,
           username: true,
@@ -226,7 +234,7 @@ postRouter.post(
 postRouter.post(
   '/retweet',
   tryCatch(async (req: Request, res: Response) => {
-    const { content, userId, rtwId } = req.body;
+    const { userId, rtwId } = req.body;
 
     const user = await User.findOne({
       where: { id: userId },
@@ -240,11 +248,10 @@ postRouter.post(
     if (!user) {
       throw new AppError('User not found', 404);
     }
-
     const post = new UserPost();
-    if (content) {
-      post.content = content;
-    }
+    // if (content) {
+    //   post.content = content;
+    // }
     post.user = user;
     await post.save();
 
