@@ -17,8 +17,7 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
 
   const userLikedPosts = postData.likes?.some((like) => like?.user?.id === user?.userId);
   const isRetweeted = postData.retweets?.some((rt: any) => rt?.user?.id === user?.userId);
-  console.log(isRetweeted);
-  console.log(postData);
+
   const handleRetweet = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsDropdownOpen(true);
@@ -87,9 +86,16 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
         rtwId: postId,
       };
 
-      await dispatch(retweetPost(retweetData)).then(() => {
-        setIsDropdownOpen(false);
-      });
+      if (!isRetweeted) {
+        await dispatch(retweetPost(retweetData)).then(() => {
+          setIsDropdownOpen(false);
+        });
+      } else {
+        const findedpost = postData.retweets?.find(
+          (retweet: any) => retweet.user.id === user?.userId && !retweet.post.content,
+        );
+        console.log(findedpost);
+      }
       console.log('retweeted');
     } catch (err) {
       console.log(err);
@@ -115,13 +121,13 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
           <span className={`ml-1 ${!isRetweeted ? 'text-black' : 'text-green-500'}`}>{postData.retweets?.length}</span>
         </div>
         {isDropdownOpen && (
-          <ul className="absolute bg-white top-0 right-0 p-4 rounded-xl border border-gray-300">
+          <ul className="absolute bg-white top-0 right-0 p-4 rounded-xl border border-gray-300 w-max">
             <li
               className="flex items-center gap-2 text-gray-700 hover:text-green-500 mb-2"
               onClick={(e) => handlePostRetweet(postData.id, e)}
             >
               <AiOutlineRetweet className="text-lg" />
-              <span>Repost</span>
+              <span>{!isRetweeted ? 'Repost' : 'Undo Repost'}</span>
             </li>
             <li className="flex items-center gap-2 text-gray-700 hover:text-green-500" onClick={handleOpenQuoteModal}>
               <CiEdit className="text-lg" />
