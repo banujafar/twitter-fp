@@ -65,6 +65,7 @@ postRouter.get(
           comment: r.comment_text,
           postId: r.post.id,
           userId: r.user.id,
+          created_time: r.created_time
         })),
         retweets: retweetsForPost.map((r) => ({
           id: r.id,

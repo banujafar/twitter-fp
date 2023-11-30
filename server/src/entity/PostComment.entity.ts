@@ -18,6 +18,6 @@ export class PostComment extends BaseEntity {
   @Column('text')
   comment_text: string
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   created_time: Date;
 }

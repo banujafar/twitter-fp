@@ -18,6 +18,7 @@ export interface IComment {
   comment?: string;
   userId: number;
   postId: number;
+  created_time: Date;
 }
 
 export interface IUserPost {
