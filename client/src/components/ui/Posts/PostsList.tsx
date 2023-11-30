@@ -11,8 +11,8 @@ import CreatePost from './CreatePost';
 const PostsList = () => {
   // const dispatch = useDispatch();
 
-  const { data } = useGetPostsQuery();
-  const loading = useSelector((state: RootState) => state.post.loading);
+  const { data,isLoading } = useGetPostsQuery();
+  //const loading = useSelector((state: RootState) => state.post.loading);
   let sortedPosts: IUserPost[];
   const isOpenQuote = useSelector((state) => modalIsOpenSelector(state, 'modalQuote'));
   const isOpenComment = useSelector((state) => modalIsOpenSelector(state, 'modalComment'));
@@ -36,7 +36,7 @@ const PostsList = () => {
   return (
     <div className="mx-2 sm:mx-0 xs:mx-0 border border-gray-200 w-full">
       <CreatePost />
-      {loading ? (
+      {isLoading ? (
         <p>Loading posts...</p>
       ) : data && data.length > 0 ? (
         sortedPosts.map((post) => <PostsItem postData={post} key={post.id} />)
