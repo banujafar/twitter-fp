@@ -15,7 +15,7 @@ export interface ILike {
 // }
 export interface IComment {
   id: number;
-  comment?: string;
+  comment: string;
   userId: number;
   postId: number;
   created_time: Date;
@@ -42,4 +42,9 @@ export interface ILikeInitialState {
   likes: ILike[];
   error: string | null;
   loading: boolean | null;
+}
+
+export interface IAddRetweet{
+  userId:number;
+  rtwId:number
 }

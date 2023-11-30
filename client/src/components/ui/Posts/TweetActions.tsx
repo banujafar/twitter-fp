@@ -2,22 +2,32 @@ import React, { useEffect, useRef, useState } from 'react';
 import { AiOutlineRetweet } from 'react-icons/ai';
 import { FaHeart, FaRegComment, FaRegHeart } from 'react-icons/fa';
 import { IUserPost } from '../../../models/post';
-import { likePost, removeLike, retweetPost } from '../../../store/features/post/postSlice';
+//import { likePost, removeLike, retweetPost } from '../../../store/features/post/postSlice';
 import { setIsOpen } from '../../../store/features/modal/modalSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../store';
 import { CiEdit } from 'react-icons/ci';
 import { BsFillShareFill } from 'react-icons/bs';
+import {
+  useAddLikeMutation,
+  useAddRetweetMutation,
+  useDeleteRetweetMutation,
+  useGetPostsQuery,
+  useRemoveLikeMutation,
+} from '../../../store/features/post/postsApi';
 
 const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user);
-
+  const { data } = useGetPostsQuery();
   const userLikedPosts = postData.likes?.some((like) => like?.user?.id === user?.userId);
   const isRetweeted = postData.retweets?.some((rt: any) => rt?.user?.id === user?.userId);
-
+  const [deleteRetweet] = useDeleteRetweetMutation();
+  const [addRetweet] = useAddRetweetMutation();
+  const [addLike]=useAddLikeMutation();
+  const [removeLike]=useRemoveLikeMutation()
   const handleRetweet = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsDropdownOpen(true);
@@ -61,9 +71,9 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
       };
 
       if (userLikedPosts) {
-        await dispatch(removeLike(data));
+        await removeLike(data)
       } else {
-        await dispatch(likePost(data));
+        await addLike(data);
       }
 
       console.log('liked');
@@ -87,16 +97,20 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
       };
 
       if (!isRetweeted) {
-        await dispatch(retweetPost(retweetData)).then(() => {
+        console.log(data);
+        await addRetweet(retweetData).then(() => {
           setIsDropdownOpen(false);
         });
       } else {
         const findedpost = postData.retweets?.find(
           (retweet: any) => retweet.user.id === user?.userId && !retweet.post.content,
         );
-        console.log(findedpost);
+        if (findedpost) {
+          await deleteRetweet(findedpost.id).then(() => {
+            setIsDropdownOpen(false);
+          });
+        }
       }
-      console.log('retweeted');
     } catch (err) {
       console.log(err);
     }
