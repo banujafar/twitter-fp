@@ -8,14 +8,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../store';
 import { CiEdit } from 'react-icons/ci';
 import { BsFillShareFill } from 'react-icons/bs';
-import {
-  useAddLikeMutation,
-  useAddRetweetMutation,
-  useDeleteRetweetMutation,
-  useGetPostsQuery,
-  useRemoveLikeMutation,
-} from '../../../store/features/post/postsApi';
-import { getPosts, likePost, removeLike, retweetPost } from '../../../store/features/post/postSlice';
+// import {
+//   useAddLikeMutation,
+//   useAddRetweetMutation,
+//   useDeleteRetweetMutation,
+//   useGetPostsQuery,
+//   useRemoveLikeMutation,
+// } from '../../../store/features/post/postsApi';
+import { likePost, removeLike, retweetPost } from '../../../store/features/post/postSlice';
 
 const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -142,7 +142,7 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
               onClick={(e) => handlePostRetweet(postData.id, e)}
             >
               <AiOutlineRetweet className="text-lg" />
-              <span>{!isRetweeted ? 'Repost' : 'Undo Repost'}</span>
+              <span>{/* {!isRetweeted ? 'Repost' : 'Undo Repost'} */}Repost</span>
             </li>
             <li className="flex items-center gap-2 text-gray-700 hover:text-green-500" onClick={handleOpenQuoteModal}>
               <CiEdit className="text-lg" />
