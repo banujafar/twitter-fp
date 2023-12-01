@@ -21,13 +21,13 @@ app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(cookieParser());
 passportConfig(passport);
 app.set('trust proxy', 1);
 
 // Initialize a new store using the given options
 const sessionRepository = AppDataSource.getRepository(Session);
-
-app.use(cookieParser());
+console.log(app.get('env'));
 app.use(
   session({
     resave: false,
@@ -35,20 +35,22 @@ app.use(
     cookie: {
       maxAge: 60 * 60 * 1000 || 7 * 24 * 60 * 60 * 1000,
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: app.get('env') === 'production' ? true : false,
       sameSite: 'lax',
+      domain: 'onrender.com',
     },
     store: new TypeormStore().connect(sessionRepository),
     secret: 'secret cookie',
   }),
 );
 
-app.use(passport.initialize());
-app.use(passport.session());
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const uploadDir = join(__dirname, '../../../client/src/assets/uploads');
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use('/api/posts', express.static(uploadDir));
 
@@ -61,7 +63,6 @@ AppDataSource.initialize()
     console.log(err);
     console.log('There is an error with connection');
   });
-
 
 app.use('/checkAuth', checkAuthMiddleware);
 app.use('/auth', userRouter);
