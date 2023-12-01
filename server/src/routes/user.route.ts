@@ -14,6 +14,7 @@ import { Token } from '../entity/token.entity.ts';
 
 const userRouter = Router();
 
+const Base_Client_Url = process.env.CLIENT_URL || 'http://localhost:5173/';
 //Register router
 userRouter.post(
   '/register',
@@ -89,16 +90,16 @@ userRouter.post(
 userRouter.get('/google', (req, res, next) => {
   passport.authenticate('google', {
     scope: ['email', 'profile'],
-    successRedirect: process.env.CLIENT_URL,
-    failureRedirect: `${process.env.CLIENT_URL}login`,
+    successRedirect: Base_Client_Url,
+    failureRedirect: `${Base_Client_Url}login`,
   })(req, res, next);
 });
 
 userRouter.get('/google/callback', (req, res, next) => {
   passport.authenticate('google', {
     scope: ['email', 'profile'],
-    successRedirect: process.env.CLIENT_URL,
-    failureRedirect: `${process.env.CLIENT_URL}login`,
+    successRedirect: Base_Client_Url,
+    failureRedirect: `${Base_Client_Url}login`,
   })(req, res, next);
 });
 
