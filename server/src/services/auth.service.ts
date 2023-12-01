@@ -64,10 +64,10 @@ const verificationWithLink = async (email: string) => {
 
   await newToken.save();
   if (!user.isVerified) {
-    const link = `http://localhost:5173/auth/verify?token=${hash}`;
+    const link = `https://twitter-client-ckmh.onrender.com/auth/verify?token=${hash}`;
     sendEmail(user.email, 'Verify your email', user.username, link, 'to continue setting up your account');
   } else {
-    const link = `http://localhost:5173/reset_password/${user.id}/${resetToken}`;
+    const link = `https://twitter-client-ckmh.onrender.com/reset_password/${user.id}/${resetToken}`;
     sendEmail(user.email, 'Password Reset Request', user.username, link, 'to reset your password');
   }
 };
