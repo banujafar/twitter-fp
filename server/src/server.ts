@@ -35,7 +35,7 @@ app.use(
       maxAge: 60 * 60 * 1000 || 7 * 24 * 60 * 60 * 1000,
       httpOnly: true,
       secure: app.get('env') === 'production' ? true : false,
-      sameSite: 'lax',
+      sameSite: 'none',
     },
     store: new TypeormStore().connect(sessionRepository),
     secret: 'secret cookie',
@@ -60,8 +60,8 @@ AppDataSource.initialize()
     console.log('There is an error with connection');
   });
 
-app.use('/checkAuth', checkAuthMiddleware);
 app.use('/auth', userRouter);
+app.use('/checkAuth', checkAuthMiddleware);
 app.use('/api/posts', postRouter);
 
 app.use(errorHandler);
