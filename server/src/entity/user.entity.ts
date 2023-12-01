@@ -3,32 +3,30 @@ import { LikedPost } from './LikedPost.entity.ts';
 import { PostComment } from './PostComment.entity.ts';
 import { PostRetweet } from './PostRetweet.entity.ts';
 
-
 @Entity()
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ type: 'varchar' })
   username: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   email: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   password: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'varchar' })
   token: string | null;
 
   @Column({ nullable: true, type: 'boolean', default: false })
   isVerified: boolean;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'varchar' })
   country: string;
 
   @Column({ type: 'date', nullable: true })
-
   @Column({ nullable: true, type: 'bytea' })
   profilePhoto: Buffer | null;
 
@@ -41,9 +39,9 @@ export class User extends BaseEntity {
   @OneToMany(() => PostRetweet, (postRetweet) => postRetweet.user)
   postRetweet: PostRetweet[];
 
-  @ManyToMany (()=>User, (user)=>user.followers)
-  followers:User[];
+  @ManyToMany(() => User, (user) => user.followers)
+  followers: User[];
 
-  @ManyToMany(()=>User,(user)=>user.following)
-  following:User[]
+  @ManyToMany(() => User, (user) => user.following)
+  following: User[];
 }
