@@ -18,7 +18,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: app.get('env') === 'production' ? 'https://twitter-client-ckmh.onrender.com' : 'http://localhost:5173',
+    origin: '*',
     credentials: true,
   }),
 );
