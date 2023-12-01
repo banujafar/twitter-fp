@@ -88,6 +88,7 @@ postRouter.post(
   uploads.array('files'),
   tryCatch(async (req: Request, res: Response) => {
     const files = (req.files as Express.Multer.File[]) || [];
+    console.log(files)
     const { content, user_id, retweeted_id } = req.body;
     console.log(content, user_id);
     if (!content && !files) {
