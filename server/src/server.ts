@@ -15,10 +15,10 @@ import { fileURLToPath } from 'url';
 import { join, dirname } from 'path';
 import cookieParser from 'cookie-parser';
 const app = express();
-console.log(app.get('env'))
+const allowedOrigins = ['https://twitter-client-ckmh.onrender.com', 'http://localhost:5173'];
 app.use(
   cors({
-    origin: '*',
+    origin: allowedOrigins,
     credentials: true,
   }),
 );
