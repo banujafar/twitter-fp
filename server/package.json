@@ -10,7 +10,7 @@
     ],
     "ext": ".ts,.js",
     "ignore": [],
-    "exec": "ts-node --esm ./src/server.ts"
+    "exec": "ts-node ./src/server.ts"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

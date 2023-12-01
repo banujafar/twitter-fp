@@ -16,7 +16,7 @@
         "resolveJsonModule": true,
       
       },
-      "ts-node": { "esm": true, "experimentalSpecifierResolution": "node" },
+      "ts-node": { "esm": true },
     "include": ["src/**/*.ts"],
     "exclude": ["node_modules"],
   }
