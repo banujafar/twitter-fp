@@ -17,7 +17,7 @@ const __dirname = dirname(__filename);
 const storage = multer.diskStorage({
   destination: (req, res, callback) => {
     const uploadDir = join(__dirname, '../../../client/src/assets/uploads');
-
+console.log(uploadDir)
     return callback(null, uploadDir);
   },
   filename: (req, file, callback) => {
@@ -88,6 +88,7 @@ postRouter.post(
   uploads.array('files'),
   tryCatch(async (req: Request, res: Response) => {
     const files = (req.files as Express.Multer.File[]) || [];
+    console.log(files)
     const { content, user_id, retweeted_id } = req.body;
     console.log(content, user_id);
     if (!content && !files) {
