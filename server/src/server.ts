@@ -35,7 +35,7 @@ app.use(
       maxAge: 60 * 60 * 1000 || 7 * 24 * 60 * 60 * 1000,
       httpOnly: true,
       secure: app.get('env') === 'production' ? true : false,
-      sameSite: 'lax',
+      sameSite: 'none',
     },
     store: new TypeormStore().connect(sessionRepository),
     secret: 'secret cookie',
