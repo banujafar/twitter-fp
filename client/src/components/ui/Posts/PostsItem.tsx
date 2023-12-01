@@ -1,8 +1,6 @@
 import React from 'react';
-import { RootState } from '../../../store';
 import { IUserPost } from '../../../models/post';
 import SinglePost from './SinglePost';
-import { useSelector } from 'react-redux';
 import TweetActions from './TweetActions';
 import { useGetPostsQuery } from '../../../store/features/post/postsApi';
 

@@ -12,7 +12,7 @@ import { AppDispatch, RootState } from '../../../store';
 import { logoutUser } from '../../../store/features/auth/authSlice';
 
 const Header = () => {
-  const [notifications, setNotifications] = useState(true);
+  //const [notifications, setNotifications] = useState(true);
   const [logoutPopover, setLogoutPopover] = useState(false);
   // const [decodedUsername, setDecodedUsername] = useState<string | null>(null);
    const dispatch = useDispatch<AppDispatch>();
@@ -52,7 +52,7 @@ const Header = () => {
       label: 'Home',
       icon: GoHome,
       activeIcon: GoHomeFill,
-      notifications: () => notifications,
+      notifications: () => true,
     },
     {
       to: '/explore',

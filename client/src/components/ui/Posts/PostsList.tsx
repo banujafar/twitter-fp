@@ -1,6 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import {useEffect} from 'react'
-import { RootState } from '../../../store';
+import {useEffect} from 'react';
 import PostsItem from './PostsItem';
 import { IUserPost } from '../../../models/post';
 import { modalIsOpenSelector } from '../../../store/features/modal/modalSlice';
