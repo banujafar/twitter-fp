@@ -16,7 +16,7 @@ import { join, dirname } from 'path';
 import cookieParser from 'cookie-parser';
 const app = express();
 
-app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
+app.use(cors({ origin: 'https://twitter-client-ckmh.onrender.com', credentials: true }));
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -35,7 +35,7 @@ app.use(
       maxAge: 60 * 60 * 1000 || 7 * 24 * 60 * 60 * 1000,
       httpOnly: true,
       secure: app.get('env') === 'production' ? true : false,
-      sameSite: 'lax',
+      sameSite: 'none',
     },
     store: new TypeormStore().connect(sessionRepository),
     secret: 'secret cookie',
