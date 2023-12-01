@@ -34,7 +34,7 @@ const Login: React.FC<object> = () => {
   };
   const handleLoginwithGoogle = () => {
     //handle google login here
-    window.open('http://localhost:3000/auth/google/callback'), '_self';
+    window.open('https://twitter-server-73xd.onrender.com/auth/google/callback'), '_self';
   };
 
   if (loading) {
