@@ -60,8 +60,8 @@ AppDataSource.initialize()
     console.log('There is an error with connection');
   });
 
-app.use('/checkAuth', checkAuthMiddleware);
 app.use('/auth', userRouter);
+app.use('/checkAuth', checkAuthMiddleware);
 app.use('/api/posts', postRouter);
 
 app.use(errorHandler);
