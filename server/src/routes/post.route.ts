@@ -17,7 +17,7 @@ const __dirname = dirname(__filename);
 const storage = multer.diskStorage({
   destination: (req, res, callback) => {
     const uploadDir = join(__dirname, '../../../client/src/assets/uploads');
-
+console.log(uploadDir)
     return callback(null, uploadDir);
   },
   filename: (req, file, callback) => {
