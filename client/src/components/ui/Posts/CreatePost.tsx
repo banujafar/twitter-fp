@@ -39,6 +39,7 @@ const CreatePost: React.FC<{ content?: any }> = ({ content }) => {
       selectedFile.forEach((file) => {
         formData.append('files', file);
       });
+      console.log(selectedFile)
     }
     if (quoteModalContent) {
       formData.append('retweeted_id', quoteModalContent.id.toString());
