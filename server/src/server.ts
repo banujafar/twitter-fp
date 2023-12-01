@@ -15,7 +15,7 @@ import { fileURLToPath } from 'url';
 import { join, dirname } from 'path';
 import cookieParser from 'cookie-parser';
 const app = express();
-
+console.log(app.get('env'))
 app.use(
   cors({
     origin: '*',
