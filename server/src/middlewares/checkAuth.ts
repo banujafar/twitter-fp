@@ -18,6 +18,7 @@ const checkAuthMiddleware = tryCatch((req: Request, res: Response, next: NextFun
   } else {
     throw new AppError('Unauthorized', 401);
   }
+  next()
 });
 
 export default checkAuthMiddleware;
