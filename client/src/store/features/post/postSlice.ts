@@ -3,7 +3,7 @@ import { IPostInitialState } from '../../../models/post';
 
 export const getPosts = createAsyncThunk('post/getPosts', async () => {
   try {
-    const response = await fetch(`http://localhost:3000/api/posts`, {
+    const response = await fetch(`https://twitter-server-73xd.onrender.com/api/posts`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -23,7 +23,7 @@ export const getPosts = createAsyncThunk('post/getPosts', async () => {
 
 export const addPost = createAsyncThunk('post/addPost', async (formData: FormData) => {
   try {
-    const response = await fetch(`http://localhost:3000/api/posts`, {
+    const response = await fetch(`https://twitter-server-73xd.onrender.com/api/posts`, {
       method: 'POST',
       body: formData,
     });
@@ -43,7 +43,7 @@ export const likePost = createAsyncThunk(
   'like/likePost',
   async ({ postId, userId }: { postId: number; userId: number }) => {
     try {
-      const response = await fetch('http://localhost:3000/api/posts/like', {
+      const response = await fetch('https://twitter-server-73xd.onrender.com/api/posts/like', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -65,7 +65,7 @@ export const likePost = createAsyncThunk(
 export const addComment = createAsyncThunk('post/addComment', async (formData: any) => {
   console.log(formData);
   try {
-    const response = await fetch(`http://localhost:3000/api/posts/comment`, {
+    const response = await fetch(`https://twitter-server-73xd.onrender.com/api/posts/comment`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -87,7 +87,7 @@ export const removeLike = createAsyncThunk(
   'like/removeLike',
   async ({ postId, userId }: { postId: number; userId: number }) => {
     try {
-      const response = await fetch('http://localhost:3000/api/posts/like', {
+      const response = await fetch('https://twitter-server-73xd.onrender.com/api/posts/like', {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -111,7 +111,7 @@ export const retweetPost = createAsyncThunk(
   'post/retweetPost',
   async ({ content, userId, rtwId }: { content?: string; userId: number; rtwId: number }) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/posts/retweet`, {
+      const response = await fetch(`https://twitter-server-73xd.onrender.com/api/posts/retweet`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
