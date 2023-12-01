@@ -10,6 +10,7 @@ import AppError from './appError.ts';
 
 
 let token:string;
+const Base_Client_Url = process.env.CLIENT_URL || 'http://localhost:5173/';
 
 //Login user with email or username with using passport local strategy
 const passportConfig = (passport: PassportStatic) => {
@@ -91,7 +92,7 @@ const passportConfig = (passport: PassportStatic) => {
             );
           }
         } catch (error) {
-          return request.res.redirect(`${process.env.CLIENT_URL}login?error=${encodeURIComponent(error.message)}`);
+          return request.res.redirect(`${Base_Client_Url}login?error=${encodeURIComponent(error.message)}`);
         }
       },
     ),
