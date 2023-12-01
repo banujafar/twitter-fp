@@ -66,6 +66,6 @@ app.use('/api/posts', postRouter);
 
 app.use(errorHandler);
 
-app.listen('3000', () => {
-  console.log('Server is up on 3000');
+app.listen('10000', () => {
+  console.log('Server is up on 10000');
 });

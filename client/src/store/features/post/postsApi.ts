@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { IAddRetweet, IUserPost } from '../../../models/post';
 export const postsApi = createApi({
   reducerPath: 'postsApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:3000/api' }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'https://twitter-server-73xd.onrender.com/api' }),
   tagTypes: ['Posts'],
   endpoints: (builder) => ({
     getPosts: builder.query<Array<IUserPost>, void>({

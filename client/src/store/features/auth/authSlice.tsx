@@ -9,7 +9,7 @@ const initialState: AuthState = {
   isAuth: null,
 };
 
-const BASE_URL = 'http://localhost:3000/auth';
+const BASE_URL = 'https://twitter-server-73xd.onrender.com/auth';
 
 export const registerUser = createAsyncThunk('auth/registerUser', async (userData: IUserRegister) => {
   return fetchWrapper(`${BASE_URL}/register`, 'POST', userData);
@@ -20,20 +20,11 @@ export const verifyEmail = createAsyncThunk('auth/verifyEmail', async (verificat
 });
 
 export const checkAuth = createAsyncThunk('auth/checkAuth', async () => {
-  return fetchWrapper('http://localhost:3000/checkAuth', 'GET');
+  return fetchWrapper('https://twitter-server-73xd.onrender.com/checkAuth', 'GET');
 });
 export const loginUser = createAsyncThunk('auth/loginUser', async (userData: IUserLogin) => {
-  // return await fetchWrapper(`${BASE_URL}/login`, 'POST', userData);
-  try {
-    const response = await fetchWrapper(`${BASE_URL}/login`, 'POST', userData);
-
-    localStorage.setItem('token', response.token);
-
-    return response;
-  } catch (error) {
-    console.error('Login failed:', error);
-    throw error;
-  }
+  return await fetchWrapper(`${BASE_URL}/login`, 'POST', userData);
+  
 });
 
 export const forgotPass = createAsyncThunk('auth/forgotPass', async (email: object) => {

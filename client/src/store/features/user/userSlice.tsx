@@ -3,7 +3,7 @@ import { IUserInitial } from '../../../models/user';
 
 export const getUsers = createAsyncThunk('user/getUsers', async () => {
   try {
-    const response = await fetch(`http://localhost:3000/auth/`, {
+    const response = await fetch(`https://twitter-server-73xd.onrender.com/auth/`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
