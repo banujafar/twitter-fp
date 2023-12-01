@@ -105,6 +105,7 @@ const passportConfig = (passport: PassportStatic) => {
     token = jwt.sign({ userId, username }, process.env.SECRET_KEY, {
       expiresIn: '1h',
     });
+    console.log(token)
     done(null, { token });
   });
 

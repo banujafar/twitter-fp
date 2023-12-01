@@ -5,6 +5,7 @@ import tryCatch from '../utils/tryCatch.ts';
 
 //check Authentication
 const checkAuthMiddleware = tryCatch((req: Request, res: Response, next: NextFunction) => {
+  console.log(req.isAuthenticated(),req.cookies['connect.sid'],req.cookies['auth_token'])
   if (req.isAuthenticated()) {
     const { auth_token } = req.cookies;
     jwt.verify(auth_token, process.env.SECRET_KEY, (err, decoded) => {
