@@ -12,7 +12,7 @@ const checkAuthMiddleware = tryCatch((req: Request, res: Response, next: NextFun
         throw new AppError(err.message, err.statusCode);
       } else {
         const { userId, username } = decoded;
-        res.status(200).json({ isAuth: true, user: { userId, username } });
+        res.status(200).json({ isAuth: true, user: { userId, username, } });
       }
     });
   } else {

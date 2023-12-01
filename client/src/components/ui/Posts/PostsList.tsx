@@ -6,21 +6,21 @@ import { IUserPost } from '../../../models/post';
 import { modalIsOpenSelector } from '../../../store/features/modal/modalSlice';
 import QuoteModal from '../../modals/QuoteModal';
 import CommentModal from '../../modals/CommentModal';
-//import { useGetPostsQuery } from '../../../store/features/post/postsApi';
+import { useGetPostsQuery } from '../../../store/features/post/postsApi';
 import CreatePost from './CreatePost';
 import { getPosts } from '../../../store/features/post/postSlice';
 
 const PostsList = () => {
   const dispatch = useDispatch();
 
-  // const { data } = useGetPostsQuery();
-  const loading = useSelector((state: RootState) => state.post.loading);
-  const posts = useSelector((state: RootState) => state.post.post);
+   const { data,isLoading } = useGetPostsQuery();
+  //const loading = useSelector((state: RootState) => state.post.loading);
+ // const posts = useSelector((state: RootState) => state.post.post);
   let sortedPosts: IUserPost[];
   const isOpenQuote = useSelector((state) => modalIsOpenSelector(state, 'modalQuote'));
   const isOpenComment = useSelector((state) => modalIsOpenSelector(state, 'modalComment'));
-  if (posts) {
-    sortedPosts = [...posts].sort((a, b) => {
+  if (data) {
+    sortedPosts = [...data].sort((a, b) => {
       const dateA = new Date(a.created_date);
       const dateB = new Date(b.created_date);
 
@@ -42,9 +42,9 @@ const PostsList = () => {
   return (
     <div className="mx-2 sm:mx-0 xs:mx-0 border border-gray-200 w-full">
       <CreatePost />
-      {loading ? (
+      {isLoading ? (
         <p>Loading posts...</p>
-      ) : posts && posts.length > 0 ? (
+      ) : data && data.length > 0 ? (
         sortedPosts.map((post) => <PostsItem postData={post} key={post.id} />)
       ) : (
         <p>No posts found</p>

@@ -171,7 +171,7 @@ const postSlice = createSlice({
       })
       .addCase(likePost.pending, (state) => {
         state.error = null;
-        state.loading = true;
+        //state.loading = true;
       })
       .addCase(likePost.fulfilled, (state, action) => {
         const likedPost = action.payload;

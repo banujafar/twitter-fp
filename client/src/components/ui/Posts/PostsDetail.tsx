@@ -9,17 +9,18 @@ import { IoMdArrowBack } from 'react-icons/io';
 import { formattedDate } from '../../../utils/FormatDate';
 import { IUserPost } from '../../../models/post';
 import TweetActions from './TweetActions';
+import { useGetPostsQuery } from '../../../store/features/post/postsApi';
 //import { useGetPostsQuery } from '../../../store/features/post/postsApi';
 
 const PostsDetail = () => {
   const { userid, postid } = useParams<{ userid?: string | undefined; postid?: string | undefined }>();
-  //const { data } = useGetPostsQuery();
+  const { data } = useGetPostsQuery();
    const posts = useSelector((state: RootState) => state.post.post);
   const userId = parseInt(userid ?? '0', 10);
   const postId = parseInt(postid ?? '0', 10);
 
   // const selectedData = posts.filter((post: IUserPost) => post.user.id === userId && post.id === postId);
-  const selectedData = posts?.filter((post: IUserPost) => post.user.id === userId && post.id === postId);
+  const selectedData = data?.filter((post: IUserPost) => post.user.id === userId && post.id === postId);
 
   //const user = useSelector((state: RootState) => state.auth.user);
   // const isRetweeted = selectedData?.map((d)=>d.retweets?.some((rt)=>rt.user.id === user?.userId))[0]

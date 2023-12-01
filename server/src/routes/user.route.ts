@@ -1,3 +1,4 @@
+import jwt from 'jsonwebtoken';
 import { Router, Request, Response, NextFunction } from 'express';
 import { markEmailAsVerified, registerUser } from '../services/user.service.ts';
 import {
@@ -95,10 +96,33 @@ userRouter.get('/google', (req, res, next) => {
 });
 
 userRouter.get('/google/callback', (req, res, next) => {
-  passport.authenticate('google', {
-    scope: ['email', 'profile'],
-    successRedirect: process.env.CLIENT_URL,
-    failureRedirect: `${process.env.CLIENT_URL}login`,
+  passport.authenticate('google', { scope: ['email', 'profile'] }, async (err, user) => {
+    try {
+      if (!user) {
+        throw new AppError('Google authentication failed', 401);
+      }
+      req.logIn(user, async (err) => {
+        if (req.body.remember) {
+          req.session.cookie.originalMaxAge = 7 * 24 * 60 * 60 * 1000;
+        }
+        if (err) {
+          throw new AppError(err.message, err.statusCode);
+        }
+        const { userId, username } = user;
+
+        const token = jwt.sign({ userId, username }, process.env.SECRET_KEY, {
+          expiresIn: '1h',
+        });
+        res.cookie('auth_token', token);
+
+        res.redirect(process.env.CLIENT_URL); // Redirect to the client after successful login
+      });
+      // Generate token (example, use your actual logic)
+
+      // res.cookie('auth_token', token);
+    } catch (error) {
+      next(error);
+    }
   })(req, res, next);
 });
 
@@ -123,13 +147,11 @@ userRouter.post(
   }),
 );
 
-
 userRouter.get(
   '/',
   tryCatch(async (req: Request, res: Response) => {
-
     const user = await User.find();
-    
+
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -137,6 +159,5 @@ userRouter.get(
     return res.status(200).json(user);
   }),
 );
-
 
 export default userRouter;
