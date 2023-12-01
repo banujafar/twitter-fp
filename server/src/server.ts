@@ -16,7 +16,12 @@ import { join, dirname } from 'path';
 import cookieParser from 'cookie-parser';
 const app = express();
 
-app.use(cors({ origin: 'https://twitter-client-ckmh.onrender.com', credentials: true }));
+app.use(
+  cors({
+    origin: app.get('env') === 'production' ? 'https://twitter-client-ckmh.onrender.com' : 'http://localhost:5173',
+    credentials: true,
+  }),
+);
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
