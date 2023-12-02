@@ -5,30 +5,31 @@ import AppError from '../config/appError.ts';
 import { UserPost } from '../entity/UserPost.entity.ts';
 import { User } from '../entity/user.entity.ts';
 import multer from 'multer';
-import { dirname, join } from 'path';
-import { fileURLToPath } from 'url';
+import storageCloud from '../config/storage.ts';
+// import { dirname, join } from 'path';
+// import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
 import { PostRetweet } from '../entity/PostRetweet.entity.ts';
 import { LikedPost } from '../entity/LikedPost.entity.ts';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = dirname(__filename);
 
-const storage = multer.diskStorage({
-  destination: (req, res, callback) => {
-    const uploadDir = join(__dirname, '../../../client/src/assets/uploads');
-console.log(uploadDir)
-    return callback(null, uploadDir);
-  },
-  filename: (req, file, callback) => {
-    const uniqueImgId = uuidv4();
-    const originalName = file.originalname;
-    const filename = `${uniqueImgId}_${originalName}`;
-    callback(null, filename);
-  },
-});
+// const storage = multer.diskStorage({
+//   destination: (req, res, callback) => {
+//     const uploadDir = join(__dirname, '../../../client/src/assets/uploads');
+// console.log(uploadDir)
+//     return callback(null, uploadDir);
+//   },
+//   filename: (req, file, callback) => {
+//     const uniqueImgId = uuidv4();
+//     const originalName = file.originalname;
+//     const filename = `${uniqueImgId}_${originalName}`;
+//     callback(null, filename);
+//   },
+// });
 
-const uploads = multer({ storage: storage });
+const uploads = multer({ storage: storageCloud });
 
 const postRouter = Router();
 
