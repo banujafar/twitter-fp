@@ -66,7 +66,7 @@ const CreatePost: React.FC<{ content?: any }> = ({ content }) => {
 
     if (fileInput.files && fileInput.files.length > 0) {
       const files = Array.from(fileInput.files);
-      setSelectedFile(files);
+      setSelectedFile((prevFiles) => (prevFiles ? [...prevFiles, ...files] : files));
     }
   };
 

@@ -1,15 +1,16 @@
 import { IoMdArrowBack } from 'react-icons/io';
-import { IoLocationOutline } from 'react-icons/io5';
-import { Link } from 'react-router-dom';
+import { IoLocationOutline, IoNotificationsOffOutline, IoNotificationsOutline } from 'react-icons/io5';
+import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
-import { getUsers } from '../../../store/features/user/userSlice';
+import { followUser, getUsers } from '../../../store/features/user/userSlice';
 import UserProfileFavorites from './UserProfileFavorites';
 import UserProfilePosts from './UserProfilePosts';
 
 const UserProfileHeader = ({ username }: { username: string | undefined }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate()
   const user = useSelector((state: RootState) => state.auth.user);
   const isCurrentUser = user?.username == username;
   const users = useSelector((state: RootState) => state.user.users);
@@ -17,6 +18,8 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
   const loading = useSelector((state: RootState) => state.user.loading);
 
   const [activeBtn, setActiveBtn] = useState<string>('posts');
+  const [follow, setFollow] = useState<boolean>(false);
+  const [notification, setNotification] = useState<boolean>(false);
 
   const handleButtonClick = (buttonType: string) => {
     setActiveBtn(buttonType);
@@ -26,6 +29,18 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
     dispatch(getUsers() as any);
   }, [dispatch]);
 
+  const handleFollow = () => {
+    setFollow(!follow);
+    setNotification(false);
+    const userId = user?.userId;
+    const targetUser = userInfo;
+    dispatch(followUser({ userId, targetUser }) as any);
+    console.log(userInfo);
+  };
+
+  const handleNotification = () => {
+    setNotification(!notification);
+  };
   return (
     <>
       {loading ? (
@@ -34,10 +49,8 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
         <>
           <div className="border-b border-gray-200 w-full p-4 bg-white">
             <div className="flex flex-col sm:flex-row items-center justify-start gap-4">
-              <button type="button" className="flex items-center justify-center">
-                <Link to="/" className="flex text-2xl">
+              <button type="button" className="items-center justify-center flex text-2xl" onClick={()=>navigate(-1)}>
                   <IoMdArrowBack />
-                </Link>
               </button>
               <h1 className="text-2xl font-semibold">{userInfo?.username}</h1>
             </div>
@@ -63,18 +76,45 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
                     </div>
                   )}
                 </div>
-                {isCurrentUser ? (
-                  <div className="pt-10">
-                    <button
-                      type="button"
-                      className="cursor-pointer font-medium py-1 px-3 border border-[#cfd9de] bg-white text-black rounded-2xl"
-                    >
-                      Edit Profile
-                    </button>
-                  </div>
-                ) : (
-                  ''
-                )}
+                <div className="flex">
+                  {isCurrentUser ? (
+                    <div className="pt-10">
+                      <button
+                        type="button"
+                        className="cursor-pointer font-medium py-1 px-3 border border-[#cfd9de] bg-white text-black rounded-2xl"
+                      >
+                        Edit Profile
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      {follow ? (
+                        <div className="pt-10">
+                          <button
+                            type="button"
+                            className="text-2xl cursor-pointer font-medium py-1 px-3 border border-[#cfd9de] bg-white text-black rounded-2xl"
+                            onClick={handleNotification}
+                          >
+                            {notification ? <IoNotificationsOffOutline /> : <IoNotificationsOutline />}
+                          </button>
+                        </div>
+                      ) : (
+                        ''
+                      )}
+                      <div className="pt-10">
+                        <button
+                          type="button"
+                          className={`capitalize cursor-pointer font-medium py-1 px-3 border ${
+                            follow ? 'border-[#cfd9de] bg-white text-black' : 'border-black bg-black text-white'
+                          }  rounded-2xl`}
+                          onClick={handleFollow}
+                        >
+                          {follow ? 'unfollow' : 'follow'}
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
               <div>
                 <h1 className="text-black text-2xl font-bold">{userInfo?.username}</h1>

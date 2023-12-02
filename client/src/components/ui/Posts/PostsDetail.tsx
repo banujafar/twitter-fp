@@ -1,5 +1,5 @@
-import { Link, useParams } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
 // import { FaHeart, FaRegComment, FaRegHeart } from 'react-icons/fa';
 // import { AiOutlineRetweet } from 'react-icons/ai';
@@ -12,9 +12,13 @@ import TweetActions from './TweetActions';
 import { modalIsOpenSelector } from '../../../store/features/modal/modalSlice';
 import QuoteModal from '../../modals/QuoteModal';
 import CommentModal from '../../modals/CommentModal';
+import { useEffect } from 'react';
+import { getPosts } from '../../../store/features/post/postSlice';
 //import { useGetPostsQuery } from '../../../store/features/post/postsApi';
 
 const PostsDetail = () => {
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
   const { userid, postid } = useParams<{ userid?: string | undefined; postid?: string | undefined }>();
   //const { data } = useGetPostsQuery();
   const posts = useSelector((state: RootState) => state.post.post);
@@ -30,14 +34,15 @@ const PostsDetail = () => {
   // const isRetweeted = selectedData?.map((d)=>d.retweets?.some((rt)=>rt.user.id === user?.userId))[0]
   // const isLiked = selectedData?.map((d)=>d.likes?.some((lk)=>lk.user.id === user?.userId))[0]
 
+  useEffect(()=>{
+    dispatch(getPosts() as any)
+  })
   return (
     <>
       <div className="border-b border-gray-200 w-full p-4 bg-white">
         <div className="flex flex-col sm:flex-row items-center justify-start gap-4">
-          <button type="button" className="flex items-center justify-center">
-            <Link to="/" className="flex text-2xl">
+          <button type="button" className="flex items-center justify-center text-2xl" onClick={()=>navigate(-1)}>
               <IoMdArrowBack />
-            </Link>
           </button>
           <h1 className="text-2xl font-semibold">Post</h1>
         </div>
