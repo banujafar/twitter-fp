@@ -140,4 +140,35 @@ userRouter.get(
 );
 
 
+userRouter.post(
+  '/follow/:userId',
+  tryCatch(async (req: Request, res: Response) => {
+    const { userId } = req.params;
+    const {targetUser} = req.body;
+
+    // const currentUser = await User.findOne({ where: { id: parseInt(userId) }, relations: ['following', 'followers']  });
+    // const userToFollow = await User.findOne({ where: { id: targetUser.id }, relations: ['followers'] });
+
+    // if (!currentUser || !userToFollow) {
+    //   return res.status(404).json({ error: 'User not found' });
+    // }
+
+    // const isAlreadyFollowing = currentUser.following && currentUser.following.some(follower => follower.id === userToFollow.id);
+
+    // if (isAlreadyFollowing) {
+    //   return res.status(400).json({ error: 'User is already being followed' });
+    // }
+
+    // currentUser.following = [...(currentUser.following || []), userToFollow];
+    // await currentUser.save();
+
+    // userToFollow.followers = [...(userToFollow.followers || []), currentUser];
+    // await userToFollow.save();
+
+
+    return res.status(200).json({message:'success'});
+  }),
+);
+
+
 export default userRouter;

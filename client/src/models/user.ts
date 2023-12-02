@@ -5,7 +5,9 @@ export interface IUser {
     country?: string | null,
     isVerified: boolean,
     profilePhoto?: null,
-    token?: string | null  
+    token?: string | null,
+    followers?: IUser[] | null,
+    following?: IUser[] | null
 }
 
 export interface IUserInitial {
