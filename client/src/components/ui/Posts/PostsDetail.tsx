@@ -36,7 +36,7 @@ const PostsDetail = () => {
 
   useEffect(()=>{
     dispatch(getPosts() as any)
-  })
+  },[dispatch])
   return (
     <>
       <div className="border-b border-gray-200 w-full p-4 bg-white">
@@ -71,9 +71,8 @@ const PostsDetail = () => {
                 </>
               )}
               {data.comments.length > 0 &&
-                data?.comments?.map((comment, index) => {
-                  console.log(comment);
-                  return (
+                data?.comments?.map((comment, index) => (
+                  
                     <div
                       key={index}
                       className="p-4 cursor-pointer bg-white border-b border-gray-200 w-full transition ease-in hover:bg-[#f7f7f7]"
@@ -98,8 +97,8 @@ const PostsDetail = () => {
                         </div>
                       </div>
                     </div>
-                  );
-                })}
+                  )
+                )}
                 
       {isOpenQuote && <QuoteModal />}
       {isOpenComment && <CommentModal />}
