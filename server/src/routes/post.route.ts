@@ -61,12 +61,12 @@ postRouter.get(
           post: like.post,
           user: like.user,
         })),
-        comments: comments.map((r) => ({
-          id: r.id,
-          comment: r.comment_text,
-          postId: r.post.id,
-          userId: r.user.id,
-          created_time: r.created_time
+        comments: comments.map((comment) => ({
+          id: comment.id,
+          comment: comment.comment_text,
+          post: comment.post,
+          user: comment.user,
+          created_time: comment.created_time
         })),
         retweets: retweetsForPost.map((r) => ({
           id: r.id,

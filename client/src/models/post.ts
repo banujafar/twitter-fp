@@ -16,8 +16,8 @@ export interface ILike {
 export interface IComment {
   id: number;
   comment: string;
-  userId: number;
-  postId: number;
+  user: IUser;
+  post: IUserPost;
   created_time: Date;
 }
 
