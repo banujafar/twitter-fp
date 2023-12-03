@@ -196,4 +196,50 @@ userRouter.post(
   }),
 );
 
+userRouter.delete(
+  '/unfollow/:userId',
+  tryCatch(async (req: Request, res: Response) => {
+    const { userId } = req.params;
+    const { targetUser } = req.body;
+    const targetUserId = targetUser.id;
+
+    const currentUser = await User.findOne({ where: { id: parseInt(userId) }, relations: ['following'] });
+    const targetUsertoUnfollow = await User.findOne({
+      where: { id: targetUserId },
+      relations: ['following', 'followers'],
+    });
+
+    if (!currentUser || !targetUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const isFollowing = currentUser.following.some(user => user.id === targetUsertoUnfollow.id);
+
+    if (!isFollowing) {
+      return res.status(404).json({ error: 'Not following the user' });
+    }
+
+    currentUser.following = currentUser.following.filter(user => user.id !== targetUsertoUnfollow.id);
+    await currentUser.save();
+
+    targetUsertoUnfollow.followers = targetUsertoUnfollow.followers.filter(user => user.id !== currentUser.id);
+    await targetUsertoUnfollow.save();
+
+    const response = {
+      targetUser: {
+        id: targetUsertoUnfollow.id,
+        username: targetUsertoUnfollow.username,
+        profilePhoto: targetUsertoUnfollow.profilePhoto,
+      },
+      currentUser: {
+        id: currentUser.id,
+        username: currentUser.username,
+        profilePhoto: currentUser.profilePhoto,
+      },
+    };
+
+    return res.status(200).json(response);
+  }),
+);
+
 export default userRouter;

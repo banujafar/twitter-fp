@@ -45,6 +45,30 @@ export const followUser = createAsyncThunk(
   },
 );
 
+export const unfollowUser = createAsyncThunk(
+  'user/unfollowUser',
+  async ({ userId, targetUser }: { userId: number | undefined; targetUser: IUser | undefined }) => {
+    try {
+      const response = await fetch(`http://localhost:3000/auth/unfollow/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({targetUser}),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error');
+      }
+
+      const responseData = await response.json();
+      return responseData;
+    } catch (error) {
+      throw error;
+    }
+  },
+);
+
 
 
 const initialState: IUserInitial = {
@@ -99,6 +123,37 @@ const userSlice = createSlice({
         state.error = null;
       })
       .addCase(followUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || null;
+      })
+      .addCase(unfollowUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(unfollowUser.fulfilled, (state, action) => {      
+        const targetUser = action.payload.targetUser;
+        const currentUser = action.payload.currentUser;
+      
+        const updatedUsers = state.users.map((user) => {
+          if (user.id === targetUser.id) {
+            return {
+              ...user,
+              followers: (user.followers || []).filter((follower) => follower.id !== currentUser.id),
+            };
+          } else if (user.id === currentUser.id) {
+            return {
+              ...user,
+              following: (user.following || []).filter((followingUser) => followingUser.id !== targetUser.id),
+            };
+          }
+          return user;
+        });
+      
+        state.users = updatedUsers
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(unfollowUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || null;
       });

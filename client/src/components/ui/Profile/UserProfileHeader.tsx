@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
-import { followUser, getUsers } from '../../../store/features/user/userSlice';
+import { followUser, unfollowUser, getUsers } from '../../../store/features/user/userSlice';
 import UserProfileFavorites from './UserProfileFavorites';
 import UserProfilePosts from './UserProfilePosts';
 
@@ -36,8 +36,9 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
 
     if (!isFollowing) {
       await dispatch(followUser({ userId, targetUser }) as any);
+    } else {
+      await dispatch(unfollowUser({ userId, targetUser }) as any);
     }
-    // await dispatch(unfollowUser({ userId, targetUser }) as any);
 
     await dispatch(getUsers() as any);
   };
