@@ -66,7 +66,7 @@ postRouter.get(
           comment: comment.comment_text,
           post: comment.post,
           user: comment.user,
-          created_time: comment.created_time
+          created_time: comment.created_time,
         })),
         retweets: retweetsForPost.map((r) => ({
           id: r.id,
@@ -89,7 +89,7 @@ postRouter.post(
   uploads.array('files'),
   tryCatch(async (req: Request, res: Response) => {
     const files = (req.files as Express.Multer.File[]) || [];
-    console.log(files)
+    console.log(files);
     const { content, user_id, retweeted_id } = req.body;
     console.log(content, user_id);
     if (!content && !files) {
@@ -195,7 +195,7 @@ postRouter.post(
   '/comment',
   tryCatch(async (req: Request, res: Response) => {
     const { comment, userId, postId } = req.body;
-console.log(comment,userId,postId)
+    console.log(comment, userId, postId);
     const post = (await UserPost.find({ where: { id: postId } })) || [];
     if (post.length === 0) {
       return res.status(404).json({ error: 'Post not found' });
@@ -220,14 +220,13 @@ console.log(comment,userId,postId)
     postComment.user = user[0];
     await postComment.save();
 
-    const { id, username } = user[0];
     const postWithComment = {
+      created_time: postComment.created_time,
       id: postComment.id,
-      comment_text: postComment.comment_text,
-      user: { id, username },
-      post: { id: post[0].id },
+      comment: postComment.comment_text,
+      user: postComment.user,
+      post: postComment.post,
     };
-
     return res.status(201).json(postWithComment);
   }),
 );
