@@ -10,7 +10,7 @@ import UserProfilePosts from './UserProfilePosts';
 
 const UserProfileHeader = ({ username }: { username: string | undefined }) => {
   const dispatch = useDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.auth.user);
   const isCurrentUser = user?.username == username;
   const users = useSelector((state: RootState) => state.user.users);
@@ -18,9 +18,9 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
   const loading = useSelector((state: RootState) => state.user.loading);
 
   const [activeBtn, setActiveBtn] = useState<string>('posts');
-  const [follow, setFollow] = useState<boolean>(false);
   const [notification, setNotification] = useState<boolean>(false);
 
+  const isFollowing = userInfo?.followers?.some((follower) => follower.id === user?.userId);
   const handleButtonClick = (buttonType: string) => {
     setActiveBtn(buttonType);
   };
@@ -29,13 +29,17 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
     dispatch(getUsers() as any);
   }, [dispatch]);
 
-  const handleFollow = () => {
-    setFollow(!follow);
+  const handleFollow = async () => {
     setNotification(false);
     const userId = user?.userId;
     const targetUser = userInfo;
-    dispatch(followUser({ userId, targetUser }) as any);
-    console.log(userInfo);
+
+    if (!isFollowing) {
+      await dispatch(followUser({ userId, targetUser }) as any);
+    }
+    // await dispatch(unfollowUser({ userId, targetUser }) as any);
+
+    await dispatch(getUsers() as any);
   };
 
   const handleNotification = () => {
@@ -49,8 +53,8 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
         <>
           <div className="border-b border-gray-200 w-full p-4 bg-white">
             <div className="flex flex-col sm:flex-row items-center justify-start gap-4">
-              <button type="button" className="items-center justify-center flex text-2xl" onClick={()=>navigate(-1)}>
-                  <IoMdArrowBack />
+              <button type="button" className="items-center justify-center flex text-2xl" onClick={() => navigate(-1)}>
+                <IoMdArrowBack />
               </button>
               <h1 className="text-2xl font-semibold">{userInfo?.username}</h1>
             </div>
@@ -88,7 +92,7 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
                     </div>
                   ) : (
                     <>
-                      {follow ? (
+                      {isFollowing ? (
                         <div className="pt-10">
                           <button
                             type="button"
@@ -105,11 +109,11 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
                         <button
                           type="button"
                           className={`capitalize cursor-pointer font-medium py-1 px-3 border ${
-                            follow ? 'border-[#cfd9de] bg-white text-black' : 'border-black bg-black text-white'
+                            isFollowing ? 'border-[#cfd9de] bg-white text-black' : 'border-black bg-black text-white'
                           }  rounded-2xl`}
                           onClick={handleFollow}
                         >
-                          {follow ? 'unfollow' : 'follow'}
+                          {isFollowing ? 'unfollow' : 'follow'}
                         </button>
                       </div>
                     </>
@@ -126,11 +130,11 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
                 {/* TODO: user's follow list */}
                 <div className="flex items-center mt-4">
                   <Link to="/following" className="text-base hover:underline">
-                    70
+                    {userInfo.following?.length}
                     <span className="text-[#536471] ml-1">Following</span>
                   </Link>
                   <Link to="/followers" className="text-base ml-4 hover:underline">
-                    280
+                    {userInfo.followers?.length}
                     <span className="text-[#536471] ml-1">Followers</span>
                   </Link>
                 </div>

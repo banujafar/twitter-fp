@@ -124,51 +124,76 @@ userRouter.post(
   }),
 );
 
-
 userRouter.get(
   '/',
   tryCatch(async (req: Request, res: Response) => {
+    const user = await User.find({ relations: ['following', 'followers'] });
 
-    const user = await User.find();
-    
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
+    const userDTO = user.map((u) => ({
+      id: u.id,
+      email: u.email,
+      username: u.username,
+      country: u.country,
+      isVerified: u.isVerified,
+      profilePhoto: u.profilePhoto,
+      token: u.token,
+      followers: u.followers.map((followingUser) => ({
+        id: followingUser.id,
+        username: followingUser.username,
+        profilePhoto: followingUser.profilePhoto,
+      })),
+      following: u.following.map((followingUser) => ({
+        id: followingUser.id,
+        username: followingUser.username,
+        profilePhoto: followingUser.profilePhoto,
+      })),
+    }));
 
-    return res.status(200).json(user);
+    return res.status(200).json(userDTO);
   }),
 );
-
 
 userRouter.post(
   '/follow/:userId',
   tryCatch(async (req: Request, res: Response) => {
     const { userId } = req.params;
-    const {targetUser} = req.body;
+    const { targetUser } = req.body;
+    const targetUserId = targetUser.id;
 
-    // const currentUser = await User.findOne({ where: { id: parseInt(userId) }, relations: ['following', 'followers']  });
-    // const userToFollow = await User.findOne({ where: { id: targetUser.id }, relations: ['followers'] });
+    const currentUser = await User.findOne({ where: { id: parseInt(userId) }, relations: ['following'] });
+    const targetUsertoFollow = await User.findOne({
+      where: { id: targetUserId },
+      relations: ['following', 'followers'],
+    });
 
-    // if (!currentUser || !userToFollow) {
-    //   return res.status(404).json({ error: 'User not found' });
-    // }
+    if (!currentUser || !targetUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
 
-    // const isAlreadyFollowing = currentUser.following && currentUser.following.some(follower => follower.id === userToFollow.id);
+    currentUser.following.push(targetUsertoFollow);
+    await currentUser.save();
 
-    // if (isAlreadyFollowing) {
-    //   return res.status(400).json({ error: 'User is already being followed' });
-    // }
+    targetUsertoFollow.followers.push(currentUser);
+    await targetUsertoFollow.save();
 
-    // currentUser.following = [...(currentUser.following || []), userToFollow];
-    // await currentUser.save();
+    const response = {
+      targetUser: {
+        id: targetUsertoFollow.id,
+        username: targetUsertoFollow.username,
+        profilePhoto: targetUsertoFollow.profilePhoto,
+      },
+      currentUser: {
+        id: currentUser.id,
+        username: currentUser.username,
+        profilePhoto: currentUser.profilePhoto,
+      },
+    };
 
-    // userToFollow.followers = [...(userToFollow.followers || []), currentUser];
-    // await userToFollow.save();
-
-
-    return res.status(200).json({message:'success'});
+    return res.status(200).json(response);
   }),
 );
-
 
 export default userRouter;

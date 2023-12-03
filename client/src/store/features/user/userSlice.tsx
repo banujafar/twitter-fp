@@ -3,7 +3,7 @@ import { IUser, IUserInitial } from '../../../models/user';
 
 export const getUsers = createAsyncThunk('user/getUsers', async () => {
   try {
-    const response = await fetch(`https://twitter-server-73xd.onrender.com/auth/`, {
+    const response = await fetch(`http://localhost:3000/auth/`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -25,12 +25,12 @@ export const followUser = createAsyncThunk(
   'user/followUser',
   async ({ userId, targetUser }: { userId: number | undefined; targetUser: IUser | undefined }) => {
     try {
-      const response = await fetch(`https://twitter-server-73xd.onrender.com/auth/follow/${userId}`, {
+      const response = await fetch(`http://localhost:3000/auth/follow/${userId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(targetUser),
+        body: JSON.stringify({targetUser}),
       });
 
       if (!response.ok) {
@@ -44,6 +44,7 @@ export const followUser = createAsyncThunk(
     }
   },
 );
+
 
 
 const initialState: IUserInitial = {
@@ -70,17 +71,30 @@ const userSlice = createSlice({
       .addCase(getUsers.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || null;
-      })  
+      })
       .addCase(followUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(followUser.fulfilled, (state, action) => {
-        // state.users.filter((user) => {
-        //   if (user.id === action.payload.userId) {
-        //     user.following?.push(action.payload);
-        //   }
-        // });
+        const targetUser = action.payload.targetUser;
+        const currentUser = action.payload.currentUser;
+
+        const updatedUsers = state.users.map((user) => {
+          if (user.id === targetUser.id) {
+            return {
+              ...user,
+              followers: [...(user.followers || []), currentUser],
+            };
+          } else if (user.id === currentUser.id) {
+            return {
+              ...user,
+              following: [...(user.following || []), targetUser],
+            };
+          }
+          return user;
+        });
+        state.users = updatedUsers
         state.loading = false;
         state.error = null;
       })
@@ -88,7 +102,6 @@ const userSlice = createSlice({
         state.loading = false;
         state.error = action.error.message || null;
       });
-
   },
 });
 
