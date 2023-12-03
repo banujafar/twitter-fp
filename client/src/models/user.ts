@@ -6,8 +6,8 @@ export interface IUser {
     isVerified: boolean,
     profilePhoto?: null,
     token?: string | null,
-    followers?: IUser[] | null,
-    following?: IUser[] | null
+    followers: IUser[] | null,
+    following: IUser[] | null
 }
 
 export interface IUserInitial {

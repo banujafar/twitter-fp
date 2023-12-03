@@ -1,4 +1,4 @@
-import { Column, PrimaryGeneratedColumn, Entity, BaseEntity, OneToMany, Like, ManyToMany } from 'typeorm';
+import { Column, PrimaryGeneratedColumn, Entity, BaseEntity, OneToMany, Like, ManyToMany, JoinTable } from 'typeorm';
 import { LikedPost } from './LikedPost.entity.ts';
 import { PostComment } from './PostComment.entity.ts';
 import { PostRetweet } from './PostRetweet.entity.ts';
@@ -40,8 +40,11 @@ export class User extends BaseEntity {
   postRetweet: PostRetweet[];
 
   @ManyToMany(() => User, (user) => user.followers)
+  @JoinTable()
   followers: User[];
 
   @ManyToMany(() => User, (user) => user.following)
+  @JoinTable()
   following: User[];
+
 }
