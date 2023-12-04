@@ -3,7 +3,7 @@ import { IUser, IUserInitial } from '../../../models/user';
 
 export const getUsers = createAsyncThunk('user/getUsers', async () => {
   try {
-    const response = await fetch(`http://localhost:3000/auth/`, {
+    const response = await fetch(`https://twitter-server-73xd.onrender.com/auth/`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -25,7 +25,7 @@ export const followUser = createAsyncThunk(
   'user/followUser',
   async ({ userId, targetUser }: { userId: number | undefined; targetUser: IUser | undefined }) => {
     try {
-      const response = await fetch(`http://localhost:3000/auth/follow/${userId}`, {
+      const response = await fetch(`https://twitter-server-73xd.onrender.com//auth/follow/${userId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -49,7 +49,7 @@ export const unfollowUser = createAsyncThunk(
   'user/unfollowUser',
   async ({ userId, targetUser }: { userId: number | undefined; targetUser: IUser | undefined }) => {
     try {
-      const response = await fetch(`http://localhost:3000/auth/unfollow/${userId}`, {
+      const response = await fetch(`https://twitter-server-73xd.onrender.com/auth/unfollow/${userId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

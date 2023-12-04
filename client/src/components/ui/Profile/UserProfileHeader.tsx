@@ -9,6 +9,8 @@ import UserProfileFavorites from './UserProfileFavorites';
 import UserProfilePosts from './UserProfilePosts';
 import { setModal } from '../../../store/features/modal/followModalSlice';
 import FollowListModal from '../../modals/FollowListModal';
+import { modalIsOpenSelector, setIsOpen } from '../../../store/features/modal/modalSlice';
+import EditProfile from '../../modals/EditProfile';
 
 const UserProfileHeader = ({ username }: { username: string | undefined }) => {
   const dispatch = useDispatch();
@@ -21,7 +23,7 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
 
   const [activeBtn, setActiveBtn] = useState<string>('posts');
   const [notification, setNotification] = useState<boolean>(false);
-
+  const isOpenEditProfile = useSelector((state) => modalIsOpenSelector(state, 'modalEditProfile'));
   const isFollowing = userInfo?.followers?.some((follower) => follower.id === user?.userId);
   const isModalOpen = useSelector((state: RootState) => state.followModal.isOpen)
 
@@ -56,6 +58,11 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
     dispatch(setModal({ isOpen: true, data: listType }));
   }
 
+
+  const handleOpenEditModal = () => {
+    dispatch(setIsOpen({ id: 'modalEditProfile', isOpen: true }));
+    dispatch(setIsOpen({ id: 'photoModal', isOpen: true }));
+  };
   return (
     <>
       {loading ? (
@@ -93,7 +100,7 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
                 </div>
                 <div className="flex">
                   {isCurrentUser ? (
-                    <div className="pt-10">
+                    <div className="pt-10" onClick={handleOpenEditModal}>
                       <button
                         type="button"
                         className="cursor-pointer font-medium py-1 px-3 border border-[#cfd9de] bg-white text-black rounded-2xl"
@@ -184,6 +191,7 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
       ) : (
         <p>User not exists</p>
       )}
+      {isOpenEditProfile && <EditProfile />}
     </>
   );
 };
