@@ -6,7 +6,7 @@ const Favorites=()=>{
     const user=useSelector((state:RootState)=>state.auth.user)
 return(
     <>
-    <div className="flex flex-col">
+    <div className="flex flex-col w-full">
     <UserProfileFavorites username={user?.username}/>
     </div>
     </>

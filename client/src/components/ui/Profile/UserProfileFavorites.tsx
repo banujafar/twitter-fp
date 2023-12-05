@@ -16,8 +16,8 @@ const UserProfileFavorites: React.FC<{ username: string | undefined }> = ({ user
 
   console.log(favData);
   return (
-    <div className="flex justify-center items-start gap-2">
-      <div className=" p-4">
+    <div className="flex items-start gap-2">
+      <div className=" p-4 w-[80%]">
         {!!favData.length ? (
           favData.map((singleFav) => {
             const isRetweet = posts.filter(
@@ -40,7 +40,7 @@ const UserProfileFavorites: React.FC<{ username: string | undefined }> = ({ user
             );
           })
         ) : (
-          <div className="flex justify-center items-center mt-8">No Liked Posts</div>
+          <div className="flex justify-center items-center">No Liked Posts</div>
         )}
       </div>
       <div className="sm:hidden xs:hidden xxs:hidden md:hidden lg:flex xl:flex">
