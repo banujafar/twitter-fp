@@ -4,12 +4,15 @@ import modalSlice from "./features/modal/modalSlice";
 import postSlice from "./features/post/postSlice";
 import userSlice from "./features/user/userSlice";
 import { postsApi } from "./features/post/postsApi";
+import followModalSlice from "./features/modal/followModalSlice";
 
 const rootReducer = combineReducers({
     auth: authSlice,
     modal:modalSlice,
     post: postSlice,
     user: userSlice,
+    followModal: followModalSlice,
+
     [postsApi.reducerPath]: postsApi.reducer
 })
 
