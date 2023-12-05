@@ -23,12 +23,17 @@ export class User extends BaseEntity {
   @Column({ nullable: true, type: 'boolean', default: false })
   isVerified: boolean;
 
-  @Column({ nullable: true, type: 'varchar' })
+  @Column({ nullable: true, type: 'varchar', length: 30 })
   country: string;
 
-  @Column({ type: 'date', nullable: true })
-  @Column({ nullable: true, type: 'bytea' })
-  profilePhoto: Buffer | null;
+  @Column({ nullable: true, type: 'varchar', length: 160 })
+  bio: string;
+
+  @Column({ nullable: true, type: 'varchar' })
+  profilePhoto: string;
+
+  @Column({ nullable: true, type: 'varchar' })
+  headerPhoto: string;
 
   @OneToMany(() => LikedPost, (likedPost) => likedPost.user)
   likedPost: LikedPost[];
@@ -46,5 +51,4 @@ export class User extends BaseEntity {
   @ManyToMany(() => User, (user) => user.following)
   @JoinTable()
   following: User[];
-
 }
