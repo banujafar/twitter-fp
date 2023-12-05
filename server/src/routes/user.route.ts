@@ -143,6 +143,7 @@ userRouter.get(
       isVerified: u.isVerified,
       profilePhoto: u.profilePhoto,
       headerPhoto: u.headerPhoto,
+      bio:u.bio,
       token: u.token,
       followers: u.followers.map((followingUser) => ({
         id: followingUser.id,
