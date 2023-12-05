@@ -11,8 +11,11 @@ import { User } from '../entity/user.entity.ts';
 import tryCatch from '../utils/tryCatch.ts';
 import AppError from '../config/appError.ts';
 import { Token } from '../entity/token.entity.ts';
+import multer from 'multer';
+import storageCloud from '../config/storage.ts';
 
 const userRouter = Router();
+const uploads = multer({ storage: storageCloud });
 
 const Base_Client_Url = process.env.CLIENT_URL || 'http://localhost:5173/';
 //Register router
@@ -139,16 +142,19 @@ userRouter.get(
       country: u.country,
       isVerified: u.isVerified,
       profilePhoto: u.profilePhoto,
+      headerPhoto: u.headerPhoto,
       token: u.token,
       followers: u.followers.map((followingUser) => ({
         id: followingUser.id,
         username: followingUser.username,
         profilePhoto: followingUser.profilePhoto,
+        headerPhoto: followingUser.headerPhoto,
       })),
       following: u.following.map((followingUser) => ({
         id: followingUser.id,
         username: followingUser.username,
         profilePhoto: followingUser.profilePhoto,
+        headerPhoto: followingUser.headerPhoto,
       })),
     }));
 
@@ -213,16 +219,16 @@ userRouter.delete(
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const isFollowing = currentUser.following.some(user => user.id === targetUsertoUnfollow.id);
+    const isFollowing = currentUser.following.some((user) => user.id === targetUsertoUnfollow.id);
 
     if (!isFollowing) {
       return res.status(404).json({ error: 'Not following the user' });
     }
 
-    currentUser.following = currentUser.following.filter(user => user.id !== targetUsertoUnfollow.id);
+    currentUser.following = currentUser.following.filter((user) => user.id !== targetUsertoUnfollow.id);
     await currentUser.save();
 
-    targetUsertoUnfollow.followers = targetUsertoUnfollow.followers.filter(user => user.id !== currentUser.id);
+    targetUsertoUnfollow.followers = targetUsertoUnfollow.followers.filter((user) => user.id !== currentUser.id);
     await targetUsertoUnfollow.save();
 
     const response = {
@@ -242,4 +248,37 @@ userRouter.delete(
   }),
 );
 
+userRouter.put(
+  '/user/:id',
+  uploads.fields([
+    { name: 'header', maxCount: 1 },
+    { name: 'profile', maxCount: 1 },
+  ]),
+  tryCatch(async (req: Request, res: Response) => {
+    const { header, profile } = req.files as { header?: Express.Multer.File; profile?: Express.Multer.File };
+    const id = +req.params.id;
+    const { location, bio } = req.body;
+    const user = await User.findOneBy({ id: id });
+    if (!user) {
+      return res.status(404).json('User not found');
+    }
+    if (header) {
+      user.headerPhoto = header[0].filename; 
+    }
+
+    if (profile) {
+      user.profilePhoto = profile[0].filename; 
+    }
+    if (location) {
+      user.country = location;
+    }
+    if (bio) {
+      user.bio = bio;
+    }
+    
+    await user.save();
+
+    return res.status(200).json(user);
+  }),
+);
 export default userRouter;

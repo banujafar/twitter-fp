@@ -5,7 +5,7 @@ import { FaRegSmile } from 'react-icons/fa';
 import { HiOutlineGif } from 'react-icons/hi2';
 import { MdClose } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
-import { addPost, getPosts, retweetPost } from '../../../store/features/post/postSlice';
+import { addPost, getPosts } from '../../../store/features/post/postSlice';
 import { AppDispatch, RootState } from '../../../store';
 // import { jwtDecode } from 'jwt-decode';
 // import { IDecodedToken } from '../../models/auth';
@@ -39,7 +39,6 @@ const CreatePost: React.FC<{ content?: any }> = ({ content }) => {
       selectedFile.forEach((file) => {
         formData.append('files', file);
       });
-      console.log(selectedFile)
     }
     if (quoteModalContent) {
       formData.append('retweeted_id', quoteModalContent.id.toString());

@@ -1,9 +1,11 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { IUser, IUserInitial } from '../../../models/user';
 
+const BASE_URL = 'https://twitter-server-73xd.onrender.com/auth';
+
 export const getUsers = createAsyncThunk('user/getUsers', async () => {
   try {
-    const response = await fetch(`https://twitter-server-73xd.onrender.com/auth/`, {
+    const response = await fetch(`${BASE_URL}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -25,12 +27,12 @@ export const followUser = createAsyncThunk(
   'user/followUser',
   async ({ userId, targetUser }: { userId: number | undefined; targetUser: IUser | undefined }) => {
     try {
-      const response = await fetch(`https://twitter-server-73xd.onrender.com//auth/follow/${userId}`, {
+      const response = await fetch(`${BASE_URL}/follow/${userId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({targetUser}),
+        body: JSON.stringify({ targetUser }),
       });
 
       if (!response.ok) {
@@ -49,12 +51,12 @@ export const unfollowUser = createAsyncThunk(
   'user/unfollowUser',
   async ({ userId, targetUser }: { userId: number | undefined; targetUser: IUser | undefined }) => {
     try {
-      const response = await fetch(`https://twitter-server-73xd.onrender.com/auth/unfollow/${userId}`, {
+      const response = await fetch(`${BASE_URL}/unfollow/${userId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({targetUser}),
+        body: JSON.stringify({ targetUser }),
       });
 
       if (!response.ok) {
@@ -69,7 +71,26 @@ export const unfollowUser = createAsyncThunk(
   },
 );
 
+export const editUser = createAsyncThunk(
+  'auth/editUser',
+  async ({ formData, userId }: { formData: FormData; userId: number | undefined }) => {
+    try {
+      const response = await fetch(`${BASE_URL}/user/${userId}`, {
+        method: 'PUT',
+        body: formData,
+      });
 
+      if (!response.ok) {
+        throw new Error('Error');
+      }
+
+      const responseData = await response.json();
+      return responseData;
+    } catch (error) {
+      throw error;
+    }
+  },
+);
 
 const initialState: IUserInitial = {
   users: [],
@@ -118,7 +139,7 @@ const userSlice = createSlice({
           }
           return user;
         });
-        state.users = updatedUsers
+        state.users = updatedUsers;
         state.loading = false;
         state.error = null;
       })
@@ -130,10 +151,10 @@ const userSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(unfollowUser.fulfilled, (state, action) => {      
+      .addCase(unfollowUser.fulfilled, (state, action) => {
         const targetUser = action.payload.targetUser;
         const currentUser = action.payload.currentUser;
-      
+
         const updatedUsers = state.users.map((user) => {
           if (user.id === targetUser.id) {
             return {
@@ -148,12 +169,34 @@ const userSlice = createSlice({
           }
           return user;
         });
-      
-        state.users = updatedUsers
+
+        state.users = updatedUsers;
         state.loading = false;
         state.error = null;
       })
       .addCase(unfollowUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || null;
+      })
+      .addCase(editUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(editUser.fulfilled, (state, action) => {
+        const currentUser = action.payload;
+        const updatedUsers = state.users.map((user) => {
+          if (user.id === currentUser.id) {
+            return currentUser;
+          }
+
+          return user;
+        });
+
+        state.users = updatedUsers;
+        state.loading = false;
+        state.error = action.payload?.error?.message || null;
+      })
+      .addCase(editUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || null;
       });
