@@ -4,6 +4,9 @@ import { useEffect } from 'react';
 import { getPosts } from '../../../store/features/post/postSlice';
 import SinglePost from '../Posts/SinglePost';
 import TweetActions from '../Posts/TweetActions';
+import { modalIsOpenSelector } from '../../../store/features/modal/modalSlice';
+import QuoteModal from '../../modals/QuoteModal';
+import CommentModal from '../../modals/CommentModal';
 
 const UserProfilePosts = ({ username }: { username: string | undefined }) => {
   const dispatch = useDispatch();
@@ -11,6 +14,8 @@ const UserProfilePosts = ({ username }: { username: string | undefined }) => {
   const loading = useSelector((state: RootState) => state.post.loading);
   const currentUsersPosts = posts.filter((post) => post.user.username == username);
 
+  const isOpenQuote = useSelector((state) => modalIsOpenSelector(state, 'modalQuote'));
+  const isOpenComment = useSelector((state) => modalIsOpenSelector(state, 'modalComment'));
   useEffect(() => {
     dispatch(getPosts() as any);
   }, [dispatch]);
@@ -42,6 +47,9 @@ const UserProfilePosts = ({ username }: { username: string | undefined }) => {
       ) : (
         <p>No posts found</p>
       )}
+
+      {isOpenQuote && <QuoteModal />}
+      {isOpenComment && <CommentModal />}
     </>
   );
 };
