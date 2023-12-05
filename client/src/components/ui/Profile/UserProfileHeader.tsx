@@ -9,6 +9,9 @@ import UserProfileFavorites from './UserProfileFavorites';
 import UserProfilePosts from './UserProfilePosts';
 import { setModal } from '../../../store/features/modal/followModalSlice';
 import FollowListModal from '../../modals/FollowListModal';
+import { modalIsOpenSelector, setIsOpen } from '../../../store/features/modal/modalSlice';
+import EditProfile from '../../modals/EditProfile';
+import { MdOutlineEmail } from 'react-icons/md';
 
 const UserProfileHeader = ({ username }: { username: string | undefined }) => {
   const dispatch = useDispatch();
@@ -21,9 +24,9 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
 
   const [activeBtn, setActiveBtn] = useState<string>('posts');
   const [notification, setNotification] = useState<boolean>(false);
-
+  const isOpenEditProfile = useSelector((state) => modalIsOpenSelector(state, 'modalEditProfile'));
   const isFollowing = userInfo?.followers?.some((follower) => follower.id === user?.userId);
-  const isModalOpen = useSelector((state: RootState) => state.followModal.isOpen)
+  const isModalOpen = useSelector((state: RootState) => state.followModal.isOpen);
 
   const handleButtonClick = (buttonType: string) => {
     setActiveBtn(buttonType);
@@ -54,8 +57,11 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
   const handleOpenModal = (e: React.MouseEvent, listType: 'following' | 'followers') => {
     e.stopPropagation();
     dispatch(setModal({ isOpen: true, data: listType }));
-  }
+  };
 
+  const handleOpenEditModal = () => {
+    dispatch(setIsOpen({ id: 'modalEditProfile', isOpen: true }));
+  };
   return (
     <>
       {loading ? (
@@ -71,13 +77,21 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
             </div>
           </div>
           <div className="flex flex-col">
-            <div className="w-full h-52 bg-[#cfd9de]"></div>
+            {userInfo?.headerPhoto ? (
+              <img
+                src={`https://res.cloudinary.com/dclheeyce/image/upload/v1701720274/${userInfo.headerPhoto}`}
+                className="w-full h-52 object-cover"
+                alt=""
+              />
+            ) : (
+              <div className="w-full h-52 bg-[#cfd9de]"></div>
+            )}
             <div className="px-4 -mt-[4.5rem]">
               <div className="flex justify-between items-center">
                 <div className="mb-3 min-w-48 w-36 h-36">
                   {userInfo?.profilePhoto ? (
                     <img
-                      src={`../src/assets/uploads/profile/${userInfo.profilePhoto}`}
+                      src={`https://res.cloudinary.com/dclheeyce/image/upload/v1701720274/${userInfo.profilePhoto}`}
                       className="rounded-full w-full h-full object-cover"
                       alt=""
                     />
@@ -93,7 +107,7 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
                 </div>
                 <div className="flex">
                   {isCurrentUser ? (
-                    <div className="pt-10">
+                    <div className="pt-10" onClick={handleOpenEditModal}>
                       <button
                         type="button"
                         className="cursor-pointer font-medium py-1 px-3 border border-[#cfd9de] bg-white text-black rounded-2xl"
@@ -104,6 +118,7 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
                   ) : (
                     <>
                       {isFollowing ? (
+                        <>
                         <div className="pt-10">
                           <button
                             type="button"
@@ -113,6 +128,15 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
                             {notification ? <IoNotificationsOffOutline /> : <IoNotificationsOutline />}
                           </button>
                         </div>
+                        <div className="pt-10">
+                          <button
+                            type="button"
+                            className="text-2xl cursor-pointer font-medium py-1 px-3 border border-[#cfd9de] bg-white text-black rounded-2xl"
+                          >
+                            <MdOutlineEmail />
+                          </button>
+                        </div>
+                        </>
                       ) : (
                         ''
                       )}
@@ -138,12 +162,23 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
                   <IoLocationOutline />
                   <span className="ml-2">{userInfo?.country ? userInfo.country : 'Location'}</span>
                 </div>
+                {userInfo?.bio && (
+                  <div className="flex items-center text-[#536471] mt-4 text-base">
+                    <span className="ml-2">{userInfo.bio}</span>
+                  </div>
+                )}
                 <div className="flex items-center mt-4">
-                  <span className="text-base hover:underline cursor-pointer" onClick={(e) => handleOpenModal(e, 'following')}>
+                  <span
+                    className="text-base hover:underline cursor-pointer"
+                    onClick={(e) => handleOpenModal(e, 'following')}
+                  >
                     {userInfo.following?.length}
                     <span className="text-[#536471] ml-1">Following</span>
                   </span>
-                  <span className="text-base ml-4 hover:underline cursor-pointer" onClick={(e) => handleOpenModal(e, 'followers')}>
+                  <span
+                    className="text-base ml-4 hover:underline cursor-pointer"
+                    onClick={(e) => handleOpenModal(e, 'followers')}
+                  >
                     {userInfo.followers?.length}
                     <span className="text-[#536471] ml-1">Followers</span>
                   </span>
@@ -179,11 +214,12 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
           ) : (
             <UserProfilePosts username={username} />
           )}
-        {isModalOpen && <FollowListModal username={username}/>}
+          {isModalOpen && <FollowListModal username={username} />}
         </>
       ) : (
         <p>User not exists</p>
       )}
+      {isOpenEditProfile && <EditProfile />}
     </>
   );
 };

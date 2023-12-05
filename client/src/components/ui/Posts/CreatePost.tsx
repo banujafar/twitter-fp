@@ -1,23 +1,30 @@
-import React, { useState, ChangeEvent, useRef } from 'react';
+import React, { useState, ChangeEvent, useRef, useEffect } from 'react';
 import { CgProfile } from 'react-icons/cg';
 import { CiImageOn } from 'react-icons/ci';
 import { FaRegSmile } from 'react-icons/fa';
 import { HiOutlineGif } from 'react-icons/hi2';
 import { MdClose } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
-import { addPost, getPosts, retweetPost } from '../../../store/features/post/postSlice';
+import { addPost, getPosts } from '../../../store/features/post/postSlice';
 import { AppDispatch, RootState } from '../../../store';
 // import { jwtDecode } from 'jwt-decode';
 // import { IDecodedToken } from '../../models/auth';
 import { setIsOpen } from '../../../store/features/modal/modalSlice';
+import { getUsers } from '../../../store/features/user/userSlice';
 
 const CreatePost: React.FC<{ content?: any }> = ({ content }) => {
   const [text, setText] = useState('');
   const [selectedFile, setSelectedFile] = useState<File[] | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const userData = useSelector((state: RootState) => state.auth.user);
+  const user = useSelector((state: RootState) => state.auth.user);
   const dispatch = useDispatch<AppDispatch>();
   const quoteModalContent = useSelector((state: RootState) => state.modal.postData['modalQuote']);
+  const users = useSelector((state: RootState) => state.user.users);
+  const userData = users.find(u => u.id === user?.userId);
+
+  useEffect(()=> {
+    dispatch(getUsers() as any)
+  },[])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -31,24 +38,23 @@ const CreatePost: React.FC<{ content?: any }> = ({ content }) => {
     // if (decodedId !== null && !isNaN(decodedId)) {
     //   formData.append('user_id', decodedId.toString());
     // }
-    if (userData?.userId) {
-      formData.append('user_id', userData.userId.toString());
+    if (user?.userId) {
+      formData.append('user_id', user.userId.toString());
     }
 
     if (selectedFile) {
       selectedFile.forEach((file) => {
         formData.append('files', file);
       });
-      console.log(selectedFile)
     }
     if (quoteModalContent) {
       formData.append('retweeted_id', quoteModalContent.id.toString());
     }
 
     try {
-      if (quoteModalContent && userData?.userId && text) {
+      if (quoteModalContent && user?.userId && text) {
         // const { id } = quoteModalContent;
-        // const userId = userData?.userId;
+        // const userId = user?.userId;
         await dispatch(addPost(formData));
       } else {
         await dispatch(addPost(formData) as any);
@@ -96,9 +102,9 @@ const CreatePost: React.FC<{ content?: any }> = ({ content }) => {
         <div className="w-auto flex">
           {userData?.profilePhoto ? (
             <img
-              src={userData.profilePhoto}
+              src={`https://res.cloudinary.com/dclheeyce/image/upload/${userData?.profilePhoto}`}
               alt={`${userData.username}'s profile`}
-              className="w-16 h-16 rounded-full mb-4 sm:mb-0"
+              className="w-16 h-16 rounded-full mb-4 sm:mb-0 object-cover"
             />
           ) : (
             <CgProfile size={44} className="text-gray-500" />
@@ -120,7 +126,7 @@ const CreatePost: React.FC<{ content?: any }> = ({ content }) => {
               {selectedFile &&
                 (Array.isArray(selectedFile) ? (
                   selectedFile.map((file, index) => (
-                    <div key={index} className="w-full relative">
+                    <div key={index} className="w-full relative mb-4">
                       <img src={URL.createObjectURL(file)} alt={`Image ${index + 1}`} className="max-w-full" />
                       <span
                         className="absolute top-0 right-0 cursor-pointer text-4xl p-2 bg-gray-700 text-white rounded-full"

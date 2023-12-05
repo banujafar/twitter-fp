@@ -28,6 +28,10 @@ export default {
       boxShadow: {
         'logout': 'rgba(101, 119, 134, 0.2) 0px 0px 15px, rgba(101, 119, 134, 0.15) 0px 0px 3px 1px',
       },
+      borderRadius:{
+        'circle':'50%'
+
+      }
     },
   },
   plugins: [],
