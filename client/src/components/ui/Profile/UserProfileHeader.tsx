@@ -1,12 +1,14 @@
 import { IoMdArrowBack } from 'react-icons/io';
 import { IoLocationOutline, IoNotificationsOffOutline, IoNotificationsOutline } from 'react-icons/io5';
-import { Link, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
 import { followUser, unfollowUser, getUsers } from '../../../store/features/user/userSlice';
 import UserProfileFavorites from './UserProfileFavorites';
 import UserProfilePosts from './UserProfilePosts';
+import { setModal } from '../../../store/features/modal/followModalSlice';
+import FollowListModal from '../../modals/FollowListModal';
 
 const UserProfileHeader = ({ username }: { username: string | undefined }) => {
   const dispatch = useDispatch();
@@ -21,6 +23,8 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
   const [notification, setNotification] = useState<boolean>(false);
 
   const isFollowing = userInfo?.followers?.some((follower) => follower.id === user?.userId);
+  const isModalOpen = useSelector((state: RootState) => state.followModal.isOpen)
+
   const handleButtonClick = (buttonType: string) => {
     setActiveBtn(buttonType);
   };
@@ -46,6 +50,12 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
   const handleNotification = () => {
     setNotification(!notification);
   };
+
+  const handleOpenModal = (e: React.MouseEvent, listType: 'following' | 'followers') => {
+    e.stopPropagation();
+    dispatch(setModal({ isOpen: true, data: listType }));
+  }
+
   return (
     <>
       {loading ? (
@@ -128,16 +138,15 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
                   <IoLocationOutline />
                   <span className="ml-2">{userInfo?.country ? userInfo.country : 'Location'}</span>
                 </div>
-                {/* TODO: user's follow list */}
                 <div className="flex items-center mt-4">
-                  <Link to="/following" className="text-base hover:underline">
+                  <span className="text-base hover:underline cursor-pointer" onClick={(e) => handleOpenModal(e, 'following')}>
                     {userInfo.following?.length}
                     <span className="text-[#536471] ml-1">Following</span>
-                  </Link>
-                  <Link to="/followers" className="text-base ml-4 hover:underline">
+                  </span>
+                  <span className="text-base ml-4 hover:underline cursor-pointer" onClick={(e) => handleOpenModal(e, 'followers')}>
                     {userInfo.followers?.length}
                     <span className="text-[#536471] ml-1">Followers</span>
-                  </Link>
+                  </span>
                 </div>
               </div>
             </div>
@@ -170,6 +179,7 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
           ) : (
             <UserProfilePosts username={username} />
           )}
+        {isModalOpen && <FollowListModal username={username}/>}
         </>
       ) : (
         <p>User not exists</p>
