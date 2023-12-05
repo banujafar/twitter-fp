@@ -9,7 +9,7 @@ const Post = () => {
       </div>
       <div className="flex flex-col mx-4 sm:hidden xs:hidden xxs:hidden md:hidden lg:flex xl:flex">
         <div className="sm:hidden xs:hidden xxs:hidden md:hidden lg:flex xl:flex">
-          <SearchBar />
+          <SearchBar searchedList={[]} />
         </div>
       </div>
     </>
