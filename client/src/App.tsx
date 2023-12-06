@@ -13,6 +13,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import VerificationPage from './pages/VerificationPage';
 import Post from './pages/Post';
 import UserProfile from './pages/UserProfile';
+import Messages from './pages/Messages';
 import Favorites from './pages/Favorites';
 import SearchBar from './components/ui/Timeline/SearchBar';
 
@@ -48,6 +49,11 @@ function App() {
           <Route path="/profile/:username/" element={
               <Layout>
                 <UserProfile />
+              </Layout>
+            } />
+          <Route path="/messages" element={
+              <Layout>
+                <Messages />
               </Layout>
             } />
             <Route path="/favorites" element={

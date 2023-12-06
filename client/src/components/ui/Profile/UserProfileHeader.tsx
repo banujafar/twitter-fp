@@ -11,6 +11,7 @@ import { setModal } from '../../../store/features/modal/followModalSlice';
 import FollowListModal from '../../modals/FollowListModal';
 import { modalIsOpenSelector, setIsOpen } from '../../../store/features/modal/modalSlice';
 import EditProfile from '../../modals/EditProfile';
+import { MdOutlineEmail } from 'react-icons/md';
 
 const UserProfileHeader = ({ username }: { username: string | undefined }) => {
   const dispatch = useDispatch();
@@ -117,6 +118,7 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
                   ) : (
                     <>
                       {isFollowing ? (
+                        <>
                         <div className="pt-10">
                           <button
                             type="button"
@@ -126,6 +128,15 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
                             {notification ? <IoNotificationsOffOutline /> : <IoNotificationsOutline />}
                           </button>
                         </div>
+                        <div className="pt-10">
+                          <button
+                            type="button"
+                            className="text-2xl cursor-pointer font-medium py-1 px-3 border border-[#cfd9de] bg-white text-black rounded-2xl"
+                          >
+                            <MdOutlineEmail />
+                          </button>
+                        </div>
+                        </>
                       ) : (
                         ''
                       )}
