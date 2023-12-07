@@ -2,7 +2,7 @@ import { LuSendHorizonal } from 'react-icons/lu';
 import MessageItem from '../components/ui/Messages/MessageItem';
 import { CgProfile } from 'react-icons/cg';
 import { Link } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { getUserChats } from '../store/features/chat/chatSlice';
@@ -12,11 +12,18 @@ const Messages = () => {
   const userChats = useSelector((state: RootState) => state.chat.chats);
   const user = useSelector((state: RootState) => state.auth.user);
   const loading = useSelector((state: RootState) => state.chat.loading);
+  const [selectedChat, setSelectedChat] = useState(0);
+
+  const selectedChatData = userChats.find((chat) => chat.id === selectedChat);
 
   useEffect(() => {
     const userId = user?.userId;
     dispatch(getUserChats(userId) as any);
   }, [dispatch]);
+
+  const handleChatItemClick = (chatId: number) => {
+    setSelectedChat(chatId);
+  };
 
   return (
     <>
@@ -29,22 +36,32 @@ const Messages = () => {
             {loading ? (
               <p>Loading chats...</p>
             ) : userChats && userChats.length > 0 ? (
-              userChats.map((chats) => <MessageItem chats={chats} key={chats.id} />)
+              userChats.map((chats) => (
+                <MessageItem chats={chats} key={chats.id} onClick={() => handleChatItemClick(chats.id)} />
+              ))
             ) : (
-              <p className='text-lg'>Welcome to your inbox!</p>
+              <p className="text-lg">Welcome to your inbox!</p>
             )}
           </div>
-          {userChats.length ? (
+          {selectedChat ? (
             <div className="w-3/5 bg-white relative h-screen">
               <div className="px-4 py-1 border-b border-navHoverColor">
                 <div className="flex items-center">
                   <div className="w-auto">
-                    <Link to={`/profile/`} className="flex text-5xl outline-none">
-                      <CgProfile className="text-gray-500" />
+                    <Link to={`/profile/${selectedChatData?.user2.username}`} className="flex text-5xl outline-none">
+                      {selectedChatData?.user2?.profilePhoto ? (
+                        <img
+                          src={`https://res.cloudinary.com/dclheeyce/image/upload/v1701517376/${selectedChatData.user2?.profilePhoto}`}
+                          alt={`${selectedChatData.user2?.profilePhoto}'s profile`}
+                          className={`w-12 h-12 rounded-full mb-4 sm:mb-0`}
+                        />
+                      ) : (
+                        <CgProfile className="text-gray-500" />
+                      )}
                     </Link>
                   </div>
                   <div className="ml-2">
-                    <h1 className="text-lg">username</h1>
+                    <h1 className="text-lg">{selectedChatData?.user2.username}</h1>
                   </div>
                 </div>
               </div>
