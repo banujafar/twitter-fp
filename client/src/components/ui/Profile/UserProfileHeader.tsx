@@ -12,6 +12,7 @@ import FollowListModal from '../../modals/FollowListModal';
 import { modalIsOpenSelector, setIsOpen } from '../../../store/features/modal/modalSlice';
 import EditProfile from '../../modals/EditProfile';
 import { MdOutlineEmail } from 'react-icons/md';
+import { createChat } from '../../../store/features/chat/chatSlice';
 
 const UserProfileHeader = ({ username }: { username: string | undefined }) => {
   const dispatch = useDispatch();
@@ -61,6 +62,13 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
 
   const handleOpenEditModal = () => {
     dispatch(setIsOpen({ id: 'modalEditProfile', isOpen: true }));
+  };
+
+  const handleCreateChat = async () => {
+    const firstId = user?.userId;
+    const secondId = userInfo?.id;
+    await dispatch(createChat({ firstId, secondId }) as any);
+    navigate('/messages');
   };
   return (
     <>
@@ -119,23 +127,24 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
                     <>
                       {isFollowing ? (
                         <>
-                        <div className="pt-10">
-                          <button
-                            type="button"
-                            className="text-2xl cursor-pointer font-medium py-1 px-3 border border-[#cfd9de] bg-white text-black rounded-2xl"
-                            onClick={handleNotification}
-                          >
-                            {notification ? <IoNotificationsOffOutline /> : <IoNotificationsOutline />}
-                          </button>
-                        </div>
-                        <div className="pt-10">
-                          <button
-                            type="button"
-                            className="text-2xl cursor-pointer font-medium py-1 px-3 border border-[#cfd9de] bg-white text-black rounded-2xl"
-                          >
-                            <MdOutlineEmail />
-                          </button>
-                        </div>
+                          <div className="pt-10">
+                            <button
+                              type="button"
+                              className="text-2xl cursor-pointer font-medium py-1 px-3 border border-[#cfd9de] bg-white text-black rounded-2xl"
+                              onClick={handleNotification}
+                            >
+                              {notification ? <IoNotificationsOffOutline /> : <IoNotificationsOutline />}
+                            </button>
+                          </div>
+                          <div className="pt-10">
+                            <button
+                              type="button"
+                              className="text-2xl cursor-pointer font-medium py-1 px-3 border border-[#cfd9de] bg-white text-black rounded-2xl"
+                              onClick={handleCreateChat}
+                            >
+                              <MdOutlineEmail />
+                            </button>
+                          </div>
                         </>
                       ) : (
                         ''
