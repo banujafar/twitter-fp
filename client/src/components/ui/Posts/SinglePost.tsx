@@ -8,9 +8,9 @@ export const UserAvatar: React.FC<{ user: IUser; size: number }> = ({ user, size
   <Link to={`/profile/${user?.username}`} onClick={(e) => e.stopPropagation()} className="flex">
     {user?.profilePhoto ? (
       <img
-        src={user?.profilePhoto}
+        src={`https://res.cloudinary.com/dclheeyce/image/upload/v1701517376/${user?.profilePhoto}`}
         alt={`${user?.username}'s profile`}
-        className={`w-16 h-16 rounded-full mb-4 sm:mb-0`}
+        className={`w-12 h-12 rounded-full mb-4 sm:mb-0`}
       />
     ) : (
       <CgProfile size={size} className="text-gray-500" />

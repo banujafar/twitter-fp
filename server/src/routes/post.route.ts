@@ -39,7 +39,7 @@ postRouter.get(
   tryCatch(async (req: Request, res: Response) => {
     const posts = await UserPost.find({
       relations: ['user', 'likes', 'comments'],
-      select: { user: { id: true, username: true, email: true } },
+      select: { user: { id: true, username: true, email: true, profilePhoto: true } },
     });
     const retweets = await PostRetweet.find({ relations: ['post', 'user', 'mainPost'] });
     if (!posts || posts.length === 0) {
@@ -73,7 +73,7 @@ postRouter.get(
           retweeted_time: r.retweeted_time,
           post: r.post,
           mainPost: r.mainPost,
-          user: { id: r.user.id, username: r.user.username, userPhoto: r.user.profilePhoto },
+          user: { id: r.user.id, username: r.user.username, profilePhoto: r.user.profilePhoto },
         })),
       };
     });
