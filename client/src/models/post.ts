@@ -44,7 +44,21 @@ export interface ILikeInitialState {
   loading: boolean | null;
 }
 
-export interface IAddRetweet{
-  userId:number;
-  rtwId:number
+export interface IAddRetweet {
+  userId: number;
+  rtwId: number;
+}
+
+export interface INotifications {
+  postId: number;
+  senderName: string;
+  type: string;
+  read: boolean;
+}
+
+
+export interface INotificationsState {
+  notifications: Notification[];
+  error: string | null;
+  loading: boolean;
 }

@@ -1,5 +1,5 @@
 import { Route, Routes } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import RegisterPage from './pages/RegisterPage';
 import Login from './pages/Login';
 import Home from './pages/Home';
@@ -16,18 +16,17 @@ import UserProfile from './pages/UserProfile';
 import Messages from './pages/Messages';
 import Favorites from './pages/Favorites';
 import SearchBar from './components/ui/Timeline/SearchBar';
-
+import Notifications from './pages/Notifications';
 function App() {
   const error = useSelector((state: RootState) => state.auth.error);
-
   useEffect(() => {
     if (error) {
       toast.error(error, {
         position: toast.POSITION.TOP_RIGHT,
-         //autoClose:5000, // 5 seconds
+        //autoClose:5000, // 5 seconds
       });
     }
-  },[error]);
+  }, [error]);
 
   return (
     <>
@@ -41,33 +40,56 @@ function App() {
               </Layout>
             }
           />
-          <Route path="/post/:userid/:postid" element={
+          <Route
+            path="/post/:userid/:postid"
+            element={
               <Layout>
                 <Post />
               </Layout>
-            } />
-          <Route path="/profile/:username/" element={
+            }
+          />
+          <Route
+            path="/profile/:username/"
+            element={
               <Layout>
                 <UserProfile />
               </Layout>
-            } />
-          <Route path="/messages" element={
+            }
+          />
+          <Route
+            path="/messages"
+            element={
               <Layout>
                 <Messages />
               </Layout>
-            } />
-            <Route path="/favorites" element={
+            }
+          />
+          <Route
+            path="/favorites"
+            element={
               <Layout>
                 <Favorites />
               </Layout>
-            } />
-             <Route path="/explore" element={
+            }
+          />
+          <Route
+            path="/explore"
+            element={
               <Layout>
                 <SearchBar searchedList={[]} />
               </Layout>
-            } />
+            }
+          />
+          <Route
+            path="/notifications"
+            element={
+              <Layout>
+                <Notifications />
+              </Layout>
+            }
+          />
         </Route>
-        
+
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/reset_password/:id/:token" element={<ResetPassword />} />
