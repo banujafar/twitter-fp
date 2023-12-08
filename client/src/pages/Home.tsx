@@ -4,7 +4,11 @@ import SearchBar from '../components/ui/Timeline/SearchBar';
 import { io } from 'socket.io-client';
 import { AppDispatch, RootState } from '../store';
 import { useEffect } from 'react';
-import { addNotification, fetchNotifications, removeNotification } from '../store/features/post/notificationSlice';
+import {
+  addNotification,
+  fetchNotifications,
+  removeNotification,
+} from '../store/features/notifications/notificationSlice';
 const Home = () => {
   const user = useSelector((state: RootState) => state.auth.user);
   const socket = io('https://twitter-server-73xd.onrender.com');

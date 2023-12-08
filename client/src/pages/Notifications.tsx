@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { AppDispatch, RootState } from '../store';
-import { fetchNotifications, readNotifications } from '../store/features/post/notificationSlice';
+import { fetchNotifications, readNotifications } from '../store/features/notifications/notificationSlice';
 
 const Notifications = () => {
   const { notifications } = useSelector((state: RootState) => state.notifications);

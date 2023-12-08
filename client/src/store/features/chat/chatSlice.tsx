@@ -11,7 +11,7 @@ export const createChat = createAsyncThunk(
   'chat/createChat',
   async ({ firstId, secondId }: { firstId: number | undefined; secondId: number | undefined }) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/chats/`, {
+      const response = await fetch(`https://twitter-server-73xd.onrender.com/api/chats/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -33,7 +33,7 @@ export const createChat = createAsyncThunk(
 
 export const getUserChats = createAsyncThunk('chat/getUserChats', async (userId: number | undefined) => {
   try {
-    const response = await fetch(`http://localhost:3000/api/chats/${userId}`, {
+    const response = await fetch(`https://twitter-server-73xd.onrender.com/api/chats/${userId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
