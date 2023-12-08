@@ -11,9 +11,12 @@ import passportConfig from './config/passport-config.ts';
 import checkAuthMiddleware from './middlewares/checkAuth.ts';
 import errorHandler from './middlewares/errorHandler.ts';
 import postRouter from './routes/post.route.ts';
+import http from 'http';
 import { fileURLToPath } from 'url';
 import { join, dirname } from 'path';
 import cookieParser from 'cookie-parser';
+import { Server } from 'socket.io';
+import socketService from './config/socketService.ts';
 import chatRouter from './routes/chat.route.ts';
 
 const app = express();
@@ -31,6 +34,12 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 passportConfig(passport);
 app.set('trust proxy', 1);
+const server = http.createServer(app);
+const io = new Server(server,{
+ cors:{
+  origin:[...allowedOrigins],
+ }
+});
 
 // Initialize a new store using the given options
 const sessionRepository = AppDataSource.getRepository(Session);
@@ -42,7 +51,8 @@ app.use(
       maxAge: 60 * 60 * 1000 || 7 * 24 * 60 * 60 * 1000,
       httpOnly: true,
       secure: app.get('env') === 'production' ? true : false,
-      sameSite: 'none',
+      //sameSite: 'none',
+      sameSite: 'lax',
     },
     store: new TypeormStore().connect(sessionRepository),
     secret: 'secret cookie',
@@ -52,7 +62,7 @@ app.use(
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const uploadDir = join(__dirname, '../../../client/src/assets/uploads');
-
+socketService(io);
 app.use(passport.initialize());
 app.use(passport.session());
 app.use('/api/posts', express.static(uploadDir));
@@ -74,6 +84,6 @@ app.use('/api/chats', chatRouter);
 
 app.use(errorHandler);
 
-app.listen('3000', () => {
+server.listen('3000', () => {
   console.log('Server is up on 3000');
 });

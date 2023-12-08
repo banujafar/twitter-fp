@@ -7,6 +7,7 @@ import { setIsOpen } from '../../store/features/modal/modalSlice';
 import SinglePost from '../ui/Posts/SinglePost';
 //import { useAddCommentMutation } from '../../store/features/post/postsApi';
 import { addComment } from '../../store/features/post/postSlice';
+import { socketSendNotification } from '../../utils/socketClient';
 const CommentModal = () => {
   const quoteModalContent = useSelector((state: RootState) => state.modal.postData['modalComment']);
   const [text, setText] = useState('');
@@ -21,6 +22,7 @@ const CommentModal = () => {
     if (user?.userId) {
       await dispatch(addComment({ comment: text, userId: user?.userId, postId: quoteModalContent.id })).then(() => {
         dispatch(setIsOpen({ id: 'modalComment', isOpen: false }));
+        socketSendNotification({username:user?.username,postData:quoteModalContent,action:'added comment'})
       });
     }
   };

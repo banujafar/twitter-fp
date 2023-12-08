@@ -3,6 +3,7 @@ import { User } from './user.entity.ts';
 import { PostRetweet } from './PostRetweet.entity.ts';
 import { LikedPost } from './LikedPost.entity.ts';
 import { PostComment } from './PostComment.entity.ts';
+import { Notifications } from './notifications.entity.ts';
 
 @Entity()
 export class UserPost extends BaseEntity {
@@ -28,4 +29,8 @@ export class UserPost extends BaseEntity {
   
   @OneToMany(() => PostComment, (commentedPost) => commentedPost.post,  { cascade: true })
   comments: PostComment[];
+
+  
+  @OneToMany(() => Notifications, (notification) => notification.post,  { cascade: true })
+  notifications: Notifications[];
 }

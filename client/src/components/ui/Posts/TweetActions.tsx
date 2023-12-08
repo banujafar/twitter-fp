@@ -16,6 +16,7 @@ import { BsFillShareFill } from 'react-icons/bs';
 //   useRemoveLikeMutation,
 // } from '../../../store/features/post/postsApi';
 import { getPosts, likePost, removeLike, retweetPost } from '../../../store/features/post/postSlice';
+import {  socketRemoveNotification, socketSendNotification } from '../../../utils/socketClient';
 
 const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -29,6 +30,7 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
   // const [addRetweet] = useAddRetweetMutation();
   // const [addLike]=useAddLikeMutation();
   // const [removeLike]=useRemoveLikeMutation()
+
   const handleRetweet = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsDropdownOpen(true);
@@ -73,7 +75,9 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
 
       if (userLikedPosts) {
         await dispatch(removeLike(data));
+        socketRemoveNotification({ username: user?.username, postData, action: 'liked' });
       } else {
+        socketSendNotification({ username: user?.username, postData, action: 'liked' });
         await dispatch(likePost(data));
       }
 
@@ -82,7 +86,6 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
       console.log(err);
     }
   };
-
   const handlePostRetweet = async (postId: number, e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     e.stopPropagation();
     e.preventDefault();
@@ -100,8 +103,9 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
       if (!isRetweeted) {
         await dispatch(retweetPost(retweetData)).then(() => {
           setIsDropdownOpen(false);
+          socketSendNotification({ username: user?.username, postData, action: 'retweeted' });
         });
-        await dispatch(getPosts() as any)
+        await dispatch(getPosts() as any);
         // } else {
         //   const findedpost = postData.retweets?.find(
         //     (retweet: any) => retweet.user.id === user?.userId && !retweet.post.content,

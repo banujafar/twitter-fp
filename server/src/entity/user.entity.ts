@@ -2,6 +2,7 @@ import { Column, PrimaryGeneratedColumn, Entity, BaseEntity, OneToMany, Like, Ma
 import { LikedPost } from './LikedPost.entity.ts';
 import { PostComment } from './PostComment.entity.ts';
 import { PostRetweet } from './PostRetweet.entity.ts';
+import { Notifications } from './notifications.entity.ts';
 
 @Entity()
 export class User extends BaseEntity {
@@ -51,4 +52,7 @@ export class User extends BaseEntity {
   @ManyToMany(() => User, (user) => user.following)
   @JoinTable()
   following: User[];
+  
+  @OneToMany(() => Notifications, (notification) => notification.user,  { cascade: true })
+  notifications: Notifications[];
 }
