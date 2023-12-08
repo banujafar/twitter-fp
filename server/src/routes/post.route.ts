@@ -11,6 +11,7 @@ import storageCloud from '../config/storage.ts';
 import { v4 as uuidv4 } from 'uuid';
 import { PostRetweet } from '../entity/PostRetweet.entity.ts';
 import { LikedPost } from '../entity/LikedPost.entity.ts';
+import { Notifications } from '../entity/notifications.entity.ts';
 
 // const __filename = fileURLToPath(import.meta.url);
 // const __dirname = dirname(__filename);
@@ -134,7 +135,7 @@ postRouter.post(
   '/like',
   tryCatch(async (req: Request, res: Response) => {
     const { postId, userId } = req.body;
-    const post = await UserPost.findOne({ where: { id: postId }, relations: ['likes'] });
+    const post = await UserPost.findOne({ where: { id: postId }, relations: ['likes', 'user'] });
     const user = await User.findOne({
       where: { id: userId },
     });
@@ -163,6 +164,13 @@ postRouter.post(
       relations: ['user', 'post'],
       select: { user: { id: true, username: true, email: true } },
     });
+    const receiver = post.user;
+    const newNotification = new Notifications();
+    newNotification.user = user;
+    newNotification.receiver = receiver;
+    newNotification.post = post;
+    newNotification.type = 'like';
+    newNotification.save();
     res.status(200).json(completeLikedPost);
   }),
 );
@@ -184,8 +192,8 @@ postRouter.delete(
     if (!existingLike) {
       return res.status(404).json({ error: 'Like not found' });
     }
-
-    await LikedPost.delete(existingLike.id);
+    const notification = await Notifications.findOne({ where: { post: { id: postId } } });
+    await Promise.allSettled([Notifications.delete(notification.id), LikedPost.delete(existingLike.id)]);
     res.status(200).json(existingLike.id);
   }),
 );
@@ -196,7 +204,7 @@ postRouter.post(
   tryCatch(async (req: Request, res: Response) => {
     const { comment, userId, postId } = req.body;
     console.log(comment, userId, postId);
-    const post = (await UserPost.find({ where: { id: postId } })) || [];
+    const post = (await UserPost.find({ where: { id: postId }, relations: ['user'] })) || [];
     if (post.length === 0) {
       return res.status(404).json({ error: 'Post not found' });
     }
@@ -227,6 +235,13 @@ postRouter.post(
       user: postComment.user,
       post: postComment.post,
     };
+    const receiver = postComment.post.user;
+    const newNotification = new Notifications();
+    newNotification.user = postComment.user;
+    newNotification.receiver = receiver;
+    newNotification.post = postComment.post;
+    newNotification.type = 'added comment';
+    newNotification.save();
     return res.status(201).json(postWithComment);
   }),
 );
@@ -263,6 +278,13 @@ postRouter.post(
       retweetedPost.mainPost = mainPost;
       retweetedPost.user = user;
       await retweetedPost.save();
+      const receiver = mainPost.user;
+      const newNotification = new Notifications();
+      newNotification.user = user;
+      newNotification.receiver = receiver;
+      newNotification.post = post;
+      newNotification.type = 'retweeted';
+      newNotification.save();
       return res.status(201).json(retweetedPost);
     }
     return res.status(201).json(post);
@@ -287,5 +309,43 @@ postRouter.delete(
     return res.status(204).json('deleted successfully');
   }),
 );
-
+postRouter.get(
+  '/notifications/:userId',
+  tryCatch(async (req: Request, res: Response) => {
+    const userId = +req.params.userId;
+    const notifications = await Notifications.find({
+      where: { receiver: { id: userId } },
+      relations: ['user', 'post'],
+      select: { post: { id: true }, user: { username: true }, type: true,read:true },
+    });
+    const modifiedNotifications = notifications.map((notification) => ({
+      postId: notification.post.id,
+      senderName: notification.user.username,
+      type: notification.type,
+      read:notification.read
+    }));
+    console.log(modifiedNotifications)
+    res.status(200).json(modifiedNotifications);
+  }),
+);
+postRouter.post(
+  '/notifications/:userId',
+  tryCatch(async (req: Request, res: Response) => {
+    const userId = +req.params.userId;
+    const notifications = await Notifications.find({
+      where: { receiver: { id: userId } },
+      relations: ['user', 'post'],
+      select: { post: { id: true }, user: { username: true }, type: true },
+    });
+    const modifiedNotifications = notifications.map((notification) => ({
+      postId: notification.post.id,
+      senderName: notification.user.username,
+      type: notification.type,
+    }));
+    for (const modifiedNotification of modifiedNotifications) {
+      await Notifications.update({ post: { id: modifiedNotification.postId } }, { read: true });
+    }
+    res.status(200).json('success');
+  }),
+);
 export default postRouter;

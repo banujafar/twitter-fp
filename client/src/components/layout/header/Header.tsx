@@ -6,19 +6,23 @@ import { IoSearchOutline, IoSearch } from 'react-icons/io5';
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 import { BiEnvelope, BiSolidEnvelope, BiSolidUser, BiUser } from 'react-icons/bi';
 import userImage from '../../../assets/images/user.jpg';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../store';
 import { logoutUser } from '../../../store/features/auth/authSlice';
+import { fetchNotifications } from '../../../store/features/post/notificationSlice';
 
 const Header = () => {
-  const [notifications, setNotifications] = useState(true);
+  const { notifications } = useSelector((state: RootState) => state.notifications);
   const [logoutPopover, setLogoutPopover] = useState(false);
   // const [decodedUsername, setDecodedUsername] = useState<string | null>(null);
-   const dispatch = useDispatch<AppDispatch>();
-   const user = useSelector((state: RootState) => state.auth.user);
-   const currentUser = user?.username
+  const dispatch = useDispatch<AppDispatch>();
+  const user = useSelector((state: RootState) => state.auth.user);
+  const currentUser = user?.username;
   // useEffect(() => {
+
+  console.log(notifications);
+  //const filteredNotifications = notifications.filter((notification) => !notification.read);
   //   const getUsernameFromToken = (authToken: string) => {
   //     try {
   //       const decoded: IDecodedToken = jwtDecode(authToken);
@@ -52,7 +56,7 @@ const Header = () => {
       label: 'Home',
       icon: GoHome,
       activeIcon: GoHomeFill,
-      notifications: () => notifications,
+      // notifications: () => notifications,
     },
     {
       to: '/explore',
@@ -65,6 +69,7 @@ const Header = () => {
       label: 'Notifications',
       icon: IoMdNotificationsOutline,
       activeIcon: IoMdNotifications,
+      notifications: () => notifications,
     },
     {
       to: '/messages',
@@ -88,6 +93,10 @@ const Header = () => {
   ];
 
   const location = useLocation();
+
+  useEffect(() => {
+    dispatch(fetchNotifications(user?.userId));
+  }, []);
 
   return (
     <header
@@ -114,10 +123,12 @@ const Header = () => {
                     ) : (
                       <link.icon style={iconStyle} />
                     )}
-                    {link.notifications ? (
-                      <div className="rounded-full absolute top-[-4px] right-[1px] w-2 h-2 bg-cyan-500"></div>
-                    ) : (
-                      ''
+                    {link.notifications && (
+                      <div
+                        className={`rounded-full absolute top-[-4px] right-[1px] w-4 h-4 bg-cyan-500 flex justify-center items-center text-white text-xs`}
+                      >
+                        {notifications.filter((notification) => !notification.read).length || ' '}
+                      </div>
                     )}
                   </div>
                   <div
