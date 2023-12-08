@@ -10,7 +10,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../store';
 import { logoutUser } from '../../../store/features/auth/authSlice';
-import { fetchNotifications } from '../../../store/features/post/notificationSlice';
+import { fetchNotifications } from '../../../store/features/notifications/notificationSlice';
 
 const Header = () => {
   const { notifications } = useSelector((state: RootState) => state.notifications);

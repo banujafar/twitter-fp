@@ -5,7 +5,8 @@ import postSlice from './features/post/postSlice';
 import userSlice from './features/user/userSlice';
 import { postsApi } from './features/post/postsApi';
 import followModalSlice from './features/modal/followModalSlice';
-import notificationSlice from './features/post/notificationSlice';import chatSlice from "./features/chat/chatSlice";
+import notificationSlice from './features/notifications/notificationSlice';
+import chatSlice from './features/chat/chatSlice';
 
 const rootReducer = combineReducers({
   auth: authSlice,
@@ -14,7 +15,7 @@ const rootReducer = combineReducers({
   user: userSlice,
   followModal: followModalSlice,
   notifications: notificationSlice,
-    chat: chatSlice,
+  chat: chatSlice,
 
   [postsApi.reducerPath]: postsApi.reducer,
 });
