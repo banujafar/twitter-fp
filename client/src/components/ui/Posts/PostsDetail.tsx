@@ -58,16 +58,21 @@ const PostsDetail = () => {
             <>
               {isRetweet && !!isRetweet.length ? (
                 <>
-                  <SinglePost postData={data} size={44} />
-                  <div className="px-8 border rounded-xl">
-                    <SinglePost postData={isRetweet[0]} size={30} />
+                <div className="border-b border-gray-200">
+                  <SinglePost postData={data} size={64} />
+                  <div className="px-8 border rounded-xl mx-8">
+                    <SinglePost postData={isRetweet[0]} size={64} />
                   </div>
                   <TweetActions postData={data} />
+                  </div>
                 </>
               ) : (
                 <>
-                  <SinglePost postData={data} size={44} />
+                <div className="border-b border-gray-200">
+
+                  <SinglePost postData={data} size={64} />
                   <TweetActions postData={data} />
+                  </div>
                 </>
               )}
               {data.comments.length > 0 &&
@@ -79,10 +84,10 @@ const PostsDetail = () => {
                     >
                       <div className="flex gap-2">
                         <div className="w-auto">
-                          <UserAvatar user={comment.user} size={44} />
+                          <UserAvatar user={comment.user} size={64} />
                         </div>
                         <div className="w-11/12 xl:w-11/12 lg:w-11/12 md:w-11/12 sm:w-11/12 xs:w-full">
-                          <div className="flex flex-col flex-grow mb-2">
+                          <div className="flex flex-col flex-grow mb-2 px-4">
                             <div className="flex items-center gap-2 mb-2">
                               <Link
                                 to={`/profile/${comment.user?.username}`}
@@ -92,7 +97,7 @@ const PostsDetail = () => {
                               </Link>
                               <p className="text-gray-500">{formattedDate(comment.created_time)}</p>
                             </div>
-                            <p className="text-gray-800">{comment.comment}</p>
+                            <p className="text-gray-800 text-lg">{comment.comment}</p>
                           </div>
                         </div>
                       </div>

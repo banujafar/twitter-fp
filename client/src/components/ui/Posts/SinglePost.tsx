@@ -10,7 +10,7 @@ export const UserAvatar: React.FC<{ user: IUser; size: number }> = ({ user, size
       <img
         src={`https://res.cloudinary.com/dclheeyce/image/upload/v1701517376/${user?.profilePhoto}`}
         alt={`${user?.username}'s profile`}
-        className={`w-12 h-12 rounded-full mb-4 sm:mb-0`}
+        className={`w-16 h-16 rounded-full mb-4 sm:mb-0 object-cover`}
       />
     ) : (
       <CgProfile size={size} className="text-gray-500" />
@@ -33,8 +33,8 @@ const SinglePost: React.FC<{ postData: IUserPost; size: number }> = ({ postData,
   const navigate = useNavigate();
   return (
     <div className="flex gap-2 flex-col py-2 " onClick={() => navigate(`/post/${postData.user.id}/${postData.id}`)}>
-      <div className="w-11/12 xl:w-11/12 lg:w-11/12 md:w-11/12 sm:w-11/12 xs:w-full ">
-        <div className="flex flex-col flex-grow mb-2">
+      <div className="w-full">
+        <div className="flex flex-col flex-grow mb-2 px-4">
           <div className="flex items-center gap-2 mb-2">
             <div className="w-auto">
               <UserAvatar user={postData.user} size={size} />
@@ -48,7 +48,7 @@ const SinglePost: React.FC<{ postData: IUserPost; size: number }> = ({ postData,
             </Link>
             <p className="text-gray-500">{formattedDate(postData.created_date)}</p>
           </div>
-          <p className="text-gray-800 ">{postData.content}</p>
+          <p className="text-gray-800 text-lg">{postData.content}</p>
           {renderImages(postData.img, postData.id)}
         </div>
       </div>

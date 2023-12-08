@@ -26,7 +26,7 @@ const UserProfileFavorites: React.FC<{ username: string | undefined }> = ({ user
 
   return (
     <div className="flex items-start gap-2">
-      <div className={`p-4 ${currentPath === '/favorites' ? 'w-[80%]' : 'w-full'}`}>
+      <div className={`${currentPath === '/favorites' ? 'w-[80%]' : 'w-full'}`}>
         {!!favData.length ? (
           favData.map((singleFav) => {
             const isRetweet = posts.filter(
@@ -35,15 +35,15 @@ const UserProfileFavorites: React.FC<{ username: string | undefined }> = ({ user
             console.log(isRetweet);
             return isRetweet && !!isRetweet.length ? (
               <>
-                <SinglePost postData={singleFav} size={44} />
-                <div className="px-8 border rounded-xl">
-                  <SinglePost postData={isRetweet[0]} size={30} />
+                <SinglePost postData={singleFav} size={64} />
+                <div className="px-8 border rounded-xl mx-8">
+                  <SinglePost postData={isRetweet[0]} size={64} />
                 </div>
                 <TweetActions postData={singleFav} />
               </>
             ) : (
               <>
-                <SinglePost postData={singleFav} size={44} />
+                <SinglePost postData={singleFav} size={64} />
                 <TweetActions postData={singleFav} />
               </>
             );
