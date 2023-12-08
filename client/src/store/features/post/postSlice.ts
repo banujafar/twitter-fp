@@ -3,7 +3,7 @@ import { IPostInitialState } from '../../../models/post';
 
 export const getPosts = createAsyncThunk('post/getPosts', async () => {
   try {
-    const response = await fetch(`https://twitter-server-73xd.onrender.com/api/posts`, {
+    const response = await fetch(`http://localhost:3000/api/posts`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
