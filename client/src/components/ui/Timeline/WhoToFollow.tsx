@@ -69,7 +69,7 @@ const WhoToFollow = () => {
         </div>
       
       </div>
-      <Link to='/suggestions' className='text-twitterColor font-medium text-base flex mt-2'>
+      <Link to='/suggestions' className='text-twitterColor font-medium text-base mt-2 inline-block'>
           Show more
         </Link>
     </div>
