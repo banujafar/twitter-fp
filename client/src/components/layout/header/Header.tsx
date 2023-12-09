@@ -92,8 +92,8 @@ const Header = () => {
       activeIcon: AiFillHeart,
     },
     {
-      to: '/communities',
-      label: 'Communities',
+      to: '/suggestions',
+      label: 'Suggestions',
       icon: BsPeople,
       activeIcon: BsPeopleFill,
     },

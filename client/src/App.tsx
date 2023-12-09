@@ -17,6 +17,7 @@ import Messages from './pages/Messages';
 import Favorites from './pages/Favorites';
 import SearchBar from './components/ui/Timeline/SearchBar';
 import Notifications from './pages/Notifications';
+import Suggestions from './pages/Suggestions';
 function App() {
   const error = useSelector((state: RootState) => state.auth.error);
   useEffect(() => {
@@ -85,6 +86,14 @@ function App() {
             element={
               <Layout>
                 <Notifications />
+              </Layout>
+            }
+          />
+           <Route
+            path="/suggestions"
+            element={
+              <Layout>
+                <Suggestions/>
               </Layout>
             }
           />
