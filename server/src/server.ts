@@ -18,6 +18,7 @@ import cookieParser from 'cookie-parser';
 import { Server } from 'socket.io';
 import socketService from './config/socketService.ts';
 import chatRouter from './routes/chat.route.ts';
+import messageRouter from './routes/message.route.ts';
 
 const app = express();
 const allowedOrigins = ['https://twitter-client-ckmh.onrender.com', 'http://localhost:5173'];
@@ -81,6 +82,7 @@ app.use('/auth', userRouter);
 app.use('/checkAuth', checkAuthMiddleware);
 app.use('/api/posts', postRouter);
 app.use('/api/chats', chatRouter);
+app.use('/api/messages', messageRouter);
 
 app.use(errorHandler);
 
