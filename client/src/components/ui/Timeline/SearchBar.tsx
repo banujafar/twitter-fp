@@ -31,7 +31,7 @@ const SearchBar: React.FC<{ searchedList: any }> = ({ searchedList }) => {
   };
 
   return (
-    <div className="flex items-center border border-gray-200 rounded-xl p-2 bg-gray-100 m-2 w-full relative">
+    <div className="flex items-center border border-gray-200 rounded-3xl p-2 bg-gray-100 m-2 w-full relative">
       <CiSearch className="text-gray-500" />
       <input
         type="text"

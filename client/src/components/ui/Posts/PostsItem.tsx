@@ -14,8 +14,8 @@ const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
   return (
     <>
       {!isRetweet && (
-        <div className="tweet-container bg-white  w-full px-4">
-          <SinglePost postData={postData} size={44} />
+        <div className="tweet-container bg-white border-b border-gray-200 w-full cursor-pointer transition ease-in hover:bg-[#f7f7f7]">
+          <SinglePost postData={postData} size={64} />
           <TweetActions postData={postData} />
         </div>
       )}
@@ -25,10 +25,10 @@ const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
             const retweetedPost = posts?.find((post) => post.id === retweet.post.id);
             return (
               retweetedPost && (
-                <div className="tweet-container bg-white  w-full px-4" key={retweetedPost?.id}>
-                  <SinglePost postData={retweetedPost} size={44} />
-                  <div className="px-8 border rounded-xl">
-                    <SinglePost postData={postData} size={30} />
+                <div className="tweet-container bg-white  w-full border-b border-gray-200 cursor-pointer transition ease-in hover:bg-[#f7f7f7]" key={retweetedPost?.id}>
+                  <SinglePost postData={retweetedPost} size={64} />
+                  <div className="px-8 border rounded-xl border-b border-gray-200 mx-8">
+                    <SinglePost postData={postData} size={64} />
                   </div>
                   <TweetActions postData={retweetedPost} />
                 </div>

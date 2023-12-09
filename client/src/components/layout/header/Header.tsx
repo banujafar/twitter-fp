@@ -5,12 +5,12 @@ import { Link, useLocation } from 'react-router-dom';
 import { IoSearchOutline, IoSearch } from 'react-icons/io5';
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 import { BiEnvelope, BiSolidEnvelope, BiSolidUser, BiUser } from 'react-icons/bi';
-import userImage from '../../../assets/images/user.jpg';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../store';
 import { logoutUser } from '../../../store/features/auth/authSlice';
 import { fetchNotifications } from '../../../store/features/notifications/notificationSlice';
+import { CgProfile } from 'react-icons/cg';
 
 const Header = () => {
   const { notifications } = useSelector((state: RootState) => state.notifications);
@@ -19,6 +19,9 @@ const Header = () => {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user);
   const currentUser = user?.username;
+  const users = useSelector((state: RootState) => state.user.users);
+  const userData = users.find(u => u.id === user?.userId);  
+
   // useEffect(() => {
 
   console.log(notifications);
@@ -165,8 +168,16 @@ const Header = () => {
             className="p-2 lg:p-2 md:p-0 sm:p-0 xs:p-0 xxs:p-0 hover:bg-navHoverColor transition ease-in cursor-pointer rounded-full"
           >
             <div className="flex items-center">
-              <div className="w-11 h-11">
-                <img src={userImage} alt="profile" />
+              <div className="w-auto">
+              {userData?.profilePhoto ? (
+              <img
+                src={`https://res.cloudinary.com/dclheeyce/image/upload/v1701517376/${userData?.profilePhoto}`}
+                alt={`${userData?.profilePhoto}'s profile`}
+                className={`w-11 h-11 rounded-full object-cover`}
+              />
+            ) : (
+              <CgProfile className="text-gray-500 w-11 h-11" />
+            )}
               </div>
               <div className="ml-2 mr-8 lg:flex flex-col md:hidden sm:hidden xs:hidden xxs:hidden">
                 <h3 className="font-bold text-base">{user?.username}</h3>

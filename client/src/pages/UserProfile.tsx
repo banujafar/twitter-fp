@@ -7,7 +7,7 @@ const UserProfile = () => {
 
   return (
     <>
-      <div className="mx-2 sm:mx-0 xs:mx-0 border border-gray-200 w-full">
+      <div className="mx-2 sm:mx-0 xs:mx-0 border border-gray-200 w-full min-h-screen">
         <UserProfileHeader username={username} />
       </div>
       <div className="flex flex-col mx-4 sm:hidden xs:hidden xxs:hidden md:hidden lg:flex xl:flex">

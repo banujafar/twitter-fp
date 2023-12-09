@@ -194,7 +194,7 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
                 </div>
               </div>
             </div>
-            <div className="flex items-start border-b border-[#eff3f4] mt-4">
+            <div className="flex items-start border-b border-gray-200 mt-4">
               <nav className="w-full">
                 <button
                   type="button"

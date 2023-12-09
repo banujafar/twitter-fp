@@ -107,7 +107,7 @@ const CreatePost: React.FC<{ content?: any }> = ({ content }) => {
               className="w-16 h-16 rounded-full mb-4 sm:mb-0 object-cover"
             />
           ) : (
-            <CgProfile size={44} className="text-gray-500" />
+            <CgProfile size={64} className="text-gray-500" />
           )}
         </div>
         <div className="w-11/12 xl:w-11/12 lg:w-11/12 md:w-11/12 sm:w-11/12 xs:w-full">

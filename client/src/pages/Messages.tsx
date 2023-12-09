@@ -40,7 +40,7 @@ const Messages = () => {
                 <MessageItem chats={chats} key={chats.id} onClick={() => handleChatItemClick(chats.id)} />
               ))
             ) : (
-              <p className="text-lg">Welcome to your inbox!</p>
+              <p className="py-4 px-3 text-2xl font-medium">Welcome to your inbox!</p>
             )}
           </div>
           {selectedChat ? (
@@ -53,7 +53,7 @@ const Messages = () => {
                         <img
                           src={`https://res.cloudinary.com/dclheeyce/image/upload/v1701517376/${selectedChatData.user2?.profilePhoto}`}
                           alt={`${selectedChatData.user2?.profilePhoto}'s profile`}
-                          className={`w-12 h-12 rounded-full mb-4 sm:mb-0`}
+                          className={`w-16 h-16 rounded-full mb-4 sm:mb-0 object-cover`}
                         />
                       ) : (
                         <CgProfile className="text-gray-500" />

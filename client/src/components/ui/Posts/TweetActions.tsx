@@ -122,7 +122,7 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
   };
 
   return (
-    <div className="flex items-center justify-between gap-4 mt-4 px-12 border-b border-gray-200 pb-2">
+    <div className="flex items-center justify-between gap-4 mt-4 px-12 pb-2">
       <div
         className="flex items-center text-gray-500 cursor-pointer hover:text-twitterColor"
         onClick={handleOpenCommentModal}
