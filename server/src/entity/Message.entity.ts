@@ -6,7 +6,7 @@ export class Message extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, { nullable: false })
+  @ManyToOne(() => User)
   @JoinColumn({ name: 'sender_id' })
   sender: User;
 
