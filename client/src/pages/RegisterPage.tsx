@@ -9,11 +9,21 @@ import { AppDispatch, RootState } from '../store';
 import TwitterLoader from '../components/loaders/TwitterLoader';
 import { useState } from 'react';
 import Verification from '../components/ui/auth/Verification';
+import { toast } from 'react-toastify';
 
 const RegisterPage = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { error, loading } = useSelector((state: RootState) => state.auth);
   const [verification, setVerification] = useState(false);
+
+  console.log(error);
+
+  const showErrorToast = (errorMessage: string | null) => {
+    toast.error(errorMessage, {
+      position: toast.POSITION.TOP_CENTER,
+      autoClose: 5000,
+    });
+  };
 
   if (loading) {
     return <TwitterLoader />;
@@ -64,10 +74,15 @@ const RegisterPage = () => {
 
                         if (registerUser.fulfilled.match(result)) {
                           setSubmitting(false);
-                          setVerification(true);
+                          if (result.payload.error) {
+                            setVerification(false);
+                            showErrorToast(result.payload.error)
+                          } else {
+                            setVerification(true);
+                          }
                         }
                       } catch (error) {
-                        console.error('Login error:', error);
+                        console.error('Register error:', error);
                         setSubmitting(false);
                       }
                     }}
@@ -113,11 +128,6 @@ const RegisterPage = () => {
                           />
                           <ErrorMessage name="password" component="div" className="text-red-500 text-base" />
                         </div>
-                        {error && (
-                          <div>
-                            <h5 className="text-red-600 font-medium">Error occurred</h5>
-                          </div>
-                        )}
                         <button
                           type="submit"
                           disabled={isSubmitting || !isValid}

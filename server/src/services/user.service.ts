@@ -33,7 +33,6 @@ const registerUser = async (username: string, email: string, password: string): 
   user.password = await bcrypt.hash(password, 10);
   user.isVerified = false;
   //user.token = verificationToken;
-  await user.save();
   return 'Registration successful';
 
   //return user.token;
