@@ -35,16 +35,20 @@ const UserProfileFavorites: React.FC<{ username: string | undefined }> = ({ user
             console.log(isRetweet);
             return isRetweet && !!isRetweet.length ? (
               <>
+              <div className="cursor-pointer border-b border-gray-200 transition ease-in hover:bg-[#f7f7f7]">
                 <SinglePost postData={singleFav} size={64} />
                 <div className="px-8 border rounded-xl mx-8">
                   <SinglePost postData={isRetweet[0]} size={64} />
                 </div>
                 <TweetActions postData={singleFav} />
+                </div>
               </>
             ) : (
               <>
+                <div className="cursor-pointer border-b border-gray-200 transition ease-in hover:bg-[#f7f7f7]">
                 <SinglePost postData={singleFav} size={64} />
                 <TweetActions postData={singleFav} />
+                </div>
               </>
             );
           })

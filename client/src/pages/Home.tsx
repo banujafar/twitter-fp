@@ -9,6 +9,7 @@ import {
   fetchNotifications,
   removeNotification,
 } from '../store/features/notifications/notificationSlice';
+import WhoToFollow from '../components/ui/Timeline/WhoToFollow';
 const Home = () => {
   const user = useSelector((state: RootState) => state.auth.user);
   const socket = io('https://twitter-server-73xd.onrender.com');
@@ -38,10 +39,11 @@ const Home = () => {
   return (
     <>
       <PostsList />
-      <div className="flex flex-col mx-4 sm:hidden xs:hidden xxs:hidden md:hidden lg:flex xl:flex">
+      <div className="flex flex-col mx-4 sm:hidden xs:hidden xxs:hidden md:hidden lg:flex xl:flex sticky top-0 right-0">
         <div className="sm:hidden xs:hidden xxs:hidden md:hidden lg:flex xl:flex">
           <SearchBar searchedList={[]} />
         </div>
+          <WhoToFollow />
       </div>
     </>
   );
