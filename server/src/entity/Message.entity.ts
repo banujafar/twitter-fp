@@ -1,5 +1,6 @@
 import { Entity, BaseEntity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { User } from './user.entity';
+import { Chat } from './Chat.entity';
 
 @Entity()
 export class Message extends BaseEntity {
@@ -7,8 +8,12 @@ export class Message extends BaseEntity {
   id: number;
 
   @ManyToOne(() => User)
-  @JoinColumn({ name: 'sender_id' })
+  @JoinColumn({ name: 'senderId' })
   sender: User;
+
+  @ManyToOne(() => Chat)
+  @JoinColumn({ name: 'chatId' })
+  chat: Chat
 
   @Column('text')
   messageText: string;

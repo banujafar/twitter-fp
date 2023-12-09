@@ -11,6 +11,7 @@ import { AppDispatch, RootState } from '../../../store';
 import { logoutUser } from '../../../store/features/auth/authSlice';
 import { fetchNotifications } from '../../../store/features/notifications/notificationSlice';
 import { CgProfile } from 'react-icons/cg';
+import { getUsers } from '../../../store/features/user/userSlice';
 
 const Header = () => {
   const { notifications } = useSelector((state: RootState) => state.notifications);
@@ -21,6 +22,10 @@ const Header = () => {
   const currentUser = user?.username;
   const users = useSelector((state: RootState) => state.user.users);
   const userData = users.find(u => u.id === user?.userId);  
+
+  useEffect(()=> {
+    dispatch(getUsers() as any)
+  }, [dispatch])
 
   // useEffect(() => {
 
