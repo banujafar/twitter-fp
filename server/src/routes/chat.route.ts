@@ -14,11 +14,11 @@ chatRouter.post(
       throw new AppError('Invalid user IDs', 400);
     }
     const existingChat = await Chat.createQueryBuilder('chat')
-    .where('(chat.user1 = :firstId AND chat.user2 = :secondId) OR (chat.user1 = :secondId AND chat.user2 = :firstId)', { firstId, secondId })
-    .orWhere('chat.user1 = :firstId OR chat.user1 = :secondId', { firstId, secondId })
-    .orWhere('chat.user2 = :firstId OR chat.user2 = :secondId', { firstId, secondId })
+    .where(
+      '((chat.user1 = :firstId AND chat.user2 = :secondId) OR (chat.user1 = :secondId AND chat.user2 = :firstId))',
+      { firstId, secondId }
+    )
     .getOne();
-
     if (existingChat) {
       return res.status(400).json({ message: 'Chat is already exists' });
     }
