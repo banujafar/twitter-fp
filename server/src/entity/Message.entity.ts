@@ -8,11 +8,11 @@ export class Message extends BaseEntity {
   id: number;
 
   @ManyToOne(() => User)
-  @JoinColumn({ name: 'senderId' })
+  @JoinColumn({ name: 'sender_id' })
   sender: User;
 
   @ManyToOne(() => Chat)
-  @JoinColumn({ name: 'chatId' })
+  @JoinColumn({ name: 'chat_id' })
   chat: Chat
 
   @Column('text')

@@ -1,4 +1,4 @@
-import { Entity, BaseEntity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Relation } from 'typeorm';
+import { Entity, BaseEntity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { User } from './user.entity';
 
 @Entity()
@@ -6,11 +6,11 @@ export class Chat extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
   
-    @ManyToOne(() => User, { nullable: false })
+    @ManyToOne(() => User)
     @JoinColumn({ name: 'user1_id' })
-    user1: Relation<User>;
+    user1: User;
   
-    @ManyToOne(() => User, { nullable: false })
+    @ManyToOne(() => User)
     @JoinColumn({ name: 'user2_id' })
-    user2: Relation<User>;
+    user2: User;
 }
