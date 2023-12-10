@@ -11,7 +11,7 @@ export class Message extends BaseEntity {
   @JoinColumn({ name: 'sender_id' })
   sender: User;
 
-  @ManyToOne(() => Chat)
+  @ManyToOne(() => Chat,  { cascade: true })
   @JoinColumn({ name: 'chat_id' })
   chat: Chat
 
