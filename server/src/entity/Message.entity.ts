@@ -7,11 +7,11 @@ export class Message extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { cascade: true })
   @JoinColumn({ name: 'senderId' })
   sender: User;
 
-  @ManyToOne(() => Chat)
+  @ManyToOne(() => Chat, { cascade: true })
   @JoinColumn({ name: 'chatId' })
   chat: Chat
 
