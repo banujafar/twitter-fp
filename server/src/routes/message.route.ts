@@ -3,6 +3,7 @@ import tryCatch from '../utils/tryCatch.ts';
 import AppError from '../config/appError.ts';
 import { Message } from '../entity/Message.entity.ts';
 import { User } from '../entity/user.entity.ts';
+import { Chat } from '../entity/Chat.entity.ts';
 
 const messageRouter = Router();
 
@@ -28,8 +29,17 @@ messageRouter.post(
       throw new AppError('Sender not found', 404);
     }
 
+    const chat = await Chat.findOne({
+      where: { id: chatId },
+    });
+
+    if (!chat) {
+      throw new AppError('Chat not found', 404);
+    }
+    
+
     const message = new Message();
-    message.chat = chatId;
+    message.chat = chat;
     message.sender = sender;
     message.messageText = text;
     message.isRead = false;
