@@ -7,12 +7,12 @@ export class Message extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, { cascade: true })
-  @JoinColumn({ name: 'senderId' })
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'sender_id' })
   sender: User;
 
-  @ManyToOne(() => Chat, { cascade: true })
-  @JoinColumn({ name: 'chatId' })
+  @ManyToOne(() => Chat)
+  @JoinColumn({ name: 'chat_id' })
   chat: Chat
 
   @Column('text')
