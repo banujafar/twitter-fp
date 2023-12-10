@@ -28,7 +28,7 @@ const CreatePost: React.FC<{ content?: any }> = ({ content }) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!text.trim().length && !selectedFile) {
+    if ((!text || !text.trim().length)  && !selectedFile) {
       return;
     }
 
