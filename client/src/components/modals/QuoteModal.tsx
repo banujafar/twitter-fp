@@ -22,7 +22,7 @@ const QuoteModal = () => {
                       <Link to={`/profile/${quoteModalContent.user?.username}`} className="flex">
                         {quoteModalContent.user?.profilePhoto ? (
                           <img
-                            src={quoteModalContent.user?.profilePhoto}
+                            src={`https://res.cloudinary.com/dclheeyce/image/upload/v1701517376/${quoteModalContent.user?.profilePhoto}`}
                             alt={`${quoteModalContent.user?.username}'s profile`}
                             className="w-16 h-16 rounded-full mb-4 sm:mb-0"
                           />
