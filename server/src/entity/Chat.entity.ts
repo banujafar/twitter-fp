@@ -6,11 +6,11 @@ export class Chat extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
   
-    @ManyToOne(() => User)
+    @ManyToOne(() => User, {cascade: true})
     @JoinColumn({ name: 'user1_id' })
     user1: User;
   
-    @ManyToOne(() => User)
+    @ManyToOne(() => User, {cascade: true})
     @JoinColumn({ name: 'user2_id' })
     user2: User;
 }
