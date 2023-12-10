@@ -32,7 +32,7 @@ const WhoToFollow = () => {
             suggestedUsers.map((u) => (
               <div key={u.id} className="flex items-center justify-between">
                 <div className="py-2 flex items-center">
-                  <div className="w-auto">
+                  <div className="w-10">
                     <Link to={`/profile/${u?.username}`} className="flex">
                       {u?.profilePhoto ? (
                         <img
@@ -45,7 +45,7 @@ const WhoToFollow = () => {
                       )}
                     </Link>
                   </div>
-                  <div className="ml-2">
+                  <div className="ml-2 mr-2">
                     <h1 className="text-base font-medium">{u?.username}</h1>
                     <Link to={`/profile/${u?.username}`} className="font-semibold text-sm text-[#536471]">
                       &#64;{u?.username}
@@ -55,7 +55,7 @@ const WhoToFollow = () => {
                 <div>
                   <button
                     type="button"
-                    className="capitalize cursor-pointer font-medium py-1 px-3 border border-black bg-black text-white rounded-2xl"
+                    className="capitalize cursor-pointer font-medium py-1 px-2 border border-black bg-black text-white rounded-2xl"
                     onClick={() => handleFollow(u)}
                   >
                     follow
@@ -69,7 +69,7 @@ const WhoToFollow = () => {
         </div>
       
       </div>
-      <Link to='/suggestions' className='text-twitterColor font-medium text-base flex mt-2'>
+      <Link to='/suggestions' className='text-twitterColor font-medium text-base mt-2 inline-block'>
           Show more
         </Link>
     </div>
