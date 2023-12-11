@@ -42,11 +42,12 @@ const socketService = (io) => {
         io.to(receiver.socketId).emit('getRetweetedPosts',data);
       });
 
-      socket.on('sendMessage', ({ chat_id, sender_id, text }) => {
-        console.log('Received new message:', text);
-        io.emit('receiveMessage', { chat_id, sender_id, text });
-      });
+     
 
+    });
+    socket.on('sendMessage', ({ chat_id, sender_id, text }) => {
+      console.log('Received new message:', text);
+      io.emit('receiveMessage', { chat_id, sender_id, text });
     });
 
     socket.on('disconnect', () => {
