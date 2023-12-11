@@ -14,6 +14,7 @@ const Notifications = () => {
   useEffect(() => {
     dispatch(fetchNotifications(userId));
   }, []);
+  
   useEffect(() => {
     dispatch(readNotifications(userId));
   }, [dispatch]);

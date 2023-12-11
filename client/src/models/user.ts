@@ -10,10 +10,12 @@ export interface IUser {
   token?: string | null;
   followers: IUser[] | null;
   following: IUser[] | null;
+  notifications: IUser[] | null;
 }
 
 export interface IUserInitial {
   users: IUser[];
   error: string | null;
   loading: boolean | null;
+  isNotified: boolean | null;
 }

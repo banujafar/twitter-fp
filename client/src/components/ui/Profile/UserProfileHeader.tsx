@@ -3,8 +3,14 @@ import { IoLocationOutline, IoNotificationsOffOutline, IoNotificationsOutline } 
 import { useNavigate } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../../store';
-import { followUser, unfollowUser, getUsers } from '../../../store/features/user/userSlice';
+import { AppDispatch, RootState } from '../../../store';
+import {
+  followUser,
+  unfollowUser,
+  getUsers,
+  notifyUser,
+  removeNotifiedUser,
+} from '../../../store/features/user/userSlice';
 import UserProfileFavorites from './UserProfileFavorites';
 import UserProfilePosts from './UserProfilePosts';
 import { setModal } from '../../../store/features/modal/followModalSlice';
@@ -13,48 +19,68 @@ import { modalIsOpenSelector, setIsOpen } from '../../../store/features/modal/mo
 import EditProfile from '../../modals/EditProfile';
 import { MdOutlineEmail } from 'react-icons/md';
 import { createChat } from '../../../store/features/chat/chatSlice';
+import { socketRemoveNotification, socketSendNotification } from '../../../utils/socketClient';
 
 const UserProfileHeader = ({ username }: { username: string | undefined }) => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.auth.user);
   const isCurrentUser = user?.username == username;
   const users = useSelector((state: RootState) => state.user.users);
   const userInfo = users.find((user) => user.username == username);
   const loading = useSelector((state: RootState) => state.user.loading);
-
   const [activeBtn, setActiveBtn] = useState<string>('posts');
-  const [notification, setNotification] = useState<boolean>(false);
   const isOpenEditProfile = useSelector((state) => modalIsOpenSelector(state, 'modalEditProfile'));
   const isFollowing = userInfo?.followers?.some((follower) => follower.id === user?.userId);
   const isModalOpen = useSelector((state: RootState) => state.followModal.isOpen);
-
+  const isNotified =
+    useSelector((state: RootState) => state.user.isNotified) ||
+    users
+      .find((u) => u.username == user?.username)
+      ?.notifications?.some((notifiedUser) => notifiedUser.username === username);
+  //     .find((u) => u.username == user?.username)
+  //     ?.notifications?.some((notifiedUser) => notifiedUser.username === username);
+  // console.log(isNotified,username)
   const handleButtonClick = (buttonType: string) => {
     setActiveBtn(buttonType);
   };
-
   useEffect(() => {
     dispatch(getUsers() as any);
   }, [dispatch]);
 
   const handleFollow = async () => {
-    setNotification(false);
     const userId = user?.userId;
     const targetUser = userInfo;
-
+    console.log(targetUser);
     if (!isFollowing) {
       await dispatch(followUser({ userId, targetUser }) as any);
+      socketSendNotification({
+        username: user?.username,
+        receiverName: userInfo?.username,
+        postId: null,
+        action: 'followed',
+      });
     } else {
       await dispatch(unfollowUser({ userId, targetUser }) as any);
+      socketRemoveNotification({
+        username: user?.username,
+        receiverName: userInfo?.username,
+        postId: null,
+        action: 'unfollowed',
+      });
     }
 
     await dispatch(getUsers() as any);
   };
 
-  const handleNotification = () => {
-    setNotification(!notification);
+  const handleNotification = async () => {
+    if (isNotified) {
+      await dispatch(removeNotifiedUser({ userId: user?.userId, notifiedUser: userInfo }));
+    } else {
+      await dispatch(notifyUser({ userId: user?.userId, notifiedUser: userInfo }));
+      console.log(isNotified);
+    }
   };
-
   const handleOpenModal = (e: React.MouseEvent, listType: 'following' | 'followers') => {
     e.stopPropagation();
     dispatch(setModal({ isOpen: true, data: listType }));
@@ -133,7 +159,7 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
                               className="text-2xl cursor-pointer font-medium py-1 px-3 border border-[#cfd9de] bg-white text-black rounded-2xl"
                               onClick={handleNotification}
                             >
-                              {notification ? <IoNotificationsOffOutline /> : <IoNotificationsOutline />}
+                              {isNotified ? <IoNotificationsOffOutline /> : <IoNotificationsOutline />}
                             </button>
                           </div>
                           <div className="pt-10">

@@ -47,7 +47,6 @@ async function markEmailAsVerified(token) {
   const userToken = await Token.findOneBy({ token });
 
   if (!userToken) {
-    console.log(userToken);
     throw new AppError('Invalid or expired verification token', 400);
   }
 

@@ -6,29 +6,10 @@ import { UserPost } from '../entity/UserPost.entity.ts';
 import { User } from '../entity/user.entity.ts';
 import multer from 'multer';
 import storageCloud from '../config/storage.ts';
-// import { dirname, join } from 'path';
-// import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
 import { PostRetweet } from '../entity/PostRetweet.entity.ts';
 import { LikedPost } from '../entity/LikedPost.entity.ts';
 import { Notifications } from '../entity/notifications.entity.ts';
-
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = dirname(__filename);
-
-// const storage = multer.diskStorage({
-//   destination: (req, res, callback) => {
-//     const uploadDir = join(__dirname, '../../../client/src/assets/uploads');
-// console.log(uploadDir)
-//     return callback(null, uploadDir);
-//   },
-//   filename: (req, file, callback) => {
-//     const uniqueImgId = uuidv4();
-//     const originalName = file.originalname;
-//     const filename = `${uniqueImgId}_${originalName}`;
-//     callback(null, filename);
-//   },
-// });
 
 const uploads = multer({ storage: storageCloud });
 
@@ -42,10 +23,14 @@ postRouter.get(
       relations: ['user', 'likes', 'comments'],
       select: { user: { id: true, username: true, email: true, profilePhoto: true } },
     });
-    const retweets = await PostRetweet.find({ relations: ['post', 'user', 'mainPost'] });
+
+    const retweets = await PostRetweet.find({
+      relations: ['post', 'user', 'mainPost'],
+    });
     if (!posts || posts.length === 0) {
       throw new AppError('No posts found', 404);
     }
+
     const filteredPostsWithRetweets = posts.map(async (post) => {
       const likes = await LikedPost.find({
         where: { post: { id: post.id } },
@@ -54,6 +39,11 @@ postRouter.get(
       });
       const comments = await PostComment.find({ where: { post: { id: post.id } }, relations: ['user', 'post'] });
       const retweetsForPost = retweets.filter((retweet) => retweet.mainPost.id === post.id);
+      const retweet = retweets.find((retweet) => retweet.post.id == post.id);
+
+      const retweeted =
+        retweet &&
+        (await UserPost.findOne({ where: { id: retweet.mainPost?.id }, relations: ['user', 'likes', 'comments'] }));
       return {
         ...post,
         likes: likes.map((like) => ({
@@ -71,11 +61,12 @@ postRouter.get(
         })),
         retweets: retweetsForPost.map((r) => ({
           id: r.id,
-          retweeted_time: r.retweeted_time,
+          created_time: r.retweeted_time,
           post: r.post,
           mainPost: r.mainPost,
           user: { id: r.user.id, username: r.user.username, profilePhoto: r.user.profilePhoto },
         })),
+        retweeted: retweeted,
       };
     });
 
@@ -90,9 +81,7 @@ postRouter.post(
   uploads.array('files'),
   tryCatch(async (req: Request, res: Response) => {
     const files = (req.files as Express.Multer.File[]) || [];
-    console.log(files);
     const { content, user_id, retweeted_id } = req.body;
-    console.log(content, user_id);
     if (!content && !files) {
       throw new AppError('Cannot be empty', 400);
     }
@@ -103,7 +92,11 @@ postRouter.post(
         id: true,
         username: true,
         email: true,
+        profilePhoto: true,
+        bio: true,
+        country: true,
       },
+      relations: ['notifications'],
     });
 
     if (!user) {
@@ -113,7 +106,8 @@ postRouter.post(
     const post = new UserPost();
     post.content = content;
     post.user = user;
-
+    post.likes = [];
+    post.comments = [];
     post.img = files.map((file) => file.filename);
 
     await post.save();
@@ -124,8 +118,17 @@ postRouter.post(
       retweetedPost.mainPost = mainPost;
       retweetedPost.user = user;
       await retweetedPost.save();
-      return res.status(201).json(retweetedPost);
+      return res.status(201).json({ ...post, retweeted: mainPost });
     }
+
+    const newNotification = new Notifications();
+    newNotification.user = user;
+    user.notifications.map((notification) => {
+      newNotification.receiver = notification;
+    });
+    newNotification.post = post;
+    newNotification.type = 'created post';
+    newNotification.save();
     return res.status(201).json(post);
   }),
 );
@@ -188,7 +191,6 @@ postRouter.delete(
       relations: ['post', 'user'],
       select: { user: { id: true, username: true, email: true } },
     });
-    console.log(existingLike.id);
     if (!existingLike) {
       return res.status(404).json({ error: 'Like not found' });
     }
@@ -203,7 +205,6 @@ postRouter.post(
   '/comment',
   tryCatch(async (req: Request, res: Response) => {
     const { comment, userId, postId } = req.body;
-    console.log(comment, userId, postId);
     const post = (await UserPost.find({ where: { id: postId }, relations: ['user'] })) || [];
     if (post.length === 0) {
       return res.status(404).json({ error: 'Post not found' });
@@ -272,7 +273,7 @@ postRouter.post(
     await post.save();
 
     if (rtwId) {
-      const mainPost = await UserPost.findOne({ where: { id: rtwId }, relations: ['user'] });
+      const mainPost = await UserPost.findOne({ where: { id: rtwId }, relations: ['user', 'likes', 'comments'] });
       const retweetedPost = new PostRetweet();
       retweetedPost.post = post;
       retweetedPost.mainPost = mainPost;
@@ -285,7 +286,7 @@ postRouter.post(
       newNotification.post = post;
       newNotification.type = 'retweeted';
       newNotification.save();
-      return res.status(201).json(retweetedPost);
+      return res.status(201).json({ ...post, retweeted: mainPost });
     }
     return res.status(201).json(post);
   }),
@@ -316,15 +317,13 @@ postRouter.get(
     const notifications = await Notifications.find({
       where: { receiver: { id: userId } },
       relations: ['user', 'post'],
-      select: { post: { id: true }, user: { username: true }, type: true,read:true },
     });
     const modifiedNotifications = notifications.map((notification) => ({
-      postId: notification.post.id,
+      postId: notification.post?.id,
       senderName: notification.user.username,
       type: notification.type,
-      read:notification.read
+      read: notification.read,
     }));
-    console.log(modifiedNotifications)
     res.status(200).json(modifiedNotifications);
   }),
 );
@@ -335,15 +334,15 @@ postRouter.post(
     const notifications = await Notifications.find({
       where: { receiver: { id: userId } },
       relations: ['user', 'post'],
-      select: { post: { id: true }, user: { username: true }, type: true },
     });
     const modifiedNotifications = notifications.map((notification) => ({
-      postId: notification.post.id,
+      postId: notification.post?.id,
       senderName: notification.user.username,
+      sender_id: notification.user.id,
       type: notification.type,
     }));
     for (const modifiedNotification of modifiedNotifications) {
-      await Notifications.update({ post: { id: modifiedNotification.postId } }, { read: true });
+      await Notifications.update({ user: { id: modifiedNotification.sender_id } }, { read: true });
     }
     res.status(200).json('success');
   }),
