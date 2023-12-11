@@ -112,14 +112,28 @@ postRouter.post(
 
     await post.save();
     if (retweeted_id) {
-      const mainPost = await UserPost.findOne({ where: { id: retweeted_id }, relations: ['user'] });
+      const mainPost = await UserPost.findOne({
+        where: { id: retweeted_id },
+        relations: ['user', 'likes', 'comments'],
+      });
       const retweetedPost = new PostRetweet();
       retweetedPost.post = post;
       retweetedPost.mainPost = mainPost;
       retweetedPost.user = user;
       await retweetedPost.save();
+      const retweets = await PostRetweet.find({
+        relations: ['post', 'user', 'mainPost'],
+      });
+      const retweetsForPost = retweets.filter((retweet) => retweet.mainPost.id === mainPost.id);
+      const likes = await LikedPost.find({
+        where: { post: { id: mainPost.id } },
+        relations: ['post', 'user'],
+        select: { user: { id: true, username: true, email: true } },
+      });
+      const comments = await PostComment.find({ where: { post: { id: mainPost.id } }, relations: ['user', 'post'] });
+
       return res.status(201).json({
-        originalPost: { ...mainPost, retweets: [retweetedPost] },
+        originalPost: { ...mainPost, retweets: retweetsForPost, likes, comments },
         retweetedPost: { ...post, retweeted: mainPost },
       });
     }
@@ -292,12 +306,24 @@ postRouter.post(
       newNotification.post = post;
       newNotification.type = 'retweeted';
       newNotification.save();
+      const retweets = await PostRetweet.find({
+        relations: ['post', 'user', 'mainPost'],
+      });
+      const retweetsForPost = retweets.filter((retweet) => retweet.mainPost.id === mainPost.id);
+      const likes = await LikedPost.find({
+        where: { post: { id: mainPost.id } },
+        relations: ['post', 'user'],
+        select: { user: { id: true, username: true, email: true } },
+      });
+      const comments = await PostComment.find({ where: { post: { id: mainPost.id } }, relations: ['user', 'post'] });
+
       return res.status(201).json({
-        originalPost: { ...mainPost, retweets: [retweetedPost] },
+        originalPost: { ...mainPost, retweets: retweetsForPost, likes, comments },
         retweetedPost: { ...post, retweeted: mainPost },
       });
+    } else {
+      return res.status(201).json(post);
     }
-    return res.status(201).json(post);
   }),
 );
 
@@ -316,7 +342,10 @@ postRouter.delete(
     if (!retweetedPost) {
       return res.status(404).json({ error: 'Retweeted post not found' });
     }
-    await Promise.allSettled([PostRetweet.delete(retweeted.id), UserPost.delete(retweetedPost.id)]);
+    const notification = await Notifications.findOne({ where: { post: { id: retweetedPost.id } } });
+    console.log(notification);
+    await Promise.allSettled([Notifications.delete(notification?.id), PostRetweet.delete(retweeted.id)]);
+    await UserPost.delete(retweetedPost.id);
     return res.status(200).json({ retweetedPostId: retweetedPost.id, mainPostId: mainPost.id });
   }),
 );
