@@ -25,11 +25,8 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
   const user = useSelector((state: RootState) => state.auth.user);
   // const { data } = useGetPostsQuery();
   const userLikedPosts = postData.likes?.some((like) => like?.user?.id === user?.userId);
-  const isRetweeted = postData.retweets?.some((rt: any) => rt?.user?.id === user?.userId);
-  // const [deleteRetweet] = useDeleteRetweetMutation();
-  // const [addRetweet] = useAddRetweetMutation();
-  // const [addLike]=useAddLikeMutation();
-  // const [removeLike]=useRemoveLikeMutation()
+  const retweets=postData.retweets?.filter((rt:any)=>!(rt.post?.content))
+  const isRetweeted = retweets?.some((rt: any) => rt?.user?.id === user?.userId );
 
   const handleRetweet = (e: React.MouseEvent) => {
     e.stopPropagation();
