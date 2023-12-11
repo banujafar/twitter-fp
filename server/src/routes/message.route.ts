@@ -50,22 +50,22 @@ messageRouter.post(
 );
 
 messageRouter.get(
-  '/:chatId',
+  '/:chat_id',
   tryCatch(async (req: Request, res: Response) => {
-    const { chatId } = req.params;
+    const { chat_id } = req.params;
 
-    if (!chatId) {
+    if (!chat_id) {
       throw new AppError('Invalid chat ID', 400);
     }
 
     const messages = await Message.find({
-      where: { chat: { id: parseInt(chatId, 10) } },
+      where: { chat: { id: parseInt(chat_id, 10) } },
       relations: ['sender', 'chat'],
     });
 
     const response = messages.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
 
-    return res.status(200).json(messages);
+    return res.status(200).json(response);
   }),
 );
 

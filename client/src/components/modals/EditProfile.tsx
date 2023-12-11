@@ -148,7 +148,7 @@ const EditProfile = () => {
                   style={{ minHeight: '3rem' }}
                   maxLength={160}
                   placeholder={'Your bio'}
-                  className={`text-black resize-none h-12 w-full overflow-y-hidden py-1 focus:outline-none text-xl font-normal placeholder-[#536471]  bg-transparent`}
+                  className={`text-white resize-none h-12 w-full overflow-y-hidden py-1 focus:outline-none text-xl font-normal placeholder-[#536471]  bg-transparent`}
                 />
               </>
             )}
@@ -161,7 +161,7 @@ const EditProfile = () => {
                   style={{ minHeight: '3rem' }}
                   maxLength={30}
                   placeholder={'Location'}
-                  className={`text-black resize-none h-12 w-full overflow-y-hidden py-1 focus:outline-none text-xl font-normal placeholder-[#536471]  bg-transparent`}
+                  className={`text-white resize-none h-12 w-full overflow-y-hidden py-1 focus:outline-none text-xl font-normal placeholder-[#536471]  bg-transparent`}
                 />
               </>
             )}

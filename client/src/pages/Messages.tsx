@@ -41,12 +41,11 @@ const Messages = () => {
   useEffect(() => {
     socket.emit('newUser', { username: user?.username });
 
-    socket.on('receiveMessage', ({ chat_id }) => {
+    socket.on('receiveMessage', ({ chat_id, sender_id, text}) => {
       if (chat_id === selectedChat) {
-        dispatch(getMessages(chat_id) as any);
+        dispatch(sendMessage({chat_id, sender_id, text}) as any);
       }
     });
-  
 
     return () => {
       socket.disconnect();
@@ -72,11 +71,11 @@ const Messages = () => {
     const sender_id = user?.userId;
     const text = messageText;
 
-    if (!text.length) {
+    if (!text || !text.trim().length) {
       return;
     }
 
-    await dispatch(sendMessage({ chat_id, sender_id, text }) as any);
+    // await dispatch(sendMessage({ chat_id, sender_id, text }) as any);
     socket.emit('sendMessage', { chat_id, sender_id, text });
     setMessageText('');
   };
@@ -121,7 +120,7 @@ const Messages = () => {
                   </div>
                 </div>
               </div>
-              <div className="px-4 overflow-y-auto h-[520px] flex-1">
+              <div className="px-4 overflow-y-auto h-[500px] flex-1">
                 {loadingMessages ? (
                   <p>Loading messages...</p>
                 ) : messages && messages.length > 0 ? (
