@@ -1,4 +1,4 @@
-import { Entity, BaseEntity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, BaseEntity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Relation } from 'typeorm';
 import { User } from './user.entity';
 import { Chat } from './Chat.entity';
 
@@ -11,7 +11,7 @@ export class Message extends BaseEntity {
   @JoinColumn({ name: 'sender_id' })
   sender: User;
 
-  @ManyToOne(() => Chat,  { cascade: true })
+  @ManyToOne(() => Chat)
   @JoinColumn({ name: 'chat_id' })
   chat: Chat
 

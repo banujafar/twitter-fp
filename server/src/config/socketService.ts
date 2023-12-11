@@ -31,6 +31,10 @@ const socketService = (io) => {
           postId
         });
       });
+      socket.on('sendMessage', ({ chat_id, sender_id, text }) => {
+        console.log('Received new message:', text);
+        io.emit('receiveMessage', { chat_id, sender_id, text });
+      });
     socket.on('disconnect', () => {
       console.log('A user disconnected');
       removeUser(socket.id)

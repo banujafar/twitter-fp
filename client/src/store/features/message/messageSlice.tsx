@@ -10,14 +10,14 @@ const initialState: IMessageInitial = {
 
 export const sendMessage = createAsyncThunk(
   'message/sendMessage',
-  async ({ chatId, senderId, text }: { chatId: number | undefined; senderId: number | undefined; text: string }) => {
+  async ({ chat_id, sender_id, text }: { chat_id: number | undefined; sender_id: number | undefined; text: string }) => {
     try {
       const response = await fetch(`https://twitter-server-73xd.onrender.com/api/messages/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ chatId, senderId, text }),
+        body: JSON.stringify({ chat_id, sender_id, text }),
       });
 
       if (!response.ok) {
@@ -32,9 +32,9 @@ export const sendMessage = createAsyncThunk(
   },
 );
 
-export const getMessages = createAsyncThunk('message/getMessages', async (chatId: number | undefined) => {
+export const getMessages = createAsyncThunk('message/getMessages', async (chat_id: number | undefined) => {
   try {
-    const response = await fetch(`https://twitter-server-73xd.onrender.com/api/messages/${chatId}`, {
+    const response = await fetch(`https://twitter-server-73xd.onrender.com/messages/${chat_id}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
