@@ -11,7 +11,8 @@ import { AppDispatch, RootState } from '../../../store';
 import { setIsOpen } from '../../../store/features/modal/modalSlice';
 import { getUsers } from '../../../store/features/user/userSlice';
 import { socketRealTimePosts, socketSendNotification } from '../../../utils/socketClient';
-const CreatePost: React.FC<{ content?: any }> = ({ content }) => {
+const CreatePost: React.FC<{ content?: any; inModal?: boolean }> = ({ content, inModal }) => {
+  console.log(inModal);
   const [text, setText] = useState('');
   const [selectedFile, setSelectedFile] = useState<File[] | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -28,17 +29,17 @@ const CreatePost: React.FC<{ content?: any }> = ({ content }) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if ((!text || !text.trim().length)  && !selectedFile) {
+    if ((!text || !text.trim().length) && !selectedFile) {
       return;
     }
+    console.log(selectedFile)
     try {
       socketRealTimePosts({
-        content:text,
+        content: text,
         user_id: user?.userId,
         files: selectedFile,
         retweeted_id: quoteModalContent?.id,
-      })
-
+      });
       setText('');
       setSelectedFile(null);
       currentUserInfo?.notifications?.forEach((current) => {
@@ -54,12 +55,14 @@ const CreatePost: React.FC<{ content?: any }> = ({ content }) => {
     }
   };
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    event.stopPropagation();
     const fileInput = event.target;
 
     if (fileInput.files && fileInput.files.length > 0) {
       const files = Array.from(fileInput.files);
       setSelectedFile((prevFiles) => (prevFiles ? [...prevFiles, ...files] : files));
     }
+    console.log(inModal);
   };
 
   const handleRemoveImage = (index?: number) => {
@@ -81,16 +84,16 @@ const CreatePost: React.FC<{ content?: any }> = ({ content }) => {
     e.target.style.height = 'auto';
     e.target.style.height = `${e.target.scrollHeight}px`;
   };
-
+  console.log(content);
   return (
-    <div className={`${content ? 'bg-black' : 'bg-white'} border-b border-gray-200 w-full p-4`}>
+    <div className={`bg-white border-b border-gray-200 w-full p-4`}>
       <div className="flex flex-col sm:flex-row items-start gap-4 ">
         <div className="w-auto flex">
           {userData?.profilePhoto ? (
             <img
               src={`https://res.cloudinary.com/dclheeyce/image/upload/${userData?.profilePhoto}`}
               alt={`${userData.username}'s profile`}
-              className="w-16 h-16 rounded-full mb-4 sm:mb-0 object-cover"
+              className="w-16 h-14 rounded-full mb-4 sm:mb-0 object-cover"
             />
           ) : (
             <CgProfile size={64} className="text-gray-500" />
@@ -102,18 +105,17 @@ const CreatePost: React.FC<{ content?: any }> = ({ content }) => {
               <textarea
                 value={text}
                 onChange={handleChange}
-                style={{ minHeight: '3rem' }}
+                style={{ minHeight: '2.5rem' }}
                 maxLength={280}
                 placeholder={content ? 'Add a comment' : 'What is happening?!'}
-                className={`text-black resize-none h-12 w-full overflow-y-hidden py-1 focus:outline-none text-xl font-normal placeholder-[#536471]  bg-transparent ${
-                  content ? 'text-white' : 'text-black'
+                className={`text-black resize-none h-12 w-[98%] overflow-y-hidden py-2 focus:outline-none text-l font-normal placeholder-[#536471]  bg-transparent focus:outline-twitterColor rounded-xl px-2 ml-1
                 }`}
               />
               {selectedFile &&
                 (Array.isArray(selectedFile) ? (
                   selectedFile.map((file, index) => (
-                    <div key={index} className="w-full relative mb-4">
-                      <img src={URL.createObjectURL(file)} alt={`Image ${index + 1}`} className="max-w-full" />
+                    <div key={index} className="w-full relative mb-4 ">
+                      <img src={URL.createObjectURL(file)} alt={`Image ${index + 1}`} className="max-w-full " />
                       <span
                         className="absolute top-0 right-0 cursor-pointer text-4xl p-2 bg-gray-700 text-white rounded-full"
                         onClick={() => handleRemoveImage(index)}
@@ -135,17 +137,17 @@ const CreatePost: React.FC<{ content?: any }> = ({ content }) => {
                 ))}
             </div>
             {content && <div>{content}</div>}
-            <div className="flex items-center gap-4 justify-between mt-5">
+             <div className="flex items-center gap-4 justify-between mt-5">
               <div className="flex items-center">
                 <label
-                  htmlFor="imageInput"
+                  htmlFor={content ? 'modalImageInput' : 'imageInput'}
                   className="rounded-full hover:bg-blue-100 p-2 flex items-center justify-center cursor-pointer"
                 >
                   <CiImageOn className="text-blue-500 text-xl" />
                   <input
                     type="file"
                     onChange={handleFileChange}
-                    id="imageInput"
+                    id={content ? 'modalImageInput' : 'imageInput'}
                     accept=".png, .jpg, .jpeg, .gif"
                     className="hidden"
                     ref={fileInputRef}
@@ -154,18 +156,23 @@ const CreatePost: React.FC<{ content?: any }> = ({ content }) => {
                   />
                 </label>
                 <label
-                  htmlFor="emojiInput"
+                  htmlFor={content ? 'modalEmojiInput' : 'emojiInput'}
                   className="rounded-full hover:bg-blue-100 p-2 flex items-center justify-center cursor-pointer"
                 >
                   <FaRegSmile className="text-blue-500 text-xl" />
                   <input type="file" id="emojiInput" accept=".png, .jpg, .jpeg, .gif" className="hidden" />
                 </label>
                 <label
-                  htmlFor="gifInput"
+                  htmlFor={content ? 'modalGifInput' : 'gifInput'}
                   className="rounded-full hover:bg-blue-100 p-2 flex items-center justify-center cursor-pointer"
                 >
                   <HiOutlineGif className="text-blue-500 text-xl" />
-                  <input type="file" id="gifInput" accept=".png, .jpg, .jpeg, .gif" className="hidden" />
+                  <input
+                    type="file"
+                    id={content ? 'modalGifInput' : 'gifInput'}
+                    accept=".png, .jpg, .jpeg, .gif"
+                    className="hidden"
+                  />
                 </label>
               </div>
               <button

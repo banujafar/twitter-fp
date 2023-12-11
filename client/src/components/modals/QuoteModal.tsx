@@ -17,7 +17,7 @@ const QuoteModal = () => {
             <CreatePost
               content={
                 <>
-                  <div className="border-gray-600 border p-2 rounded-2xl flex flex-col ">
+                  <div className="border-gray-400 border p-2 rounded-2xl flex flex-col ">
                     <div className="flex gap-2 items-center mb-2">
                       <Link to={`/profile/${quoteModalContent.user?.username}`} className="flex">
                         {quoteModalContent.user?.profilePhoto ? (

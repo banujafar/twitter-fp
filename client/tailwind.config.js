@@ -17,7 +17,7 @@ export default {
         sm: '0',
         xs:'0',
         xxs:'0'
-      }
+      },
     },
     extend: {
       colors:{
@@ -33,6 +33,7 @@ export default {
 
       }
     },
+  
   },
   plugins: [],
 };
