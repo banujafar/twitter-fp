@@ -2,7 +2,6 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { IUser, IUserInitial } from '../../../models/user';
 
 const BASE_URL = 'https://twitter-server-73xd.onrender.com/auth';
-
 export const getUsers = createAsyncThunk('user/getUsers', async () => {
   try {
     const response = await fetch(`${BASE_URL}`, {
@@ -91,11 +90,58 @@ export const editUser = createAsyncThunk(
     }
   },
 );
+export const notifyUser = createAsyncThunk(
+  'auth/notifyUser',
+  async ({ userId, notifiedUser }: { userId: number | undefined; notifiedUser: IUser | undefined }) => {
+    try {
+      const response = await fetch(`${BASE_URL}/notify-me/${userId}`, {
+        method: 'POST',
+        body: JSON.stringify(notifiedUser),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
+      if (!response.ok) {
+        throw new Error('Error');
+      }
+
+      const responseData = await response.json();
+      return responseData;
+    } catch (error) {
+      throw error;
+    }
+  },
+);
+
+export const removeNotifiedUser = createAsyncThunk(
+  'auth/removeNotify',
+  async ({ userId, notifiedUser }: { userId: number | undefined; notifiedUser: IUser | undefined }) => {
+    try {
+      const response = await fetch(`${BASE_URL}/notify-me/${userId}`, {
+        method: 'Delete',
+        body: JSON.stringify(notifiedUser),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Error');
+      }
+
+      const responseData = await response.json();
+      return responseData;
+    } catch (error) {
+      throw error;
+    }
+  },
+);
 const initialState: IUserInitial = {
   users: [],
   error: null,
   loading: false,
+  isNotified: false,
 };
 
 const userSlice = createSlice({
@@ -197,6 +243,32 @@ const userSlice = createSlice({
         state.error = action.payload?.error?.message || null;
       })
       .addCase(editUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || null;
+      })
+      .addCase(notifyUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(notifyUser.fulfilled, (state, _) => {
+        state.loading = false;
+        state.error = null;
+        state.isNotified = true;
+      })
+      .addCase(notifyUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || null;
+      })
+      .addCase(removeNotifiedUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(removeNotifiedUser.fulfilled, (state, _) => {
+        state.loading = false;
+        state.error = null;
+        state.isNotified = false;
+      })
+      .addCase(removeNotifiedUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || null;
       });

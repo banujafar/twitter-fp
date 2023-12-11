@@ -33,4 +33,5 @@ export class UserPost extends BaseEntity {
   
   @OneToMany(() => Notifications, (notification) => notification.post,  { cascade: true })
   notifications: Notifications[];
+  
 }

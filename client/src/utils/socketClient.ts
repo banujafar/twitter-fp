@@ -1,38 +1,61 @@
 import { io } from 'socket.io-client';
-//import { useEffect } from 'react';
-import { IUserPost } from '../models/post';
 const socket = io('https://twitter-server-73xd.onrender.com');
 
 const socketSendNotification = ({
   username,
-  postData,
+  receiverName,
   action,
+  postId,
 }: {
   username: string | undefined;
-  postData?: IUserPost;
+  receiverName: string | undefined;
+  postId?: number | null;
   action?: string;
 }) => {
   socket.emit('sendNotification', {
     senderName: username,
-    receiverName: postData?.user.username,
+    receiverName: receiverName,
     type: action,
-    postId: postData?.id,
+    postId: postId,
   });
 };
 const socketRemoveNotification = ({
   username,
-  postData,
+  receiverName,
   action,
+  postId,
 }: {
   username: string | undefined;
-  postData?: IUserPost;
+  receiverName: string | undefined;
+  postId?: number | null;
   action?: string;
 }) => {
   socket.emit('removeNotification', {
     senderName: username,
-    receiverName: postData?.user.username,
+    receiverName: receiverName,
     type: action,
-    postId: postData?.id,
+    postId: postId,
   });
 };
-export { socketSendNotification, socketRemoveNotification };
+const socketRealTimePosts = ({
+  content,
+  retweeted_id,
+  user_id,
+  files,
+}: {
+  content: string;
+  retweeted_id: number | undefined;
+  user_id: number | undefined;
+  files: File[] | null;
+}) => {
+  socket.emit('realTimePosts', {
+    content,
+    user_id,
+    files,
+    retweeted_id,
+  });
+};
+const socketRetweetPosts = (data: any) => {
+  socket.emit('addRetweet', data);
+};
+export { socketSendNotification, socketRemoveNotification, socketRealTimePosts, socketRetweetPosts };
