@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
-import {useEffect} from 'react'
-import { RootState } from '../../../store';
+import { useEffect } from 'react';
+import { AppDispatch, RootState } from '../../../store';
 import PostsItem from './PostsItem';
 import { IUserPost } from '../../../models/post';
 import { modalIsOpenSelector } from '../../../store/features/modal/modalSlice';
@@ -11,7 +11,7 @@ import CreatePost from './CreatePost';
 import { getPosts } from '../../../store/features/post/postSlice';
 
 const PostsList = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   // const { data } = useGetPostsQuery();
   const loading = useSelector((state: RootState) => state.post.loading);
@@ -35,10 +35,11 @@ const PostsList = () => {
   } else {
     sortedPosts = [];
   }
-
   useEffect(() => {
+    // Fetch initial posts
     dispatch(getPosts() as any);
   }, [dispatch]);
+
   return (
     <div className="mx-2 sm:mx-0 xs:mx-0 border border-gray-200 w-full min-h-screen">
       <CreatePost />

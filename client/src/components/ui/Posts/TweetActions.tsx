@@ -15,8 +15,8 @@ import { BsFillShareFill } from 'react-icons/bs';
 //   useGetPostsQuery,
 //   useRemoveLikeMutation,
 // } from '../../../store/features/post/postsApi';
-import { getPosts, likePost, removeLike, retweetPost } from '../../../store/features/post/postSlice';
-import {  socketRemoveNotification, socketSendNotification } from '../../../utils/socketClient';
+import { likePost, removeLike, removeRetweet } from '../../../store/features/post/postSlice';
+import { socketRemoveNotification, socketRetweetPosts, socketSendNotification } from '../../../utils/socketClient';
 
 const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -75,9 +75,19 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
 
       if (userLikedPosts) {
         await dispatch(removeLike(data));
-        socketRemoveNotification({ username: user?.username, postData, action: 'liked' });
+        socketRemoveNotification({
+          username: user?.username,
+          receiverName: postData?.user.username,
+          postId: postData.id,
+          action: 'liked',
+        });
       } else {
-        socketSendNotification({ username: user?.username, postData, action: 'liked' });
+        socketSendNotification({
+          username: user?.username,
+          receiverName: postData?.user.username,
+          postId: postData.id,
+          action: 'liked',
+        });
         await dispatch(likePost(data));
       }
 
@@ -101,20 +111,26 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
       };
 
       if (!isRetweeted) {
-        await dispatch(retweetPost(retweetData)).then(() => {
-          setIsDropdownOpen(false);
-          socketSendNotification({ username: user?.username, postData, action: 'retweeted' });
+        socketSendNotification({
+          username: user?.username,
+          receiverName: postData?.user.username,
+          postId: postData.id,
+          action: 'retweeted',
         });
-        await dispatch(getPosts() as any);
-        // } else {
-        //   const findedpost = postData.retweets?.find(
-        //     (retweet: any) => retweet.user.id === user?.userId && !retweet.post.content,
-        //   );
-        //   if (findedpost) {
-        //     await deleteRetweet(findedpost.id).then(() => {
-        //       setIsDropdownOpen(false);
-        //     });
-        //   }
+        socketRetweetPosts(retweetData);
+        setIsDropdownOpen(false);
+
+        //await dispatch(getPosts() as any);
+      } else {
+        const findedpost = postData.retweets?.find(
+          (retweet: any) => retweet.user.id === user?.userId && !retweet.post.content,
+        );
+        console.log(findedpost);
+        if (findedpost) {
+          await dispatch(removeRetweet(findedpost.id)).then(() => {
+            setIsDropdownOpen(false);
+          });
+        }
       }
     } catch (err) {
       console.log(err);
@@ -146,7 +162,7 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
               onClick={(e) => handlePostRetweet(postData.id, e)}
             >
               <AiOutlineRetweet className="text-lg" />
-              <span>{/* {!isRetweeted ? 'Repost' : 'Undo Repost'} */}Repost</span>
+              <span>{!isRetweeted ? 'Repost' : 'Undo Repost'}</span>
             </li>
             <li className="flex items-center gap-2 text-gray-700 hover:text-green-500" onClick={handleOpenQuoteModal}>
               <CiEdit className="text-lg" />

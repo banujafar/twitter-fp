@@ -27,7 +27,8 @@ export interface IUserPost {
   content?: string | null;
   img?: File | null;
   created_date: Date;
-  retweets?: IUserPost[] | null;
+  retweeted: IUserPost | null;
+  retweets: IUserPost[] | null;
   likes: ILike[];
   comments: IComment[];
 }
@@ -55,7 +56,6 @@ export interface INotifications {
   type: string;
   read: boolean;
 }
-
 
 export interface INotificationsState {
   notifications: Notification[];

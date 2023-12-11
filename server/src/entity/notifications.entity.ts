@@ -6,13 +6,8 @@ import {
   ManyToOne,
   JoinColumn,
   Relation,
-  CreateDateColumn,
-  OneToMany,
 } from 'typeorm';
 import { User } from './user.entity.ts';
-import { PostRetweet } from './PostRetweet.entity.ts';
-import { LikedPost } from './LikedPost.entity.ts';
-import { PostComment } from './PostComment.entity.ts';
 import { UserPost } from './UserPost.entity.ts';
 
 @Entity()
@@ -28,7 +23,7 @@ export class Notifications extends BaseEntity {
   @JoinColumn({ name: 'receiver_id' })
   receiver: Relation<User>;
 
-  @ManyToOne(() => UserPost)
+  @ManyToOne(() => UserPost, { nullable: true })
   @JoinColumn({ name: 'post_id' })
   post: Relation<UserPost>;
 

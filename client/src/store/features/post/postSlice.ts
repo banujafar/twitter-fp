@@ -1,9 +1,10 @@
 import { createAsyncThunk, createSlice, current } from '@reduxjs/toolkit';
-import { IPostInitialState } from '../../../models/post';
+import { IPostInitialState, IUserPost } from '../../../models/post';
 
+const BASE_URL = 'https://twitter-server-73xd.onrender.com/api/posts';
 export const getPosts = createAsyncThunk('post/getPosts', async () => {
   try {
-    const response = await fetch(`https://twitter-server-73xd.onrender.com/api/posts`, {
+    const response = await fetch(`${BASE_URL}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -23,7 +24,7 @@ export const getPosts = createAsyncThunk('post/getPosts', async () => {
 
 export const addPost = createAsyncThunk('post/addPost', async (formData: FormData) => {
   try {
-    const response = await fetch(`https://twitter-server-73xd.onrender.com/api/posts`, {
+    const response = await fetch(`${BASE_URL}`, {
       method: 'POST',
       body: formData,
     });
@@ -43,7 +44,7 @@ export const likePost = createAsyncThunk(
   'like/likePost',
   async ({ postId, userId }: { postId: number; userId: number }) => {
     try {
-      const response = await fetch('https://twitter-server-73xd.onrender.com/api/posts/like', {
+      const response = await fetch(`${BASE_URL}/like`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -63,9 +64,8 @@ export const likePost = createAsyncThunk(
   },
 );
 export const addComment = createAsyncThunk('post/addComment', async (formData: any) => {
-  console.log(formData);
   try {
-    const response = await fetch(`https://twitter-server-73xd.onrender.com/api/posts/comment`, {
+    const response = await fetch(`${BASE_URL}/comment`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -87,7 +87,7 @@ export const removeLike = createAsyncThunk(
   'like/removeLike',
   async ({ postId, userId }: { postId: number; userId: number }) => {
     try {
-      const response = await fetch('https://twitter-server-73xd.onrender.com/api/posts/like', {
+      const response = await fetch(`${BASE_URL}/like`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -106,12 +106,32 @@ export const removeLike = createAsyncThunk(
     }
   },
 );
+export const removeRetweet = createAsyncThunk('retweet/removeRetweet', async (rtwId: number) => {
+  console.log(rtwId);
+  try {
+    const response = await fetch(`${BASE_URL}/retweet/${rtwId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Error');
+    }
+
+    const responseData = await response.json();
+    return responseData;
+  } catch (error) {
+    throw error;
+  }
+});
 
 export const retweetPost = createAsyncThunk(
   'post/retweetPost',
   async ({ content, userId, rtwId }: { content?: string; userId: number; rtwId: number }) => {
     try {
-      const response = await fetch(`https://twitter-server-73xd.onrender.com/api/posts/retweet`, {
+      const response = await fetch(`${BASE_URL}/retweet`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -144,11 +164,28 @@ const postSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(addPost.pending, (state) => {
-        state.loading = true;
+        //state.loading = true;
         state.error = null;
       })
       .addCase(addPost.fulfilled, (state, action) => {
-        state.post = state.post ? [...state.post, action.payload] : [action.payload];
+        const { originalPost, retweetedPost } = action.payload;
+        console.log(originalPost);
+        if (originalPost && retweetedPost) {
+          const updatedPosts = current(state.post).map((singlePost) => {
+            if (singlePost.id === originalPost.id) {
+              return originalPost;
+            } else {
+              return singlePost;
+            }
+          });
+
+          state.post = [...updatedPosts, retweetedPost];
+        } else {
+          state.post = [...state.post, action.payload];
+        }
+
+        // console.log(updatedPosts);
+
         state.loading = false;
         state.error = null;
       })
@@ -180,7 +217,7 @@ const postSlice = createSlice({
           if (p.id === likedPost.post.id) {
             return {
               ...p,
-              likes: [...p.likes, likedPost],
+              likes: [...p?.likes, likedPost],
             };
           }
           return p;
@@ -243,22 +280,45 @@ const postSlice = createSlice({
         state.error = null;
       })
       .addCase(retweetPost.fulfilled, (state, action) => {
-        const { mainPost } = action.payload;
+        const { originalPost, retweetedPost } = action.payload;
         const updatedPosts = current(state.post).map((singlePost) => {
-          if (singlePost.id === mainPost.id) {
-            return {
-              ...singlePost,
-              retweets: [...(singlePost.retweets || []), action.payload],
-            };
+          if (singlePost.id === originalPost.id) {
+            return originalPost;
+          } else {
+            return singlePost;
           }
-          return singlePost;
         });
-        console.log(action.payload)
-        state.post = updatedPosts;
+        console.log(updatedPosts);
+        state.post = [...updatedPosts, retweetedPost];
         state.loading = false;
         state.error = null;
       })
       .addCase(retweetPost.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || null;
+      })
+      .addCase(removeRetweet.pending, (state) => {
+        //state.loading = true;
+        state.error = null;
+      })
+      .addCase(removeRetweet.fulfilled, (state, action) => {
+        console.log(action.payload);
+        const { retweetedPostId, mainPostId } = action.payload;
+        const filteredPosts: IUserPost[] = current(state.post).filter((post) => post.id !== retweetedPostId);
+        const updatedPosts = filteredPosts.map((singlePost) => {
+          if (singlePost.id === mainPostId) {
+            const filteredRetweets =
+              singlePost.retweets &&
+              singlePost.retweets?.filter((singleRetweet: any) => singleRetweet.post?.id !== retweetedPostId);
+            return { ...singlePost, retweets: filteredRetweets };
+          }
+          return singlePost;
+        });
+        state.post = updatedPosts;
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(removeRetweet.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || null;
       });

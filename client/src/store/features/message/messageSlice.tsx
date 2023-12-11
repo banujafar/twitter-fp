@@ -34,7 +34,7 @@ export const sendMessage = createAsyncThunk(
 
 export const getMessages = createAsyncThunk('message/getMessages', async (chat_id: number | undefined) => {
   try {
-    const response = await fetch(`https://twitter-server-73xd.onrender.com/messages/${chat_id}`, {
+    const response = await fetch(`https://twitter-server-73xd.onrender.com/api/messages/${chat_id}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

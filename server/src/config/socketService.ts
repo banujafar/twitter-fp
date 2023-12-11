@@ -1,4 +1,4 @@
-let onlineUsers=[]
+let onlineUsers = [];
 const addNewUser = (username, socketId) => {
   !onlineUsers.some((user) => user.username === username) && onlineUsers.push({ username, socketId });
 };
@@ -14,31 +14,45 @@ const socketService = (io) => {
     socket.on('newUser', ({ username }) => {
       addNewUser(username, socket.id);
     });
-    socket.on('sendNotification', ({ senderName, receiverName,type,postId }) => {
+    socket.on('sendNotification', ({ senderName, receiverName, type, postId }) => {
       const receiver = getUser(receiverName);
-      console.log(receiverName)
       io.to(receiver?.socketId).emit('getNotification', {
         senderName,
         type,
-        postId
+        postId,
       });
     });
-    socket.on('removeNotification', ({ senderName, receiverName,type,postId }) => {
-        const receiver = getUser(receiverName);
-        io.to(receiver?.socketId).emit('getFilteredNotification', {
-          senderName,
-          type,
-          postId
-        });
+    socket.on('removeNotification', ({ senderName, receiverName, type, postId }) => {
+      const receiver = getUser(receiverName);
+      io.to(receiver?.socketId).emit('getFilteredNotification', {
+        senderName,
+        type,
+        postId,
       });
+    });
+    socket.on('realTimePosts', (data) => {
+      const receivers = onlineUsers;
+      receivers.map((receiver) => {
+        io.to(receiver.socketId).emit('getRealTimePosts', data);
+      });
+    });
+    socket.on('addRetweet', (data) => {
+      const receivers = onlineUsers;
+      receivers.map((receiver) => {
+        io.to(receiver.socketId).emit('getRetweetedPosts',data);
+      });
+
       socket.on('sendMessage', ({ chat_id, sender_id, text }) => {
         console.log('Received new message:', text);
         io.emit('receiveMessage', { chat_id, sender_id, text });
       });
+
+    });
+
     socket.on('disconnect', () => {
       console.log('A user disconnected');
-      removeUser(socket.id)
+      removeUser(socket.id);
     });
-  }); 
+  });
 };
 export default socketService;

@@ -24,7 +24,7 @@ const Messages = () => {
   const selectedChatData = userChats.find((chat) => chat.id === selectedChat);
   const userData = selectedChatData?.user1.id === user?.userId ? selectedChatData?.user2 : selectedChatData?.user1;
 
-  const socket = io('http://localhost:3000/');
+  const socket = io('https://twitter-server-73xd.onrender.com');
 
   useEffect(() => {
     const userId = user?.userId;
@@ -72,7 +72,7 @@ const Messages = () => {
     const sender_id = user?.userId;
     const text = messageText;
 
-    if (!text.length) {
+    if (!text || !text.trim().length) {
       return;
     }
 
