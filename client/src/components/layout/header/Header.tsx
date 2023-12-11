@@ -12,6 +12,8 @@ import { logoutUser } from '../../../store/features/auth/authSlice';
 import { fetchNotifications } from '../../../store/features/notifications/notificationSlice';
 import { CgProfile } from 'react-icons/cg';
 import { getUsers } from '../../../store/features/user/userSlice';
+import PostModal from '../../modals/PostModal';
+import { setPostModal } from '../../../store/features/modal/postModalSlice';
 
 const Header = () => {
   const { notifications } = useSelector((state: RootState) => state.notifications);
@@ -21,7 +23,8 @@ const Header = () => {
   const user = useSelector((state: RootState) => state.auth.user);
   const currentUser = user?.username;
   const users = useSelector((state: RootState) => state.user.users);
-  const userData = users.find(u => u.id === user?.userId);  
+  const userData = users.find(u => u.id === user?.userId);
+  const isModalOpen = useSelector((state: RootState) => state.postModal.isOpen);
 
   useEffect(()=> {
     dispatch(getUsers() as any)
@@ -106,7 +109,13 @@ const Header = () => {
     dispatch(fetchNotifications(user?.userId));
   }, []);
 
+  const handleOpenPostModal = (e: React.MouseEvent)=> {
+      e.stopPropagation();
+      dispatch(setPostModal({isOpen: true}))
+  }
+
   return (
+    <>
     <header
       className={`${
         logoutPopover ? 'lg:overflow-y-auto md:overflow-hidden sm:overflow-hidden xs:overflow-hidden' : ''
@@ -163,7 +172,9 @@ const Header = () => {
           </nav>
         </div>
         <div className="mt-1 mb-1">
-          <button className="flex items-center justify-center shadow w-[211px] lg:w-[211px] md:w-[44px] sm:w-[44px] xs:w-[44px] md:h-[44px] sm:h-[44px] xs:h-[44px] lg:min-h-[52px] md:min-h-[44px] sm:min-h-[44px] xs:min-h-[44px] md:min-w-[44px] sm:min-w-[44px] xs:min-w-[44px] lg:rounded-3xl md:rounded-full sm:rounded-full xs:rounded-full md:p-0 sm:p-0 xs:p-0 min-w-[52px] min-h-[52px] text-base cursor-pointer bg-twitterColor hover:bg-opacity-80 text-white font-bold py-2 px-4 rounded-3xl">
+          <button
+          onClick={handleOpenPostModal}
+          className="flex items-center justify-center shadow w-[211px] lg:w-[211px] md:w-[44px] sm:w-[44px] xs:w-[44px] md:h-[44px] sm:h-[44px] xs:h-[44px] lg:min-h-[52px] md:min-h-[44px] sm:min-h-[44px] xs:min-h-[44px] md:min-w-[44px] sm:min-w-[44px] xs:min-w-[44px] lg:rounded-3xl md:rounded-full sm:rounded-full xs:rounded-full md:p-0 sm:p-0 xs:p-0 min-w-[52px] min-h-[52px] text-base cursor-pointer bg-twitterColor hover:bg-opacity-80 text-white font-bold py-2 px-4 rounded-3xl">
             Post
           </button>
         </div>
@@ -193,6 +204,8 @@ const Header = () => {
         </div>
       </div>
     </header>
+    {isModalOpen && <PostModal />}
+    </>
   );
 };
 
