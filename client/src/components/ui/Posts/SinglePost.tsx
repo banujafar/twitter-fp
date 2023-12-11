@@ -21,7 +21,12 @@ export const UserAvatar: React.FC<{ user: IUser; size: number }> = ({ user, size
 const renderImages = (img: any, id: number) => {
   if (Array.isArray(img)) {
     return img.map((imgUrl) => (
-      <img key={id} src={`https://res.cloudinary.com/dclheeyce/image/upload/v1701517376/${imgUrl}`} alt="post img" className="mt-4 w-full max-w-full" />
+      <img
+        key={id}
+        src={`https://res.cloudinary.com/dclheeyce/image/upload/v1701517376/${imgUrl}`}
+        alt="post img"
+        className="mt-4 w-full max-w-full"
+      />
     ));
   } else if (img) {
     return <img src={`/src/assets/uploads/${img}`} alt="post img" className="mt-4 w-full max-w-full" />;

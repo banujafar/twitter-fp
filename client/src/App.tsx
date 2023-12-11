@@ -1,5 +1,5 @@
 import { Route, Routes } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import RegisterPage from './pages/RegisterPage';
 import Login from './pages/Login';
 import Home from './pages/Home';

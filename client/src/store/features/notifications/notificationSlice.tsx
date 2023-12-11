@@ -1,10 +1,13 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { INotificationsState } from '../../../models/post';
 
+
+const BASE_URL = 'https://twitter-server-73xd.onrender.com/api/posts';
+
 export const fetchNotifications = createAsyncThunk(
   'notifications/fetchNotifications',
   async (userId: number | undefined) => {
-    const response = await fetch(`https://twitter-server-73xd.onrender.com/api/posts/notifications/${userId}`);
+    const response = await fetch(`${BASE_URL}/notifications/${userId}`);
 
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
@@ -16,7 +19,7 @@ export const fetchNotifications = createAsyncThunk(
 export const readNotifications = createAsyncThunk(
   'notifications/readNotifications',
   async (userId: number | undefined) => {
-    const response = await fetch(`https://twitter-server-73xd.onrender.com/api/posts/notifications/${userId}`, {
+    const response = await fetch(`${BASE_URL}/notifications/${userId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

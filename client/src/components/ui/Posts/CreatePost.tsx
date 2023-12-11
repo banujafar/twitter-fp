@@ -5,13 +5,12 @@ import { FaRegSmile } from 'react-icons/fa';
 import { HiOutlineGif } from 'react-icons/hi2';
 import { MdClose } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
-import { addPost, getPosts } from '../../../store/features/post/postSlice';
 import { AppDispatch, RootState } from '../../../store';
 // import { jwtDecode } from 'jwt-decode';
 // import { IDecodedToken } from '../../models/auth';
 import { setIsOpen } from '../../../store/features/modal/modalSlice';
 import { getUsers } from '../../../store/features/user/userSlice';
-
+import { socketRealTimePosts, socketSendNotification } from '../../../utils/socketClient';
 const CreatePost: React.FC<{ content?: any }> = ({ content }) => {
   const [text, setText] = useState('');
   const [selectedFile, setSelectedFile] = useState<File[] | null>(null);
@@ -20,48 +19,35 @@ const CreatePost: React.FC<{ content?: any }> = ({ content }) => {
   const dispatch = useDispatch<AppDispatch>();
   const quoteModalContent = useSelector((state: RootState) => state.modal.postData['modalQuote']);
   const users = useSelector((state: RootState) => state.user.users);
-  const userData = users.find(u => u.id === user?.userId);
+  const userData = users.find((u) => u.id === user?.userId);
+  const currentUserInfo = users.find((singleUser) => singleUser.username == user?.username);
 
-  useEffect(()=> {
-    dispatch(getUsers() as any)
-  },[])
+  useEffect(() => {
+    dispatch(getUsers() as any);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if ((!text || !text.trim().length)  && !selectedFile) {
       return;
     }
-
-    const formData = new FormData();
-    formData.append('content', text);
-
-    // if (decodedId !== null && !isNaN(decodedId)) {
-    //   formData.append('user_id', decodedId.toString());
-    // }
-    if (user?.userId) {
-      formData.append('user_id', user.userId.toString());
-    }
-
-    if (selectedFile) {
-      selectedFile.forEach((file) => {
-        formData.append('files', file);
-      });
-    }
-    if (quoteModalContent) {
-      formData.append('retweeted_id', quoteModalContent.id.toString());
-    }
-
     try {
-      if (quoteModalContent && user?.userId && text) {
-        // const { id } = quoteModalContent;
-        // const userId = user?.userId;
-        await dispatch(addPost(formData));
-      } else {
-        await dispatch(addPost(formData) as any);
-      }
+      socketRealTimePosts({
+        content:text,
+        user_id: user?.userId,
+        files: selectedFile,
+        retweeted_id: quoteModalContent?.id,
+      })
+
       setText('');
       setSelectedFile(null);
-      await dispatch(getPosts() as any);
+      currentUserInfo?.notifications?.forEach((current) => {
+        socketSendNotification({
+          username: user?.username,
+          receiverName: current.username,
+          action: 'created post',
+        });
+      });
       dispatch(setIsOpen({ id: 'modalQuote', isOpen: false }));
     } catch (error) {
       console.error('Error submitting post:', error);

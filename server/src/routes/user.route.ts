@@ -13,6 +13,7 @@ import AppError from '../config/appError.ts';
 import { Token } from '../entity/token.entity.ts';
 import multer from 'multer';
 import storageCloud from '../config/storage.ts';
+import { Notifications } from '../entity/notifications.entity.ts';
 
 const userRouter = Router();
 const uploads = multer({ storage: storageCloud });
@@ -130,11 +131,12 @@ userRouter.post(
 userRouter.get(
   '/',
   tryCatch(async (req: Request, res: Response) => {
-    const user = await User.find({ relations: ['following', 'followers'] });
+    const user = await User.find({ relations: ['following', 'followers', 'notifications'] });
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
+
     const userDTO = user.map((u) => ({
       id: u.id,
       email: u.email,
@@ -143,7 +145,7 @@ userRouter.get(
       isVerified: u.isVerified,
       profilePhoto: u.profilePhoto,
       headerPhoto: u.headerPhoto,
-      bio:u.bio,
+      bio: u.bio,
       token: u.token,
       followers: u.followers.map((followingUser) => ({
         id: followingUser.id,
@@ -157,6 +159,7 @@ userRouter.get(
         profilePhoto: followingUser.profilePhoto,
         headerPhoto: followingUser.headerPhoto,
       })),
+      notifications: u.notifications,
     }));
 
     return res.status(200).json(userDTO);
@@ -198,7 +201,11 @@ userRouter.post(
         profilePhoto: currentUser.profilePhoto,
       },
     };
-
+    const newNotification = new Notifications();
+    newNotification.user = currentUser;
+    newNotification.receiver = targetUser;
+    newNotification.type = 'followed';
+    newNotification.save();
     return res.status(200).json(response);
   }),
 );
@@ -213,7 +220,7 @@ userRouter.delete(
     const currentUser = await User.findOne({ where: { id: parseInt(userId) }, relations: ['following'] });
     const targetUsertoUnfollow = await User.findOne({
       where: { id: targetUserId },
-      relations: ['following', 'followers'],
+      relations: ['following', 'followers', 'notifications'],
     });
 
     if (!currentUser || !targetUser) {
@@ -232,6 +239,9 @@ userRouter.delete(
     targetUsertoUnfollow.followers = targetUsertoUnfollow.followers.filter((user) => user.id !== currentUser.id);
     await targetUsertoUnfollow.save();
 
+    const notification = await Notifications.findOne({ where: { user: { id: currentUser.id }, type: 'followed' } });
+
+    await currentUser.save();
     const response = {
       targetUser: {
         id: targetUsertoUnfollow.id,
@@ -244,7 +254,7 @@ userRouter.delete(
         profilePhoto: currentUser.profilePhoto,
       },
     };
-
+    await Notifications.delete(notification.id);
     return res.status(200).json(response);
   }),
 );
@@ -264,11 +274,11 @@ userRouter.put(
       return res.status(404).json('User not found');
     }
     if (header) {
-      user.headerPhoto = header[0].filename; 
+      user.headerPhoto = header[0].filename;
     }
 
     if (profile) {
-      user.profilePhoto = profile[0].filename; 
+      user.profilePhoto = profile[0].filename;
     }
     if (location) {
       user.country = location;
@@ -276,10 +286,46 @@ userRouter.put(
     if (bio) {
       user.bio = bio;
     }
-    
+
     await user.save();
 
     return res.status(200).json(user);
+  }),
+);
+userRouter.post(
+  '/notify-me/:userId',
+  tryCatch(async (req, res) => {
+    const userId = +req.params.userId;
+    const notifiedId = req.body.id;
+    const user = await User.findOne({ where: { id: userId }, relations: ['notifications'] });
+    const receiverUser = await User.findOne({ where: { id: notifiedId } });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    if (!user.notifications.includes(receiverUser)) {
+      user.notifications.push(receiverUser);
+      await user.save();
+      res.status(200).json({ message: 'successfully notified' });
+    } else {
+      res.status(200).json({ message: 'User already notified' });
+    }
+  }),
+);
+userRouter.delete(
+  '/notify-me/:userId',
+  tryCatch(async (req, res) => {
+    const userId = +req.params.userId;
+    const notifiedId = req.body.id;
+    const user = await User.findOne({ where: { id: userId }, relations: ['notifications'] });
+    const receiverUser = await User.findOne({ where: { id: notifiedId } });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    const filteredNotifications = user.notifications.filter((notifiedUser) => notifiedUser.id !== receiverUser.id);
+    user.notifications = filteredNotifications;
+    await user.save();
+    res.status(200).json({ message: 'successfully deleted' });
   }),
 );
 export default userRouter;
