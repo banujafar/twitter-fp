@@ -107,7 +107,6 @@ export const removeLike = createAsyncThunk(
   },
 );
 export const removeRetweet = createAsyncThunk('retweet/removeRetweet', async (rtwId: number) => {
-  console.log(rtwId);
   try {
     const response = await fetch(`${BASE_URL}/retweet/${rtwId}`, {
       method: 'DELETE',
@@ -169,7 +168,6 @@ const postSlice = createSlice({
       })
       .addCase(addPost.fulfilled, (state, action) => {
         const { originalPost, retweetedPost } = action.payload;
-        console.log(originalPost);
         if (originalPost && retweetedPost) {
           const updatedPosts = current(state.post).map((singlePost) => {
             if (singlePost.id === originalPost.id) {
@@ -184,7 +182,7 @@ const postSlice = createSlice({
           state.post = [...state.post, action.payload];
         }
 
-        // console.log(updatedPosts);
+        // updatedPosts);
 
         state.loading = false;
         state.error = null;
@@ -237,7 +235,7 @@ const postSlice = createSlice({
       .addCase(removeLike.fulfilled, (state, action) => {
         const removedLikeId = action.payload;
         const updatedPosts = state.post.map((p) => {
-          if (p.likes.some((like) => like.id === removedLikeId)) {
+          if (p.likes?.some((like) => like.id === removedLikeId)) {
             return {
               ...p,
               likes: p.likes.filter((like) => like.id !== removedLikeId),
@@ -288,7 +286,6 @@ const postSlice = createSlice({
             return singlePost;
           }
         });
-        console.log(updatedPosts);
         state.post = [...updatedPosts, retweetedPost];
         state.loading = false;
         state.error = null;
@@ -302,7 +299,6 @@ const postSlice = createSlice({
         state.error = null;
       })
       .addCase(removeRetweet.fulfilled, (state, action) => {
-        console.log(action.payload);
         const { retweetedPostId, mainPostId } = action.payload;
         const filteredPosts: IUserPost[] = current(state.post).filter((post) => post.id !== retweetedPostId);
         const updatedPosts = filteredPosts.map((singlePost) => {
