@@ -15,7 +15,7 @@ import { IUserPost } from '../models/post';
 import WhoToFollow from '../components/ui/Timeline/WhoToFollow';
 const Home = () => {
   const user = useSelector((state: RootState) => state.auth.user);
-  const socket = io('http://localhost:3000');
+  const socket = io('https://twitter-server-73xd.onrender.com');
   const dispatch = useDispatch<AppDispatch>();
   const [lastPosts, setLastPosts] = useState<IUserPost[]>([]);
   const { post } = useSelector((state: RootState) => state.post);

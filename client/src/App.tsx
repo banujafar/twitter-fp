@@ -97,6 +97,11 @@ function App() {
               </Layout>
             }
           />
+          <Route path="/post/:userid/:postid" element={
+              <Layout>
+                <Post />
+              </Layout>
+            } />
         </Route>
 
         <Route path="/register" element={<RegisterPage />} />

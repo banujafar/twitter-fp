@@ -118,7 +118,10 @@ postRouter.post(
       retweetedPost.mainPost = mainPost;
       retweetedPost.user = user;
       await retweetedPost.save();
-      return res.status(201).json({ ...post, retweeted: mainPost });
+      return res.status(201).json({
+        originalPost: { ...mainPost, retweets: [retweetedPost] },
+        retweetedPost: { ...post, retweeted: mainPost },
+      });
     }
 
     const newNotification = new Notifications();
@@ -259,6 +262,9 @@ postRouter.post(
         id: true,
         username: true,
         email: true,
+        profilePhoto: true,
+        country: true,
+        bio: true,
       },
     });
 
@@ -286,7 +292,10 @@ postRouter.post(
       newNotification.post = post;
       newNotification.type = 'retweeted';
       newNotification.save();
-      return res.status(201).json({ ...post, retweeted: mainPost });
+      return res.status(201).json({
+        originalPost: { ...mainPost, retweets: [retweetedPost] },
+        retweetedPost: { ...post, retweeted: mainPost },
+      });
     }
     return res.status(201).json(post);
   }),
@@ -297,17 +306,18 @@ postRouter.delete(
   '/retweet/:rtwId',
   tryCatch(async (req: Request, res: Response) => {
     const rtwId = +req.params.rtwId;
-    const retweeted = await PostRetweet.findOne({ where: { id: rtwId }, relations: ['user', 'post'] });
+    const retweeted = await PostRetweet.findOne({ where: { id: rtwId }, relations: ['user', 'post', 'mainPost'] });
     if (!retweeted) {
       return res.status(404).json({ error: 'Retweet not found' });
     }
     const postId = retweeted.post.id;
+    const mainPost = retweeted.mainPost;
     const retweetedPost = await UserPost.findOne({ where: { id: postId } });
     if (!retweetedPost) {
       return res.status(404).json({ error: 'Retweeted post not found' });
     }
     await Promise.allSettled([PostRetweet.delete(retweeted.id), UserPost.delete(retweetedPost.id)]);
-    return res.status(204).json('deleted successfully');
+    return res.status(200).json({ retweetedPostId: retweetedPost.id, mainPostId: mainPost.id });
   }),
 );
 postRouter.get(

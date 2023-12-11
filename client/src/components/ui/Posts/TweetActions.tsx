@@ -15,7 +15,7 @@ import { BsFillShareFill } from 'react-icons/bs';
 //   useGetPostsQuery,
 //   useRemoveLikeMutation,
 // } from '../../../store/features/post/postsApi';
-import { likePost, removeLike } from '../../../store/features/post/postSlice';
+import { likePost, removeLike, removeRetweet } from '../../../store/features/post/postSlice';
 import { socketRemoveNotification, socketRetweetPosts, socketSendNotification } from '../../../utils/socketClient';
 
 const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
@@ -121,15 +121,16 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
         setIsDropdownOpen(false);
 
         //await dispatch(getPosts() as any);
-        // } else {
-        //   const findedpost = postData.retweets?.find(
-        //     (retweet: any) => retweet.user.id === user?.userId && !retweet.post.content,
-        //   );
-        //   if (findedpost) {
-        //     await deleteRetweet(findedpost.id).then(() => {
-        //       setIsDropdownOpen(false);
-        //     });
-        //   }
+      } else {
+        const findedpost = postData.retweets?.find(
+          (retweet: any) => retweet.user.id === user?.userId && !retweet.post.content,
+        );
+        console.log(findedpost);
+        if (findedpost) {
+          await dispatch(removeRetweet(findedpost.id)).then(() => {
+            setIsDropdownOpen(false);
+          });
+        }
       }
     } catch (err) {
       console.log(err);
@@ -161,7 +162,7 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
               onClick={(e) => handlePostRetweet(postData.id, e)}
             >
               <AiOutlineRetweet className="text-lg" />
-              <span>{/* {!isRetweeted ? 'Repost' : 'Undo Repost'} */}Repost</span>
+              <span>{!isRetweeted ? 'Repost' : 'Undo Repost'}</span>
             </li>
             <li className="flex items-center gap-2 text-gray-700 hover:text-green-500" onClick={handleOpenQuoteModal}>
               <CiEdit className="text-lg" />
