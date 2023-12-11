@@ -41,7 +41,14 @@ const socketService = (io) => {
       receivers.map((receiver) => {
         io.to(receiver.socketId).emit('getRetweetedPosts',data);
       });
+
+      socket.on('sendMessage', ({ chat_id, sender_id, text }) => {
+        console.log('Received new message:', text);
+        io.emit('receiveMessage', { chat_id, sender_id, text });
+      });
+
     });
+
     socket.on('disconnect', () => {
       console.log('A user disconnected');
       removeUser(socket.id);

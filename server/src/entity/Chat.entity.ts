@@ -1,5 +1,6 @@
-import { Entity, BaseEntity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, BaseEntity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { User } from './user.entity';
+import { Message } from './Message.entity';
 
 @Entity()
 export class Chat extends BaseEntity {
@@ -13,4 +14,7 @@ export class Chat extends BaseEntity {
     @ManyToOne(() => User, {cascade: true})
     @JoinColumn({ name: 'user2_id' })
     user2: User;
+
+    @OneToMany(() => Message, (message) => message.chat,  { cascade: true })
+    messages: Message[];
 }

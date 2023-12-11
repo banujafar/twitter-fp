@@ -10,14 +10,14 @@ const messageRouter = Router();
 messageRouter.post(
   '/',
   tryCatch(async (req: Request, res: Response) => {
-    const { chatId, senderId, text } = req.body;
+    const { chat_id, sender_id, text } = req.body;
 
-    if (!chatId || !senderId || !text) {
+    if (!chat_id || !sender_id || !text) {
       throw new AppError('req body not found', 400);
     }
 
     const sender = await User.findOne({
-      where: { id: senderId },
+      where: { id: sender_id },
       select: {
         id: true,
         username: true,
@@ -30,13 +30,12 @@ messageRouter.post(
     }
 
     const chat = await Chat.findOne({
-      where: { id: chatId },
+      where: { id: chat_id },
     });
 
     if (!chat) {
       throw new AppError('Chat not found', 404);
     }
-    
 
     const message = new Message();
     message.chat = chat;
@@ -63,6 +62,8 @@ messageRouter.get(
       where: { chat: { id: parseInt(chatId, 10) } },
       relations: ['sender', 'chat'],
     });
+
+    const response = messages.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
 
     return res.status(200).json(messages);
   }),

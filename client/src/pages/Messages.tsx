@@ -9,6 +9,7 @@ import { getUserChats } from '../store/features/chat/chatSlice';
 import { getMessages, sendMessage } from '../store/features/message/messageSlice';
 import { IMessage } from '../models/message';
 import MessageItem from '../components/ui/Messages/MessageItem';
+import { io } from 'socket.io-client';
 
 const Messages = () => {
   const dispatch = useDispatch();
@@ -23,20 +24,42 @@ const Messages = () => {
   const selectedChatData = userChats.find((chat) => chat.id === selectedChat);
   const userData = selectedChatData?.user1.id === user?.userId ? selectedChatData?.user2 : selectedChatData?.user1;
 
-  console.log(messages)
+  const socket = io('http://localhost:3000/');
 
   useEffect(() => {
     const userId = user?.userId;
     dispatch(getUserChats(userId) as any);
-  }, [dispatch]);
+
+    socket.emit('newUser', { username: user?.username });
+
+    return () => {
+      socket.disconnect();
+    };
+
+  }, [dispatch, user]);
+
+  useEffect(() => {
+    socket.emit('newUser', { username: user?.username });
+
+    socket.on('receiveMessage', ({ chat_id }) => {
+      if (chat_id === selectedChat) {
+        dispatch(getMessages(chat_id) as any);
+      }
+    });
+  
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [dispatch, selectedChatData, user]);
 
   const handleChatItemClick = (chatId: number) => {
     setSelectedChat(chatId);
   };
 
   useEffect(() => {
-    const chatId = selectedChat;
-    dispatch(getMessages(chatId) as any);
+    const chat_id = selectedChat;
+    dispatch(getMessages(chat_id) as any);   
   }, [dispatch, selectedChatData]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,15 +68,16 @@ const Messages = () => {
 
   const handleSendMessage = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const chatId = selectedChat;
-    const senderId = user?.userId;
+    const chat_id = selectedChat;
+    const sender_id = user?.userId;
     const text = messageText;
 
     if (!text.length) {
       return;
     }
 
-    await dispatch(sendMessage({ chatId, senderId, text }) as any);
+    await dispatch(sendMessage({ chat_id, sender_id, text }) as any);
+    socket.emit('sendMessage', { chat_id, sender_id, text });
     setMessageText('');
   };
 
