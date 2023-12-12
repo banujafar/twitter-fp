@@ -2,8 +2,6 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
 // import { FaHeart, FaRegComment, FaRegHeart } from 'react-icons/fa';
-// import { AiOutlineRetweet } from 'react-icons/ai';
-//import { BsFillShareFill } from 'react-icons/bs';
 import SinglePost, { UserAvatar } from './SinglePost';
 import { IoMdArrowBack } from 'react-icons/io';
 import { formattedDate } from '../../../utils/FormatDate';
@@ -14,7 +12,6 @@ import QuoteModal from '../../modals/QuoteModal';
 import CommentModal from '../../modals/CommentModal';
 import { useEffect } from 'react';
 import { getPosts } from '../../../store/features/post/postSlice';
-//import { useGetPostsQuery } from '../../../store/features/post/postsApi';
 
 const PostsDetail = () => {
   const dispatch = useDispatch();

@@ -74,6 +74,76 @@ postRouter.get(
     return res.status(200).json(result);
   }),
 );
+//get single post
+postRouter.get(
+  '/:postId',
+  tryCatch(async (req: Request, res: Response) => {
+    const postId = +req.params.postId;
+
+    const post = await UserPost.findOne({
+      where: { id: postId },
+      relations: ['user', 'likes', 'comments'],
+      select: { user: { id: true, username: true, email: true, profilePhoto: true } },
+    });
+
+    const retweets = await PostRetweet.find({
+      where: { post: { id: postId } },
+      relations: ['post', 'user', 'mainPost'],
+    });
+
+    if (!post) {
+      throw new AppError('Post not found', 404);
+    }
+
+    const likes = await LikedPost.find({
+      where: { post: { id: post.id } },
+      relations: ['post', 'user'],
+      select: { user: { id: true, username: true, email: true } },
+    });
+
+    const comments = await PostComment.find({
+      where: { post: { id: post.id } },
+      relations: ['user', 'post'],
+    });
+
+    const retweetsForPost = retweets.filter((retweet) => retweet.mainPost.id === post.id);
+    const retweet = retweets.find((retweet) => retweet.post.id === post.id);
+
+    const retweeted =
+      retweet &&
+      (await UserPost.findOne({
+        where: { id: retweet.mainPost?.id },
+        relations: ['user', 'likes', 'comments'],
+      }));
+
+    const result = {
+      ...post,
+      likes: likes.map((like) => ({
+        id: like.id,
+        liked_time: like.liked_time,
+        post: like.post,
+        user: like.user,
+      })),
+      comments: comments.map((comment) => ({
+        id: comment.id,
+        comment: comment.comment_text,
+        post: comment.post,
+        user: comment.user,
+        created_time: comment.created_time,
+      })),
+      retweets: retweetsForPost.map((r) => ({
+        id: r.id,
+        created_time: r.retweeted_time,
+        post: r.post,
+        mainPost: r.mainPost,
+        user: { id: r.user.id, username: r.user.username, profilePhoto: r.user.profilePhoto },
+      })),
+      retweeted: retweeted,
+    };
+
+    return res.status(200).json(result);
+  }),
+);
 
 // add new post
 postRouter.post(

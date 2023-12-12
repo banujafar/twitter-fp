@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { INotificationsState } from '../../../models/post';
-
+import {  INotificationsState } from '../../../models/post';
 
 const BASE_URL = 'https://twitter-server-73xd.onrender.com/api/posts';
 
@@ -42,7 +41,7 @@ const notificationsSlice = createSlice({
     loading: false,
   } as INotificationsState,
   reducers: {
-    addNotification: (state, action: PayloadAction<Notification>) => {
+    addNotification: (state, action) => {
       state.notifications.push(action.payload);
     },
     removeNotification: (state, action: PayloadAction<{ postId: number }>) => {
