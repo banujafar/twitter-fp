@@ -14,7 +14,7 @@ const Modal: React.FC<{ modal: IModal }> = ({ modal }) => {
   };
   return (
     <div className=' flex justify-center items-center'>
-      <div className="z-50 max-w-lg w-2/3 bg-black rounded-lg px-8 pt-8 pb-16 border-gray-700 border-2 fixed top-24 ">
+      <div className="z-50 max-w-lg w-2/3 bg-white rounded-lg px-8 pt-8 pb-16 border-gray-700 border-2 fixed top-24 overflow-y-scroll max-h-[80%]">
         <div className="flex justify-between items-center mb-4 text-gray-700">
           <span className="text-2xl text-gray-700 cursor-pointer" onClick={handleCloseModal}>
             X
