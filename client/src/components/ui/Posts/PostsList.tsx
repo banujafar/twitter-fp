@@ -6,7 +6,6 @@ import { IUserPost } from '../../../models/post';
 import { modalIsOpenSelector } from '../../../store/features/modal/modalSlice';
 import QuoteModal from '../../modals/QuoteModal';
 import CommentModal from '../../modals/CommentModal';
-//import { useGetPostsQuery } from '../../../store/features/post/postsApi';
 import CreatePost from './CreatePost';
 import { getPosts } from '../../../store/features/post/postSlice';
 

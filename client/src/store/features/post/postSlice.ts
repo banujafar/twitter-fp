@@ -1,25 +1,15 @@
 import { createAsyncThunk, createSlice, current } from '@reduxjs/toolkit';
 import { IPostInitialState, IUserPost } from '../../../models/post';
+import fetchWrapper from '../../helpers/fetchWrapper';
 
 const BASE_URL = 'https://twitter-server-73xd.onrender.com/api/posts';
-export const getPosts = createAsyncThunk('post/getPosts', async () => {
-  try {
-    const response = await fetch(`${BASE_URL}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
 
-    if (!response.ok) {
-      throw new Error('Error');
-    }
+export const getPosts = createAsyncThunk('like/getPosts', async () => {
+  return fetchWrapper(`${BASE_URL}`, 'GET');
+});
 
-    const responseData = await response.json();
-    return responseData;
-  } catch (error) {
-    throw error;
-  }
+export const getPost = createAsyncThunk('like/getPost', async (postId: number) => {
+  return fetchWrapper(`${BASE_URL}/${postId}`, 'GET');
 });
 
 export const addPost = createAsyncThunk('post/addPost', async (formData: FormData) => {
@@ -43,110 +33,29 @@ export const addPost = createAsyncThunk('post/addPost', async (formData: FormDat
 export const likePost = createAsyncThunk(
   'like/likePost',
   async ({ postId, userId }: { postId: number; userId: number }) => {
-    try {
-      const response = await fetch(`${BASE_URL}/like`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ postId, userId }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Error');
-      }
-
-      const responseData = await response.json();
-      return responseData;
-    } catch (error) {
-      throw error;
-    }
+    return fetchWrapper(`${BASE_URL}/like`, 'POST', { postId, userId });
   },
 );
+
 export const addComment = createAsyncThunk('post/addComment', async (formData: any) => {
-  try {
-    const response = await fetch(`${BASE_URL}/comment`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData),
-    });
-
-    if (!response.ok) {
-      throw new Error('Error');
-    }
-
-    const responseData = await response.json();
-    return responseData;
-  } catch (error) {
-    throw error;
-  }
+  return fetchWrapper(`${BASE_URL}/comment`, 'POST', formData);
 });
+
 export const removeLike = createAsyncThunk(
   'like/removeLike',
   async ({ postId, userId }: { postId: number; userId: number }) => {
-    try {
-      const response = await fetch(`${BASE_URL}/like`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ postId, userId }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Error');
-      }
-
-      const responseData = await response.json();
-      return responseData;
-    } catch (error) {
-      throw error;
-    }
+    return fetchWrapper(`${BASE_URL}/like`, 'DELETE', { postId, userId });
   },
 );
+
 export const removeRetweet = createAsyncThunk('retweet/removeRetweet', async (rtwId: number) => {
-  try {
-    const response = await fetch(`${BASE_URL}/retweet/${rtwId}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error('Error');
-    }
-
-    const responseData = await response.json();
-    return responseData;
-  } catch (error) {
-    throw error;
-  }
+  return fetchWrapper(`${BASE_URL}/retweet/${rtwId}`, 'DELETE');
 });
 
 export const retweetPost = createAsyncThunk(
-  'post/retweetPost',
+  'retweet/retweetPost',
   async ({ content, userId, rtwId }: { content?: string; userId: number; rtwId: number }) => {
-    try {
-      const response = await fetch(`${BASE_URL}/retweet`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ content, userId, rtwId }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Error');
-      }
-
-      const responseData = await response.json();
-      return responseData;
-    } catch (error) {
-      throw error;
-    }
+    return fetchWrapper(`${BASE_URL}/retweet`, 'POST', { content, userId, rtwId });
   },
 );
 
@@ -163,27 +72,19 @@ const postSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(addPost.pending, (state) => {
-        //state.loading = true;
         state.error = null;
       })
       .addCase(addPost.fulfilled, (state, action) => {
-        const { originalPost, retweetedPost } = action.payload;
-        if (originalPost && retweetedPost) {
+        const { originalPost } = action.payload;
+        if (originalPost) {
           const updatedPosts = current(state.post).map((singlePost) => {
             if (singlePost.id === originalPost.id) {
               return originalPost;
-            } else {
-              return singlePost;
             }
+            return singlePost;
           });
-
-          state.post = [...updatedPosts, retweetedPost];
-        } else {
-          state.post = [...state.post, action.payload];
+          state.post = updatedPosts;
         }
-
-        // updatedPosts);
-
         state.loading = false;
         state.error = null;
       })
@@ -204,13 +105,24 @@ const postSlice = createSlice({
         state.loading = false;
         state.error = action.error.message || null;
       })
+      .addCase(getPost.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(getPost.fulfilled, (state, action) => {
+        state.post = [...state.post, action.payload];
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(getPost.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || null;
+      })
       .addCase(likePost.pending, (state) => {
         state.error = null;
         state.loading = true;
       })
       .addCase(likePost.fulfilled, (state, action) => {
         const likedPost = action.payload;
-
         const updatedPosts = state.post.map((p) => {
           if (p.id === likedPost.post.id) {
             return {
@@ -274,19 +186,17 @@ const postSlice = createSlice({
         state.error = action.error.message || null;
       })
       .addCase(retweetPost.pending, (state) => {
-        //state.loading = true;
         state.error = null;
       })
       .addCase(retweetPost.fulfilled, (state, action) => {
-        const { originalPost, retweetedPost } = action.payload;
-        const updatedPosts = current(state.post).map((singlePost) => {
-          if (singlePost.id === originalPost.id) {
+        const { originalPost } = action.payload;
+        const updatedPosts = current(state.post).map((post) => {
+          if (post.id === originalPost.id) {
             return originalPost;
-          } else {
-            return singlePost;
           }
+          return post;
         });
-        state.post = [...updatedPosts, retweetedPost];
+        state.post = updatedPosts;
         state.loading = false;
         state.error = null;
       })
@@ -295,7 +205,6 @@ const postSlice = createSlice({
         state.error = action.error.message || null;
       })
       .addCase(removeRetweet.pending, (state) => {
-        //state.loading = true;
         state.error = null;
       })
       .addCase(removeRetweet.fulfilled, (state, action) => {

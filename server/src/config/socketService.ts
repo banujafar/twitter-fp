@@ -31,14 +31,21 @@ const socketService = (io) => {
       });
     });
     socket.on('realTimePosts', (data) => {
-      console.log(data);
-      console.log(onlineUsers);
-      io.to(onlineUsers.map((user) => user.socketId)).emit('getRealTimePosts', data);
+      onlineUsers.forEach((user) => {
+        // Check if the user is not the sender
+        io.to(user.socketId).emit('getRealTimePosts', data);
+      });
     });
     socket.on('addRetweet', (data) => {
       const receivers = onlineUsers;
       receivers.map((receiver) => {
         io.to(receiver.socketId).emit('getRetweetedPosts', data);
+      });
+    });
+    socket.on('removeRetweet', (data) => {
+      const receivers = onlineUsers;
+      receivers.map((receiver) => {
+        io.to(receiver.socketId).emit('removeRetweetedPosts', data);
       });
     });
     socket.on('sendMessage', ({ chat_id, sender_id, text }) => {

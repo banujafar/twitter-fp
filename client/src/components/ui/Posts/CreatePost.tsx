@@ -6,14 +6,13 @@ import { HiOutlineGif } from 'react-icons/hi2';
 import { MdClose } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../store';
-// import { jwtDecode } from 'jwt-decode';
-// import { IDecodedToken } from '../../models/auth';
 import { setIsOpen } from '../../../store/features/modal/modalSlice';
 import { getUsers } from '../../../store/features/user/userSlice';
 import { socketRealTimePosts, socketSendNotification } from '../../../utils/socketClient';
 import { setPostModal } from '../../../store/features/modal/postModalSlice';
+import { addPost } from '../../../store/features/post/postSlice';
+
 const CreatePost: React.FC<{ content?: any; inModal?: boolean }> = ({ content, inModal }) => {
-  console.log(inModal);
   const [text, setText] = useState('');
   const [selectedFile, setSelectedFile] = useState<File[] | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -30,19 +29,40 @@ const CreatePost: React.FC<{ content?: any; inModal?: boolean }> = ({ content, i
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     if ((!text || !text.trim().length) && !selectedFile) {
       return;
     }
-    console.log(selectedFile)
-    try {
-      socketRealTimePosts({
-        content: text,
-        user_id: user?.userId,
-        files: selectedFile,
-        retweeted_id: quoteModalContent?.id,
+
+    const formData = new FormData();
+    formData.append('content', text);
+
+    if (user?.userId) {
+      formData.append('user_id', user.userId.toString());
+    }
+
+    if (selectedFile) {
+      selectedFile.forEach((file) => {
+        formData.append('files', file);
       });
+    }
+
+    if (quoteModalContent) {
+      formData.append('retweeted_id', quoteModalContent.id.toString());
+    }
+
+    try {
+      const result = await dispatch(addPost(formData));
+
+      if (result.payload) {
+        const postId = quoteModalContent ? result.payload?.retweetedPost.id : result.payload?.id;
+        console.log(result.payload);
+        socketRealTimePosts(postId);
+      }
+
       setText('');
       setSelectedFile(null);
+
       currentUserInfo?.notifications?.forEach((current) => {
         socketSendNotification({
           username: user?.username,
@@ -50,12 +70,14 @@ const CreatePost: React.FC<{ content?: any; inModal?: boolean }> = ({ content, i
           action: 'created post',
         });
       });
+
       dispatch(setIsOpen({ id: 'modalQuote', isOpen: false }));
       dispatch(setPostModal({ isOpen: false }));
     } catch (error) {
       console.error('Error submitting post:', error);
     }
   };
+
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     event.stopPropagation();
     const fileInput = event.target;
@@ -138,7 +160,7 @@ const CreatePost: React.FC<{ content?: any; inModal?: boolean }> = ({ content, i
                 ))}
             </div>
             {content && <div>{content}</div>}
-             <div className="flex items-center gap-4 justify-between mt-5">
+            <div className="flex items-center gap-4 justify-between mt-5">
               <div className="flex items-center">
                 <label
                   htmlFor={content ? 'modalImageInput' : 'imageInput'}

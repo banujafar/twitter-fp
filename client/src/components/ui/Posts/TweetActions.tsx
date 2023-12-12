@@ -2,31 +2,27 @@ import React, { useEffect, useRef, useState } from 'react';
 import { AiOutlineRetweet } from 'react-icons/ai';
 import { FaHeart, FaRegComment, FaRegHeart } from 'react-icons/fa';
 import { IUserPost } from '../../../models/post';
-//import { likePost, removeLike, retweetPost } from '../../../store/features/post/postSlice';
 import { setIsOpen } from '../../../store/features/modal/modalSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../store';
 import { CiEdit } from 'react-icons/ci';
 import { BsFillShareFill } from 'react-icons/bs';
-// import {
-//   useAddLikeMutation,
-//   useAddRetweetMutation,
-//   useDeleteRetweetMutation,
-//   useGetPostsQuery,
-//   useRemoveLikeMutation,
-// } from '../../../store/features/post/postsApi';
-import { likePost, removeLike, removeRetweet } from '../../../store/features/post/postSlice';
-import { socketRemoveNotification, socketRetweetPosts, socketSendNotification } from '../../../utils/socketClient';
+import { likePost, removeLike, retweetPost } from '../../../store/features/post/postSlice';
+import {
+  socketRemoveNotification,
+  socketRemoveRetweets,
+  socketRetweetPosts,
+  socketSendNotification,
+} from '../../../utils/socketClient';
 
 const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user);
-  // const { data } = useGetPostsQuery();
   const userLikedPosts = postData.likes?.some((like) => like?.user?.id === user?.userId);
-  const retweets=postData.retweets?.filter((rt:any)=>!(rt.post?.content))
-  const isRetweeted = retweets?.some((rt: any) => rt?.user?.id === user?.userId );
+  const retweets = postData.retweets?.filter((rt: any) => !rt.post?.content);
+  const isRetweeted = retweets?.some((rt: any) => rt?.user?.id === user?.userId);
 
   const handleRetweet = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -79,16 +75,14 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
           action: 'liked',
         });
       } else {
+        await dispatch(likePost(data));
         socketSendNotification({
           username: user?.username,
           receiverName: postData?.user.username,
           postId: postData.id,
           action: 'liked',
         });
-        await dispatch(likePost(data));
       }
-
-      console.log('liked');
     } catch (err) {
       console.log(err);
     }
@@ -108,27 +102,27 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
       };
 
       if (!isRetweeted) {
-        socketSendNotification({
-          username: user?.username,
-          receiverName: postData?.user.username,
-          postId: postData.id,
-          action: 'retweeted',
-        });
-        socketRetweetPosts(retweetData);
-        setIsDropdownOpen(false);
-
-        //await dispatch(getPosts() as any);
+        const result = await dispatch(retweetPost(retweetData));
+        if (result.payload) {
+          const postId = result.payload.retweetedPost.id;
+          socketRetweetPosts(postId);
+          setIsDropdownOpen(false);
+        }
       } else {
         const findedpost = postData.retweets?.find(
           (retweet: any) => retweet.user.id === user?.userId && !retweet.post.content,
         );
-        console.log(findedpost);
         if (findedpost) {
-          await dispatch(removeRetweet(findedpost.id)).then(() => {
-            setIsDropdownOpen(false);
-          });
+          socketRemoveRetweets(findedpost.id);
+          setIsDropdownOpen(false);
         }
       }
+      socketSendNotification({
+        username: user?.username,
+        receiverName: postData?.user.username,
+        postId: postData.id,
+        action: 'retweeted',
+      });
     } catch (err) {
       console.log(err);
     }
