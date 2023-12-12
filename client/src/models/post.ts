@@ -22,6 +22,7 @@ export interface IUserPost {
   created_date: Date;
   retweeted: IUserPost | null;
   retweets: IUserPost[] | null;
+  post?: IUserPost;
   likes: ILike[];
   comments: IComment[];
 }

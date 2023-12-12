@@ -68,7 +68,13 @@ const initialState: IPostInitialState = {
 const postSlice = createSlice({
   name: 'post',
   initialState,
-  reducers: {},
+  reducers: {
+    filterRetweet: (state, action) => {
+      console.log(action.payload)
+      state.post = current(state.post).filter((item) => item.id !== action.payload);
+      console.log(state.post)
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(addPost.pending, (state) => {
@@ -190,6 +196,7 @@ const postSlice = createSlice({
       })
       .addCase(retweetPost.fulfilled, (state, action) => {
         const { originalPost } = action.payload;
+        console.log(action.payload)
         const updatedPosts = current(state.post).map((post) => {
           if (post.id === originalPost.id) {
             return originalPost;
@@ -230,4 +237,5 @@ const postSlice = createSlice({
   },
 });
 
+export const { filterRetweet } = postSlice.actions;
 export default postSlice.reducer;

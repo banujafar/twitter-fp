@@ -67,7 +67,7 @@ const CreatePost: React.FC<{ content?: any; inModal?: boolean }> = ({ content, i
         socketSendNotification({
           username: user?.username,
           receiverName: current.username,
-          action: 'created post',
+          action: 'created',
         });
       });
 

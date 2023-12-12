@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../store';
 import { CiEdit } from 'react-icons/ci';
 import { BsFillShareFill } from 'react-icons/bs';
-import { likePost, removeLike, retweetPost } from '../../../store/features/post/postSlice';
+import { likePost, removeLike, removeRetweet, retweetPost } from '../../../store/features/post/postSlice';
 import {
   socketRemoveNotification,
   socketRemoveRetweets,
@@ -102,7 +102,14 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
       };
 
       if (!isRetweeted) {
+        console.log(postData);
         const result = await dispatch(retweetPost(retweetData));
+        socketSendNotification({
+          username: user?.username,
+          receiverName: postData?.user.username,
+          postId: postData.id,
+          action: 'retweeted',
+        });
         if (result.payload) {
           const postId = result.payload.retweetedPost.id;
           socketRetweetPosts(postId);
@@ -112,17 +119,20 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
         const findedpost = postData.retweets?.find(
           (retweet: any) => retweet.user.id === user?.userId && !retweet.post.content,
         );
+        console.log(findedpost);
         if (findedpost) {
-          socketRemoveRetweets(findedpost.id);
+          await dispatch(removeRetweet(findedpost.id)).then(() => {
+            socketRemoveRetweets(findedpost.post?.id);
+          });
+          socketRemoveNotification({
+            username: user?.username,
+            receiverName: postData?.user.username,
+            postId: postData.id,
+            action: 'retweeted',
+          });
           setIsDropdownOpen(false);
         }
       }
-      socketSendNotification({
-        username: user?.username,
-        receiverName: postData?.user.username,
-        postId: postData.id,
-        action: 'retweeted',
-      });
     } catch (err) {
       console.log(err);
     }

@@ -214,7 +214,7 @@ postRouter.post(
       newNotification.receiver = notification;
     });
     newNotification.post = post;
-    newNotification.type = 'created post';
+    newNotification.type = 'created';
     newNotification.save();
     return res.status(201).json(post);
   }),
@@ -259,7 +259,7 @@ postRouter.post(
     newNotification.user = user;
     newNotification.receiver = receiver;
     newNotification.post = post;
-    newNotification.type = 'like';
+    newNotification.type = 'liked';
     newNotification.save();
     res.status(200).json(completeLikedPost);
   }),
@@ -282,7 +282,7 @@ postRouter.delete(
       return res.status(404).json({ error: 'Like not found' });
     }
     const notification = await Notifications.findOne({ where: { post: { id: postId } } });
-    await Promise.allSettled([Notifications.delete(notification.id), LikedPost.delete(existingLike.id)]);
+    await Promise.allSettled([Notifications.delete(notification?.id), LikedPost.delete(existingLike.id)]);
     res.status(200).json(existingLike.id);
   }),
 );
@@ -386,9 +386,16 @@ postRouter.post(
         select: { user: { id: true, username: true, email: true } },
       });
       const comments = await PostComment.find({ where: { post: { id: mainPost.id } }, relations: ['user', 'post'] });
+      const retweet = retweets.find((retweet) => retweet.post.id == mainPost.id);
 
+      const retweeted =
+        retweet &&
+        (await UserPost.findOne({
+          where: { id: retweet.mainPost?.id },
+          relations: ['user', 'likes', 'comments'],
+        }));
       return res.status(201).json({
-        originalPost: { ...mainPost, retweets: retweetsForPost, likes, comments },
+        originalPost: { ...mainPost, retweets: retweetsForPost, likes, comments, retweeted: retweeted },
         retweetedPost: { ...post, retweeted: mainPost },
       });
     } else {
@@ -428,6 +435,7 @@ postRouter.get(
       relations: ['user', 'post'],
     });
     const modifiedNotifications = notifications.map((notification) => ({
+      id: notification.id,
       postId: notification.post?.id,
       senderName: notification.user.username,
       type: notification.type,
@@ -445,6 +453,7 @@ postRouter.post(
       relations: ['user', 'post'],
     });
     const modifiedNotifications = notifications.map((notification) => ({
+      id: notification.id,
       postId: notification.post?.id,
       senderName: notification.user.username,
       sender_id: notification.user.id,
