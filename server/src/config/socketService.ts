@@ -31,18 +31,15 @@ const socketService = (io) => {
       });
     });
     socket.on('realTimePosts', (data) => {
-      console.log(data)
-        io.emit('getRealTimePosts', data);
-      
+      console.log(data);
+      console.log(onlineUsers);
+      io.to(onlineUsers.map((user) => user.socketId)).emit('getRealTimePosts', data);
     });
     socket.on('addRetweet', (data) => {
       const receivers = onlineUsers;
       receivers.map((receiver) => {
-        io.to(receiver.socketId).emit('getRetweetedPosts',data);
+        io.to(receiver.socketId).emit('getRetweetedPosts', data);
       });
-
-     
-
     });
     socket.on('sendMessage', ({ chat_id, sender_id, text }) => {
       console.log('Received new message:', text);
