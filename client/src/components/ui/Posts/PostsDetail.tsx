@@ -44,7 +44,7 @@ const PostsDetail = () => {
         selectedData.length > 0 &&
         selectedData?.map((data) => {
           return (
-            <>
+            <div key={data.id}>
               {data.retweeted ? (
                 <>
                   <div className="border-b border-gray-200">
@@ -93,7 +93,7 @@ const PostsDetail = () => {
 
               {isOpenQuote && <QuoteModal />}
               {isOpenComment && <CommentModal />}
-            </>
+              </div>
           );
         })}
     </>
