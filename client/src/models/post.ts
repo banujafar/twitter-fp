@@ -6,13 +6,6 @@ export interface ILike {
   post: IUserPost;
   liked_time: Date;
 }
-// TODO: it should be fixed, comment returns:
-// {
-//   "id": 39,
-//   "comment": "test",
-//   "postId": 245,
-//   "userId": 151
-// }
 export interface IComment {
   id: number;
   comment: string;
@@ -58,7 +51,7 @@ export interface INotifications {
 }
 
 export interface INotificationsState {
-  notifications: Notification[];
+  notifications: INotifications[];
   error: string | null;
   loading: boolean;
 }
