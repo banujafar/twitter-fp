@@ -50,7 +50,7 @@ const UserProfilePosts = ({ username }: { username: string | undefined }) => {
             (singlePost) => singlePost.retweets?.find((retweet: any) => retweet.post.id === postData.id),
           );
           return isRetweet && !!isRetweet.length ? (
-            <>
+            <div key={postData.id}>
               <div className="cursor-pointer border-b border-gray-200 transition ease-in hover:bg-[#f7f7f7]">
                 <SinglePost postData={postData} size={64} />
                 <div className="px-8 border rounded-xl mx-8">
@@ -58,14 +58,14 @@ const UserProfilePosts = ({ username }: { username: string | undefined }) => {
                 </div>
                 <TweetActions postData={postData} />
               </div>
-            </>
+            </div>
           ) : (
-            <>
+            <div key={postData.id}>
               <div className="border-b border-gray-200 cursor-pointer transition ease-in hover:bg-[#f7f7f7]">
                 <SinglePost postData={postData} size={64} />
                 <TweetActions postData={postData} />
               </div>
-            </>
+            </div>
           );
         })
       ) : (

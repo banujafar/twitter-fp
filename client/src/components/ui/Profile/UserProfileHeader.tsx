@@ -62,6 +62,7 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
       });
     } else {
       await dispatch(unfollowUser({ userId, targetUser }) as any);
+      await dispatch(getUsers() as any)
       socketRemoveNotification({
         username: user?.username,
         receiverName: userInfo?.username,

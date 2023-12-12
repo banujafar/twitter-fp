@@ -54,7 +54,7 @@ export const getMessages = createAsyncThunk('message/getMessages', async (chat_i
 
 export const markMessagesAsRead = createAsyncThunk('message/readMessage',async (chat_id: number) => {
   try {
-    const response = await fetch(`http://localhost:3000/api/messages/mark-as-read`, {
+    const response = await fetch(`https://twitter-server-73xd.onrender.com/api/messages/mark-as-read`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
