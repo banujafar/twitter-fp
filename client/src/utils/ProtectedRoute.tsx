@@ -14,6 +14,7 @@ const ProtectedRoute = () => {
   useEffect(() => {
     const fetchData = async () => {
       await dispatch(checkAuth()).then((res) => {
+        console.log(res.payload)
         if (res.payload?.error) {
           navigate('/login');
         }
