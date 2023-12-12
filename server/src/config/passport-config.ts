@@ -1,4 +1,3 @@
-import jwt from 'jsonwebtoken';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { User } from '../entity/user.entity.ts';
 import bcrypt from 'bcrypt';
@@ -8,8 +7,6 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth2';
 import { Request } from 'express';
 import AppError from './appError.ts';
 
-
-let token:string;
 const Base_Client_Url = process.env.CLIENT_URL || 'http://localhost:5173/';
 
 //Login user with email or username with using passport local strategy
@@ -98,27 +95,21 @@ const passportConfig = (passport: PassportStatic) => {
     ),
   );
 
-
-  passport.serializeUser((user: User, done) => {
-    const userId = user.id;
-    const username = user.username;
-
-    token = jwt.sign({ userId, username }, process.env.SECRET_KEY, {
-      expiresIn: '1h',
-    });
-    done(null, { token });
+  passport.serializeUser((user:User, done) => {
+    // auth_token = jwt.sign({ userId, username }, process.env.SECRET_KEY, {
+    //   expiresIn: '1h',
+    // });
+    const { id, username } = user;
+    done(null, { id, username });
   });
 
   passport.deserializeUser((user: User, done) => {
-    const userId = user.id;
-    const username = user.username;
-
-    token = jwt.sign({ userId, username }, process.env.SECRET_KEY, {
-      expiresIn: '1h',
-    });
-    done(null, { token });
+    // auth_token = jwt.sign({ userId, username }, process.env.SECRET_KEY, {
+    //   expiresIn: '1h',
+    // });
+    const { id, username } = user;
+    done(null, { id, username });
   });
 };
 
 export default passportConfig;
-export {token}

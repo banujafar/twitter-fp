@@ -32,10 +32,8 @@ const socketService = (io) => {
     });
     socket.on('realTimePosts', (data) => {
       console.log(data)
-      const receivers = onlineUsers;
-      receivers.map((receiver) => {
-        io.to(receiver.socketId).emit('getRealTimePosts', data);
-      });
+        io.emit('getRealTimePosts', data);
+      
     });
     socket.on('addRetweet', (data) => {
       const receivers = onlineUsers;

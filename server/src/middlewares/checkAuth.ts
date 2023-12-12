@@ -2,12 +2,29 @@ import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import AppError from '../config/appError.ts';
 import tryCatch from '../utils/tryCatch.ts';
+import { User } from '../entity/user.entity.ts';
 
-//check Authentication
-const checkAuthMiddleware = tryCatch((req: Request, res: Response, next: NextFunction) => {
+// Check Authentication
+const checkAuthMiddleware = tryCatch((req, res: Response, next: NextFunction) => {
   if (req.isAuthenticated()) {
+    const user = req.user;
+    const { id, username } = user;
+    console.log(id, username);
+
     const { auth_token } = req.cookies;
-    console.log(auth_token,process.env.SECRET_KEY)
+
+    if (!auth_token) {
+      // If auth_token doesn't exist, create a new token and set it in the response cookies
+      const newToken = jwt.sign({ id, username }, process.env.SECRET_KEY, {
+        expiresIn: '1h',
+      });
+      res.cookie('auth_token', newToken, {
+        httpOnly: true,
+        expires: new Date(Date.now() + 1 * 3600000),
+      });
+    }
+
+    // Verify the existing or newly created token
     jwt.verify(auth_token, process.env.SECRET_KEY, (err, decoded) => {
       if (err) {
         throw new AppError(err.message, err.statusCode);
