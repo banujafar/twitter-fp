@@ -37,27 +37,19 @@ const socketRemoveNotification = ({
     postId: postId,
   });
 };
-const socketRealTimePosts = ({
-  content,
-  retweeted_id,
-  user_id,
-  files,
-}: {
-  content: string;
-  retweeted_id: number | undefined;
-  user_id: number | undefined;
-  files: File[] | null;
-}) => {
-  console.log(files)
-  socket.emit('realTimePosts', {
-    
-    content,
-    user_id,
-    files,
-    retweeted_id,
-  });
+const socketRealTimePosts = (postId: number | undefined) => {
+  socket.emit('realTimePosts', postId);
 };
-const socketRetweetPosts = (data: any) => {
-  socket.emit('addRetweet', data);
+const socketRetweetPosts = (postId: number | undefined) => {
+  socket.emit('addRetweet', postId);
 };
-export { socketSendNotification, socketRemoveNotification, socketRealTimePosts, socketRetweetPosts };
+const socketRemoveRetweets = (postId: number | undefined) => {
+  socket.emit('removeRetweet', postId);
+};
+export {
+  socketSendNotification,
+  socketRemoveNotification,
+  socketRealTimePosts,
+  socketRetweetPosts,
+  socketRemoveRetweets,
+};

@@ -1,72 +1,23 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { IUser, IUserInitial } from '../../../models/user';
+import fetchWrapper from '../../helpers/fetchWrapper';
 
 const BASE_URL = 'https://twitter-server-73xd.onrender.com/auth';
+
 export const getUsers = createAsyncThunk('user/getUsers', async () => {
-  try {
-    const response = await fetch(`${BASE_URL}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error('Error');
-    }
-
-    const responseData = await response.json();
-    return responseData;
-  } catch (error) {
-    throw error;
-  }
+  return fetchWrapper(`${BASE_URL}`, 'GET');
 });
-
 export const followUser = createAsyncThunk(
-  'user/followUser',
+  'user/followUsers',
   async ({ userId, targetUser }: { userId: number | undefined; targetUser: IUser | undefined }) => {
-    try {
-      const response = await fetch(`${BASE_URL}/follow/${userId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ targetUser }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Error');
-      }
-
-      const responseData = await response.json();
-      return responseData;
-    } catch (error) {
-      throw error;
-    }
+    return fetchWrapper(`${BASE_URL}/follow/${userId}`, 'POST', { targetUser });
   },
 );
 
 export const unfollowUser = createAsyncThunk(
   'user/unfollowUser',
   async ({ userId, targetUser }: { userId: number | undefined; targetUser: IUser | undefined }) => {
-    try {
-      const response = await fetch(`${BASE_URL}/unfollow/${userId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ targetUser }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Error');
-      }
-
-      const responseData = await response.json();
-      return responseData;
-    } catch (error) {
-      throw error;
-    }
+    return fetchWrapper(`${BASE_URL}/unfollow/${userId}`, 'DELETE', { targetUser });
   },
 );
 
@@ -90,53 +41,21 @@ export const editUser = createAsyncThunk(
     }
   },
 );
+
 export const notifyUser = createAsyncThunk(
-  'auth/notifyUser',
+  'user/notifyUser',
   async ({ userId, notifiedUser }: { userId: number | undefined; notifiedUser: IUser | undefined }) => {
-    try {
-      const response = await fetch(`${BASE_URL}/notify-me/${userId}`, {
-        method: 'POST',
-        body: JSON.stringify(notifiedUser),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Error');
-      }
-
-      const responseData = await response.json();
-      return responseData;
-    } catch (error) {
-      throw error;
-    }
+    return fetchWrapper(`${BASE_URL}/notify-me/${userId}`, 'POST', notifiedUser);
   },
 );
 
 export const removeNotifiedUser = createAsyncThunk(
-  'auth/removeNotify',
+  'user/removeNotify',
   async ({ userId, notifiedUser }: { userId: number | undefined; notifiedUser: IUser | undefined }) => {
-    try {
-      const response = await fetch(`${BASE_URL}/notify-me/${userId}`, {
-        method: 'Delete',
-        body: JSON.stringify(notifiedUser),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Error');
-      }
-
-      const responseData = await response.json();
-      return responseData;
-    } catch (error) {
-      throw error;
-    }
+    return fetchWrapper(`${BASE_URL}/notify-me/${userId}`, 'Delete', notifiedUser);
   },
 );
+
 const initialState: IUserInitial = {
   users: [],
   error: null,
@@ -198,9 +117,10 @@ const userSlice = createSlice({
         state.error = null;
       })
       .addCase(unfollowUser.fulfilled, (state, action) => {
+        console.log(action.payload)
         const targetUser = action.payload.targetUser;
         const currentUser = action.payload.currentUser;
-
+        console.log(targetUser);
         const updatedUsers = state.users.map((user) => {
           if (user.id === targetUser.id) {
             return {

@@ -9,9 +9,8 @@ import {
   fetchNotifications,
   removeNotification,
 } from '../store/features/notifications/notificationSlice';
-import { addPost, retweetPost } from '../store/features/post/postSlice';
+import { getPost, removeRetweet } from '../store/features/post/postSlice';
 import { IUserPost } from '../models/post';
-
 import WhoToFollow from '../components/ui/Timeline/WhoToFollow';
 const Home = () => {
   const user = useSelector((state: RootState) => state.auth.user);
@@ -35,31 +34,13 @@ const Home = () => {
       dispatch(removeNotification(data));
     });
     socket?.on('getRealTimePosts', (data) => {
-      console.log(data);
-      const { content, user_id, files, retweeted_id } = data;
-      console.log(files);
-      const formData = new FormData();
-      formData.append('content', content);
-
-      if (user_id) {
-        formData.append('user_id', user_id.toString());
-      }
-
-      if (!!files?.length) {
-        files.forEach((arrayBuffer: ArrayBuffer) => {
-          const blob = new Blob([arrayBuffer]);
-          const file = new File([blob], 'file', { type: 'image/*' });
-          console.log(file)
-          formData.append('files', file);
-        });
-      }
-      if (retweeted_id) {
-        formData.append('retweeted_id', retweeted_id.toString());
-      }
-      dispatch(addPost(formData));
+      dispatch(getPost(data));
     });
     socket?.on('getRetweetedPosts', (data) => {
-      dispatch(retweetPost(data));
+      dispatch(getPost(data));
+    });
+    socket?.on('removeRetweetedPosts', (data) => {
+      dispatch(removeRetweet(data));
     });
   }, [socket]);
 
@@ -67,7 +48,7 @@ const Home = () => {
     const userId = user?.userId;
     dispatch(fetchNotifications(userId));
   }, []);
-  console.log(post);
+
   useEffect(() => {
     const currentDate = new Date();
     const filteredPosts = post.filter((singlePost) => {
