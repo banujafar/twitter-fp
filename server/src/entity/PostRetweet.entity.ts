@@ -7,7 +7,7 @@ export class PostRetweet extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => UserPost)
+  @ManyToOne(() => UserPost, {cascade: true})
   @JoinColumn({ name: 'mainPost_id' })
   mainPost: Relation<UserPost>;
 
@@ -15,7 +15,7 @@ export class PostRetweet extends BaseEntity {
   @JoinColumn({ name: 'user_id' })
   user: Relation<User>;
 
-  @ManyToOne(() => UserPost)
+  @ManyToOne(() => UserPost,  {cascade: true})
   @JoinColumn({ name: 'post_id' })
   post: Relation<UserPost>;
 
