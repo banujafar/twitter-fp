@@ -46,7 +46,10 @@ chatRouter.get(
       .where('chat.user1 = :userId OR chat.user2 = :userId', { userId })
       .leftJoinAndSelect('chat.user1', 'user1')
       .leftJoinAndSelect('chat.user2', 'user2')
+      .leftJoinAndSelect('chat.messages', 'messages')
+      .orderBy('messages.timestamp', 'ASC')
       .getMany();
+
 
     return res.status(200).json(chat);
   }),

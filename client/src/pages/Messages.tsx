@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { getUserChats } from '../store/features/chat/chatSlice';
-import { getMessages, sendMessage } from '../store/features/message/messageSlice';
+import { getMessages, markMessagesAsRead, sendMessage } from '../store/features/message/messageSlice';
 import { IMessage } from '../models/message';
 import MessageItem from '../components/ui/Messages/MessageItem';
 import { io } from 'socket.io-client';
@@ -20,7 +20,6 @@ const Messages = () => {
   const [messageText, setMessageText] = useState('');
   const messages = useSelector((state: RootState) => state.message.messages);
   const loadingMessages = useSelector((state: RootState) => state.message.loading);
-
   const selectedChatData = userChats.find((chat) => chat.id === selectedChat);
   const userData = selectedChatData?.user1.id === user?.userId ? selectedChatData?.user2 : selectedChatData?.user1;
 
@@ -52,8 +51,11 @@ const Messages = () => {
     };
   }, [dispatch, selectedChatData, user]);
 
-  const handleChatItemClick = (chatId: number) => {
+  const handleChatItemClick = async(chatId: number) => {
     setSelectedChat(chatId);
+    const chat_id = chatId
+    await dispatch(markMessagesAsRead(chat_id) as any);   
+
   };
 
   useEffect(() => {
@@ -62,7 +64,7 @@ const Messages = () => {
   }, [dispatch, selectedChatData]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setMessageText(e.target.value);
+    setMessageText(e.target.value);    
   };
 
   const handleSendMessage = async (e: React.FormEvent<HTMLFormElement>) => {

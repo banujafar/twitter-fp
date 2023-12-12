@@ -69,4 +69,19 @@ messageRouter.get(
   }),
 );
 
+messageRouter.post(
+  '/mark-as-read',
+  tryCatch(async (req: Request, res: Response) => {
+    const { chat_id } = req.body;
+
+    if (!chat_id) {
+      throw new AppError('Chat ID is required', 400);
+    }
+
+    const updatedMsg = await Message.update({ chat: { id: chat_id } }, { isRead: true });
+
+    res.status(200).json(updatedMsg);
+  })
+)
+
 export default messageRouter;

@@ -52,6 +52,28 @@ export const getMessages = createAsyncThunk('message/getMessages', async (chat_i
   }
 });
 
+export const markMessagesAsRead = createAsyncThunk('message/readMessage',async (chat_id: number) => {
+  try {
+    const response = await fetch(`http://localhost:3000/api/messages/mark-as-read`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ chat_id }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Error');
+    }
+
+    const responseData = await response.json();
+    return responseData;
+  } catch (error) {
+    throw error;
+  }
+}
+)
+
 const messageSlice = createSlice({
   name: 'message',
   initialState,
@@ -81,6 +103,21 @@ const messageSlice = createSlice({
         state.error = null;
       })
       .addCase(getMessages.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || null;
+      })
+      .addCase(markMessagesAsRead.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(markMessagesAsRead.fulfilled, (state, action) => {
+        state.messages = state.messages.map((message) =>
+        message.id === action.payload.id ? { ...message, isRead: true } : message
+      );        
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(markMessagesAsRead.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || null;
       });
