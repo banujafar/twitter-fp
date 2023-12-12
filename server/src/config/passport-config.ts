@@ -100,6 +100,7 @@ const passportConfig = (passport: PassportStatic) => {
     //   expiresIn: '1h',
     // });
     const { id, username } = user;
+    console.log(id)
     done(null, { id, username });
   });
 
