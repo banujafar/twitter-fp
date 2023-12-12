@@ -110,8 +110,7 @@ const CreatePost: React.FC<{ content?: any; inModal?: boolean }> = ({ content, i
                 style={{ minHeight: '2.5rem' }}
                 maxLength={280}
                 placeholder={content ? 'Add a comment' : 'What is happening?!'}
-                className={`text-black resize-none h-12 w-[98%] overflow-y-hidden py-2 focus:outline-none text-l font-normal placeholder-[#536471]  bg-transparent focus:outline-twitterColor rounded-xl px-2 ml-1
-                }`}
+                className={`text-black resize-none h-12 w-[98%] overflow-y-hidden py-1 focus:outline-none text-xl font-normal placeholder-[#536471] bg-transparent`}
               />
               {selectedFile &&
                 (Array.isArray(selectedFile) ? (

@@ -25,6 +25,7 @@ const Header = () => {
   const users = useSelector((state: RootState) => state.user.users);
   const userData = users.find(u => u.id === user?.userId);
   const isModalOpen = useSelector((state: RootState) => state.postModal.isOpen);
+  const unreadNotificationsCount = notifications.filter((notification) => !notification.read).length;
 
   useEffect(()=> {
     dispatch(getUsers() as any)
@@ -142,7 +143,7 @@ const Header = () => {
                     )}
                     {link.notifications && (
                       <div
-                        className={`rounded-full absolute top-[-4px] right-[1px] w-4 h-4 bg-cyan-500 flex justify-center items-center text-white text-xs`}
+                      className={`rounded-full absolute top-[-4px] right-[1px] w-4 h-4 ${unreadNotificationsCount>0 ? 'bg-cyan-500': ''}  flex justify-center items-center text-white text-xs`}
                       >
                         {notifications.filter((notification) => !notification.read).length || ' '}
                       </div>
