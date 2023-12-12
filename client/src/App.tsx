@@ -18,6 +18,7 @@ import Favorites from './pages/Favorites';
 import SearchBar from './components/ui/Timeline/SearchBar';
 import Notifications from './pages/Notifications';
 import Suggestions from './pages/Suggestions';
+import SearchPage from './pages/SearchPage';
 function App() {
   const error = useSelector((state: RootState) => state.auth.error);
   useEffect(() => {
@@ -77,7 +78,7 @@ function App() {
             path="/explore"
             element={
               <Layout>
-                <SearchBar searchedList={[]} />
+                <SearchPage />
               </Layout>
             }
           />
