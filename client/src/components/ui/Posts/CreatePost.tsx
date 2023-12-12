@@ -11,6 +11,7 @@ import { AppDispatch, RootState } from '../../../store';
 import { setIsOpen } from '../../../store/features/modal/modalSlice';
 import { getUsers } from '../../../store/features/user/userSlice';
 import { socketRealTimePosts, socketSendNotification } from '../../../utils/socketClient';
+import { setPostModal } from '../../../store/features/modal/postModalSlice';
 const CreatePost: React.FC<{ content?: any; inModal?: boolean }> = ({ content, inModal }) => {
   console.log(inModal);
   const [text, setText] = useState('');
@@ -50,6 +51,7 @@ const CreatePost: React.FC<{ content?: any; inModal?: boolean }> = ({ content, i
         });
       });
       dispatch(setIsOpen({ id: 'modalQuote', isOpen: false }));
+      dispatch(setPostModal({ isOpen: false }));
     } catch (error) {
       console.error('Error submitting post:', error);
     }
