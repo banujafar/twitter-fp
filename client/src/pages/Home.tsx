@@ -18,6 +18,8 @@ const Home = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [lastPosts, setLastPosts] = useState<IUserPost[]>([]);
   const { post } = useSelector((state: RootState) => state.post);
+  const posts = useSelector((state: RootState) => state.post.post);
+
   useEffect(() => {
     socket.emit('newUser', {
       username: user?.username,
@@ -82,7 +84,7 @@ const Home = () => {
       <PostsList />
       <div className="flex flex-col mx-4 sm:hidden xs:hidden xxs:hidden md:hidden lg:flex xl:flex sticky top-0 right-0">
         <div className="sm:hidden xs:hidden xxs:hidden md:hidden lg:flex xl:flex">
-          <SearchBar searchedList={[]} />
+          <SearchBar searchedList={posts} />
         </div>
         <WhoToFollow />
       </div>

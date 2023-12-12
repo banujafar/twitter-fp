@@ -23,6 +23,8 @@ const SearchBar: React.FC<{ searchedList: any }> = ({ searchedList }) => {
     }, 300);
 
     debounceFilter(text);
+    return () => debounceFilter.cancel();
+
   }, [text, searchedList]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,7 +43,7 @@ const SearchBar: React.FC<{ searchedList: any }> = ({ searchedList }) => {
         onChange={handleChange}
       />
       {!!filteredPosts.length && (
-        <div className="absolute top-14 left-0 w-full border rounded-xl py-4 px-2">
+        <div className="absolute top-14 left-0 w-full border rounded-xl py-4 px-2 z-50 bg-white h-96 overflow-y-auto">
           {filteredPosts?.map((post: any) => (
             <div key={post.id} className="my-4 px-2  border-gray-300">
               {post.content?.includes(text) ? (
