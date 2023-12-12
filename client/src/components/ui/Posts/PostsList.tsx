@@ -20,7 +20,7 @@ const PostsList = () => {
   const users = useSelector((state: RootState) => state.user.users);
   const currentUserInfo = users.find((u)=>u.id === currentuser?.userId);
   const currentUserfollowings = currentUserInfo?.following;
-  const filteredPosts = posts.filter((post) =>
+  const filteredPosts = posts?.filter((post) =>
   currentUserfollowings?.map((follow) => follow.id).includes(post.user.id) || post.user.id === currentUserInfo?.id
 );
   let sortedPosts: IUserPost[];

@@ -34,19 +34,17 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
   const isFollowing = userInfo?.followers?.some((follower) => follower.id === user?.userId);
   const isModalOpen = useSelector((state: RootState) => state.followModal.isOpen);
   const isNotified =
-    useSelector((state: RootState) => state.user.isNotified) ||
-    users
-      .find((u) => u.username == user?.username)
-      ?.notifications?.some((notifiedUser) => notifiedUser.username === username);
+    useSelector((state: RootState) => state.user.isNotified) 
   //     .find((u) => u.username == user?.username)
   //     ?.notifications?.some((notifiedUser) => notifiedUser.username === username);
   // console.log(isNotified,username)
   const handleButtonClick = (buttonType: string) => {
     setActiveBtn(buttonType);
   };
+
   useEffect(() => {
     dispatch(getUsers() as any);
-  }, [dispatch]);
+  }, []);
 
   const handleFollow = async () => {
     const userId = user?.userId;
@@ -75,8 +73,10 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
   };
 
   const handleNotification = async () => {
+    console.log(isNotified);
     if (isNotified) {
       await dispatch(removeNotifiedUser({ userId: user?.userId, notifiedUser: userInfo }));
+      console.log(isNotified);
     } else {
       await dispatch(notifyUser({ userId: user?.userId, notifiedUser: userInfo }));
       console.log(isNotified);
@@ -90,7 +90,7 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
   const handleOpenEditModal = () => {
     dispatch(setIsOpen({ id: 'modalEditProfile', isOpen: true }));
   };
-
+console.log(users)
   const handleCreateChat = async () => {
     const firstId = user?.userId;
     const secondId = userInfo?.id;

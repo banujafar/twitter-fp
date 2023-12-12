@@ -9,7 +9,7 @@ import {
   fetchNotifications,
   removeNotification,
 } from '../store/features/notifications/notificationSlice';
-import { getPost, removeRetweet } from '../store/features/post/postSlice';
+import { filterRetweet, getPost } from '../store/features/post/postSlice';
 import { IUserPost } from '../models/post';
 import WhoToFollow from '../components/ui/Timeline/WhoToFollow';
 const Home = () => {
@@ -42,10 +42,11 @@ const Home = () => {
       dispatch(getPost(data));
     });
     socket?.on('removeRetweetedPosts', (data) => {
-      dispatch(removeRetweet(data));
+      console.log(data);
+      dispatch(filterRetweet(data));
     });
   }, [socket]);
-
+  
   useEffect(() => {
     const userId = user?.userId;
     dispatch(fetchNotifications(userId));
