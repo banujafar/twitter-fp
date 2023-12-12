@@ -31,6 +31,7 @@ const socketService = (io) => {
       });
     });
     socket.on('realTimePosts', (data) => {
+      console.log(data)
       const receivers = onlineUsers;
       receivers.map((receiver) => {
         io.to(receiver.socketId).emit('getRealTimePosts', data);

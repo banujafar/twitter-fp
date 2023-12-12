@@ -16,11 +16,20 @@ const PostsList = () => {
   // const { data } = useGetPostsQuery();
   const loading = useSelector((state: RootState) => state.post.loading);
   const posts = useSelector((state: RootState) => state.post.post);
+  const currentuser = useSelector((state: RootState) => state.auth.user);
+
+  const users = useSelector((state: RootState) => state.user.users);
+  const currentUserInfo = users.find((u)=>u.id === currentuser?.userId);
+  const currentUserfollowings = currentUserInfo?.following;
+  const filteredPosts = posts.filter((post) =>
+  currentUserfollowings?.map((follow) => follow.id).includes(post.user.id) || post.user.id === currentUserInfo?.id
+);
   let sortedPosts: IUserPost[];
+
   const isOpenQuote = useSelector((state) => modalIsOpenSelector(state, 'modalQuote'));
   const isOpenComment = useSelector((state) => modalIsOpenSelector(state, 'modalComment'));
   if (posts) {
-    sortedPosts = [...posts].sort((a, b) => {
+    sortedPosts = [...filteredPosts].sort((a, b) => {
       const dateA = new Date(a.created_date);
       const dateB = new Date(b.created_date);
 
@@ -45,10 +54,10 @@ const PostsList = () => {
       <CreatePost />
       {loading ? (
         <p>Loading posts...</p>
-      ) : posts && posts.length > 0 ? (
+      ) : filteredPosts && filteredPosts.length > 0 ? (
         sortedPosts.map((post) => <PostsItem postData={post} key={post.id} />)
       ) : (
-        <p>No posts found</p>
+        <p className='mt-5 text-3xl text-center font-medium'>No Tweets Yet</p>
       )}
       {isOpenQuote && <QuoteModal />}
       {isOpenComment && <CommentModal />}

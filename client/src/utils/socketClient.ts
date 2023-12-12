@@ -48,7 +48,9 @@ const socketRealTimePosts = ({
   user_id: number | undefined;
   files: File[] | null;
 }) => {
+  console.log(files)
   socket.emit('realTimePosts', {
+    
     content,
     user_id,
     files,

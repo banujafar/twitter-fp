@@ -35,16 +35,21 @@ const Home = () => {
       dispatch(removeNotification(data));
     });
     socket?.on('getRealTimePosts', (data) => {
+      console.log(data);
       const { content, user_id, files, retweeted_id } = data;
+      console.log(files);
       const formData = new FormData();
       formData.append('content', content);
 
-      if (user?.userId) {
+      if (user_id) {
         formData.append('user_id', user_id.toString());
       }
 
       if (!!files?.length) {
-        files.forEach((file: File) => {
+        files.forEach((arrayBuffer: ArrayBuffer) => {
+          const blob = new Blob([arrayBuffer]);
+          const file = new File([blob], 'file', { type: 'image/*' });
+          console.log(file)
           formData.append('files', file);
         });
       }
@@ -98,7 +103,7 @@ const Home = () => {
         <div className="sm:hidden xs:hidden xxs:hidden md:hidden lg:flex xl:flex">
           <SearchBar searchedList={[]} />
         </div>
-          <WhoToFollow />
+        <WhoToFollow />
       </div>
     </>
   );
