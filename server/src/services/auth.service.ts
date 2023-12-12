@@ -1,3 +1,4 @@
+import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { NextFunction, Request, Response } from 'express';
 import passport from 'passport';
@@ -7,7 +8,6 @@ import { Token } from '../entity/token.entity.ts';
 import crypto from 'crypto';
 import sendEmail from '../utils/sendEmail.ts';
 import AppError from '../config/appError.ts';
-import { token } from '../config/passport-config.ts';
 
 const Base_Client_Url = process.env.CLIENT_URL || 'http://localhost:5173/';
 //Make a user's login attempt using the provided email and password or username and password
@@ -27,6 +27,10 @@ const loginUser = async (req: Request, res: Response, next: NextFunction) => {
           if (err) {
             throw new AppError(err.message, err.statusCode);
           }
+          const { id, username } = user;
+          const token = jwt.sign({ id, username }, process.env.SECRET_KEY, {
+            expiresIn: '1h',
+          });
           res.cookie('auth_token', token, { httpOnly: true, sameSite: 'none', secure: true });
 
           res.status(200).json({ message: 'Login Successful' });
