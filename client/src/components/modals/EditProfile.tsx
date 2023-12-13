@@ -89,7 +89,7 @@ const EditProfile = () => {
           >
             {activeModal === 'photo' && (
               <>
-                <h1 className=" text-white">Pick a profile picture</h1>
+                <h1 className=" text-black">Pick a profile picture</h1>
                 <div className="relative">
                   {selectedFile && selectedFile['profile'] ? (
                     <img
@@ -117,7 +117,7 @@ const EditProfile = () => {
             )}
             {activeModal === 'header' && (
               <>
-                <h1 className=" text-white">Pick a header picture</h1>
+                <h1 className=" text-black">Pick a header picture</h1>
                 <div className="relative">
                   {selectedFile && selectedFile['header'] ? (
                     <img src={URL.createObjectURL(selectedFile['header'])} alt="" className="w-52 h-52 bg-no-repeat" />

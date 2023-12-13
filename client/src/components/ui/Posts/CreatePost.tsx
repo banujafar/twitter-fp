@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, useRef, useEffect } from 'react';
+import React, { useState, ChangeEvent, useRef } from 'react';
 import { CgProfile } from 'react-icons/cg';
 import { CiImageOn } from 'react-icons/ci';
 import { FaRegSmile } from 'react-icons/fa';
@@ -7,7 +7,6 @@ import { MdClose } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../store';
 import { setIsOpen } from '../../../store/features/modal/modalSlice';
-import { getUsers } from '../../../store/features/user/userSlice';
 import { socketRealTimePosts, socketSendNotification } from '../../../utils/socketClient';
 import { setPostModal } from '../../../store/features/modal/postModalSlice';
 import { addPost } from '../../../store/features/post/postSlice';
