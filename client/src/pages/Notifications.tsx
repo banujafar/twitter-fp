@@ -15,12 +15,12 @@ const Notifications = () => {
 
   useEffect(() => {
     dispatch(fetchNotifications(userId));
-  console.log(notifications);
   }, []);
 
   useEffect(() => {
     dispatch(readNotifications(userId));
-  }, [dispatch]);
+  }, []);
+
   const handleHover = (notificationId: number) => {
     setShowSenderInfo(notificationId);
   };
@@ -44,16 +44,20 @@ const Notifications = () => {
               </Link>
               {` ${notification.type}`}
 
-              {notification.type === 'followed' ? <span> you</span>:
-              notification.type === 'created' ? (
-                <Link to={`/post/${senderUser?.id}/${notification.postId}`}>post</Link>
-              ):
-              <Link
-                to={`/post/${notification.type === 'retweeted' ? senderUser?.id : user?.userId}/${notification.postId}`}
-              >
-                {' '}
-                your post
-              </Link>}
+              {notification.type === 'followed' ? (
+                <span> you</span>
+              ) : notification.type === 'created' ? (
+                <Link to={`/post/${senderUser?.id}/${notification.postId}`}> post</Link>
+              ) : (
+                <Link
+                  to={`/post/${notification.type === 'retweeted' ? senderUser?.id : user?.userId}/${
+                    notification.postId
+                  }`}
+                >
+                  {' '}
+                  your post
+                </Link>
+              )}
 
               {showSenderInfo === notification.id && (
                 <div className="sender-info border border-gray-200 rounded-xl w-1/2 p-4">
