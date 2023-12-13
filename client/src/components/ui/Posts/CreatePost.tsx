@@ -22,10 +22,6 @@ const CreatePost: React.FC<{ content?: any; inModal?: boolean }> = ({ content, i
   const users = useSelector((state: RootState) => state.user.users);
   const userData = users.find((u) => u.id === user?.userId);
 
-  useEffect(() => {
-    dispatch(getUsers() as any);
-  }, []);
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
