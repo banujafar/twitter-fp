@@ -101,6 +101,7 @@ userRouter.get('/google', (req, res, next) => {
 
 userRouter.get('/google/callback', (req, res, next) => {
   passport.authenticate('google', {
+    
     scope: ['email', 'profile'],
     successRedirect: Base_Client_Url,
     failureRedirect: `${Base_Client_Url}login`,
