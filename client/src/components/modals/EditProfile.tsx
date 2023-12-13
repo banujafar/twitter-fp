@@ -141,27 +141,27 @@ const EditProfile = () => {
             )}
             {activeModal === 'bio' && (
               <>
-                <h1 className=" text-white">Describe yourself</h1>
+                <h1 className=" text-black">Describe yourself</h1>
                 <textarea
                   value={bio}
                   onChange={handleChangeBio}
                   style={{ minHeight: '3rem' }}
                   maxLength={160}
                   placeholder={'Your bio'}
-                  className={`text-white resize-none h-12 w-full overflow-y-hidden py-1 focus:outline-none text-xl font-normal placeholder-[#536471]  bg-transparent`}
+                  className={`text-black resize-none h-12 w-full overflow-y-hidden py-1 focus:outline-none text-xl font-normal placeholder-[#536471]  bg-transparent focus:border-twitterColor focus:border rounded-lg p-4`}
                 />
               </>
             )}
             {activeModal === 'location' && (
               <>
-                <h1 className=" text-white">Where do you live?</h1>
+                <h1 className=" text-black">Where do you live?</h1>
                 <textarea
                   value={location}
                   onChange={handleChangeLocation}
                   style={{ minHeight: '3rem' }}
                   maxLength={30}
                   placeholder={'Location'}
-                  className={`text-white resize-none h-12 w-full overflow-y-hidden py-1 focus:outline-none text-xl font-normal placeholder-[#536471]  bg-transparent`}
+                  className={`text-black resize-none h-12 w-full overflow-y-hidden py-1 focus:outline-none text-xl font-normal placeholder-[#536471]  bg-transparent focus:border focus:border-twitterColor rounded-lg p-4`}
                 />
               </>
             )}
