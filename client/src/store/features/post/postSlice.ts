@@ -60,7 +60,7 @@ export const retweetPost = createAsyncThunk(
 );
 
 export const deletePost = createAsyncThunk('post/deletePost', async (post_id: number | undefined) => {
-  return fetchWrapper(`${'http://localhost:3000/api/posts'}/${post_id}`, 'DELETE');
+  return fetchWrapper(`${BASE_URL}/${post_id}`, 'DELETE');
 });
 
 const initialState: IPostInitialState = {
