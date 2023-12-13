@@ -59,6 +59,10 @@ export const retweetPost = createAsyncThunk(
   },
 );
 
+export const deletePost = createAsyncThunk('post/deletePost', async (post_id: number | undefined) => {
+  return fetchWrapper(`${BASE_URL}/${post_id}`, 'DELETE');
+});
+
 const initialState: IPostInitialState = {
   post: [],
   error: null,
@@ -233,7 +237,23 @@ const postSlice = createSlice({
       .addCase(removeRetweet.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || null;
-      });
+      })
+      .addCase(deletePost.pending, (state) => {
+        state.error = null;
+        state.loading = true;
+      })
+      .addCase(deletePost.fulfilled, (state, action) => {
+        const postId = action.payload.id;
+        console.log(postId)
+        const updatedPosts = state.post.filter((p)=> {p.id !== postId})
+        state.post = updatedPosts;
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(deletePost.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || null;
+      })
   },
 });
 

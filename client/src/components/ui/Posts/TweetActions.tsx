@@ -1,13 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AiOutlineRetweet } from 'react-icons/ai';
-import { FaHeart, FaRegComment, FaRegHeart } from 'react-icons/fa';
+import { FaHeart, FaRegComment, FaRegHeart, FaRegTrashAlt } from 'react-icons/fa';
 import { IUserPost } from '../../../models/post';
 import { setIsOpen } from '../../../store/features/modal/modalSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../store';
 import { CiEdit } from 'react-icons/ci';
-import { BsFillShareFill } from 'react-icons/bs';
-import { likePost, removeLike, removeRetweet, retweetPost } from '../../../store/features/post/postSlice';
+import { deletePost, getPosts, likePost, removeLike, removeRetweet, retweetPost } from '../../../store/features/post/postSlice';
 import {
   socketRemoveNotification,
   socketRemoveRetweets,
@@ -23,6 +22,7 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
   const userLikedPosts = postData.likes?.some((like) => like?.user?.id === user?.userId);
   const retweets = postData.retweets?.filter((rt: any) => !rt.post?.content);
   const isRetweeted = retweets?.some((rt: any) => rt?.user?.id === user?.userId);
+  const isUsersPost = postData.user.id === user?.userId;
 
   const handleRetweet = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -138,6 +138,13 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
     }
   };
 
+  const handleDeletePost = async (post_id: number, e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    e.preventDefault();
+    await dispatch(deletePost(post_id) as any);
+    await dispatch(getPosts() as any);
+    console.log('deleted', post_id);
+  };
+
   return (
     <div className="flex items-center justify-between gap-4 mt-4 px-12 pb-2">
       <div
@@ -187,9 +194,15 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
         </div>
       )}
 
-      <div className="flex items-center text-gray-500 cursor-pointer">
-        <BsFillShareFill />
+      {isUsersPost ?
+        <div className="flex items-center text-red-500 cursor-pointer" onClick={(e) => handleDeletePost(postData.id, e)}>
+       <FaRegTrashAlt />
+
       </div>
+      :
+      ''
+    }
+    
     </div>
   );
 };

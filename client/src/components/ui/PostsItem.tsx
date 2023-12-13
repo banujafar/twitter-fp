@@ -8,7 +8,7 @@ import { AppDispatch, RootState } from '../../store';
 import { setIsOpen } from '../../store/features/modal/modalSlice';
 import { IUserPost } from '../../models/post';
 import { getPosts, likePost, removeLike, retweetPost } from '../../store/features/post/postSlice';
-import SinglePost from './SinglePost';
+import SinglePost from './Posts/SinglePost';
 import { useNavigate } from 'react-router-dom';
 
 const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
@@ -18,10 +18,9 @@ const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user);
   const userLikedPosts = postData.likes?.some((like) => like?.user?.id === user?.userId);
-  const navigate = useNavigate()
-
+  const navigate = useNavigate();
   const handleRetweet = (e: React.MouseEvent) => {
-    e.stopPropagation()
+    e.stopPropagation();
     setIsDropdownOpen(true);
   };
   // console.log(postData);
@@ -49,7 +48,7 @@ const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
 
   const handleLike = async (postId: number, e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     e.preventDefault();
-    e.stopPropagation()
+    e.stopPropagation();
 
     try {
       let decodedUserId: number = 0;
@@ -84,11 +83,11 @@ const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
       }
       const retweetData = {
         userId: decodedUserId,
-        rtwId: postId
+        rtwId: postId,
       };
-      
-      await dispatch(retweetPost(retweetData))
-      await dispatch(getPosts())
+
+      await dispatch(retweetPost(retweetData));
+      await dispatch(getPosts());
       console.log('retweeted');
     } catch (err) {
       console.log(err);
@@ -101,9 +100,10 @@ const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
 
   return (
     <div
-    onClick={()=>navigate(`/post/${userid}/${postid}`)}
-    className="tweet-container cursor-pointer bg-white border-b border-gray-200 w-full p-4 transition ease-in hover:bg-[#f7f7f7]">
-      <SinglePost postData={postData} />
+      onClick={() => navigate(`/post/${userid}/${postid}`)}
+      className="tweet-container cursor-pointer bg-white border-b border-gray-200 w-full p-4 transition ease-in hover:bg-[#f7f7f7]"
+    >
+      <SinglePost postData={postData} size={44} />
       <div className="flex items-center justify-between gap-4 mt-4 px-12">
         <div
           className="flex items-center text-gray-500 cursor-pointer hover:text-twitterColor"
@@ -147,7 +147,6 @@ const PostsItem: React.FC<{ postData: IUserPost }> = ({ postData }) => {
             <span className="ml-1">{postData.likes?.length}</span>
           </div>
         )}
-
         <div className="flex items-center text-gray-500 cursor-pointer">
           <BsFillShareFill />
         </div>

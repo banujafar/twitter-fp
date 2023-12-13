@@ -465,4 +465,26 @@ postRouter.post(
     res.status(200).json('success');
   }),
 );
+
+postRouter.delete('/:post_id', tryCatch(async(req:Request, res:Response)=> {
+  const {post_id} = req.params;
+
+  const postToDelete = await UserPost.findOne({
+    where: { id: parseInt(post_id, 10) }
+  });
+
+  if (!postToDelete) {
+    throw new AppError('Post not found', 404);
+  }
+  const notificationsToDelete = await Notifications.find({ where: { post: { id: postToDelete.id } } });
+  const retweetPostToDelete = await PostRetweet.find({ where: { post:{id: postToDelete.id} } });
+
+
+  await Notifications.remove(notificationsToDelete);
+  await PostRetweet.remove(retweetPostToDelete);
+
+  await UserPost.remove(postToDelete);
+
+  return res.status(204).json(postToDelete);
+}))
 export default postRouter;
