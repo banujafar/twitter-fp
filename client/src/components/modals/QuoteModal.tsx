@@ -14,6 +14,7 @@ const QuoteModal = () => {
         modalContent: (
           <>
             <CreatePost
+            inModal={true}
               content={
                 <>
                   <div className="border-gray-400 border p-2 rounded-2xl flex flex-col ">

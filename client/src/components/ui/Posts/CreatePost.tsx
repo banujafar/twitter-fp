@@ -46,7 +46,7 @@ const CreatePost: React.FC<{ content?: any; inModal?: boolean }> = ({ content, i
       });
     }
 
-    if (quoteModalContent) {
+    if (inModal) {
       formData.append('retweeted_id', quoteModalContent.id.toString());
     }
 
@@ -54,7 +54,7 @@ const CreatePost: React.FC<{ content?: any; inModal?: boolean }> = ({ content, i
       const result = await dispatch(addPost(formData));
 
       if (result.payload) {
-        const postId = quoteModalContent ? result.payload?.retweetedPost.id : result.payload?.id;
+        const postId = inModal ? result.payload?.retweetedPost.id : result.payload?.id;
         console.log(result.payload);
         socketRealTimePosts(postId);
       }
