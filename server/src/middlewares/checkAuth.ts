@@ -7,6 +7,7 @@ import tryCatch from '../utils/tryCatch.ts';
 const checkAuthMiddleware = tryCatch((req, res: Response, next: NextFunction) => {
   if (req.isAuthenticated()) {
     const user = req.user;
+    console.log(user)
     const userId = user.id;
     const username = user.username;
 

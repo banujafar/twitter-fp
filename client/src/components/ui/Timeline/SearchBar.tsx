@@ -46,7 +46,12 @@ const SearchBar: React.FC<{ searchedList: any; searchedUsers: any }> = ({ search
                 {post.content}
               </Link>
             </div>
-          ))}
+          ))}{' '}
+        </div>
+      )}
+
+      {!!filteredusers.length && (
+        <div className="absolute top-14 left-0 w-full border rounded-xl py-4 px-2 z-50 bg-white h-96 overflow-y-auto">
           {filteredusers?.map((user: any) => (
             <Link to={`/profile/${user?.username}`} className="flex items-center mt-2">
               <UserAvatar user={user} size={66} />

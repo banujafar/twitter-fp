@@ -81,7 +81,9 @@ const passportConfig = (passport: PassportStatic) => {
         try {
           const user = await User.findOneBy({ email: profile.email });
           if (!user) {
-            return done(null, profile);
+            const { id, username } = profile;
+            console.log(id);
+            return done(null, { id, username });
           } else {
             throw new AppError(
               'You have a registered address with this email.Please login with just email and password',
@@ -95,12 +97,12 @@ const passportConfig = (passport: PassportStatic) => {
     ),
   );
 
-  passport.serializeUser((user:User, done) => {
+  passport.serializeUser((user: User, done) => {
     // auth_token = jwt.sign({ userId, username }, process.env.SECRET_KEY, {
     //   expiresIn: '1h',
     // });
     const { id, username } = user;
-    console.log(id)
+    console.log(id);
     done(null, { id, username });
   });
 
