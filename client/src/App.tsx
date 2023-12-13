@@ -15,7 +15,6 @@ import Post from './pages/Post';
 import UserProfile from './pages/UserProfile';
 import Messages from './pages/Messages';
 import Favorites from './pages/Favorites';
-import SearchBar from './components/ui/Timeline/SearchBar';
 import Notifications from './pages/Notifications';
 import Suggestions from './pages/Suggestions';
 import SearchPage from './pages/SearchPage';
@@ -90,19 +89,22 @@ function App() {
               </Layout>
             }
           />
-           <Route
+          <Route
             path="/suggestions"
             element={
               <Layout>
-                <Suggestions/>
+                <Suggestions />
               </Layout>
             }
           />
-          <Route path="/post/:userid/:postid" element={
+          <Route
+            path="/post/:userid/:postid"
+            element={
               <Layout>
                 <Post />
               </Layout>
-            } />
+            }
+          />
         </Route>
 
         <Route path="/register" element={<RegisterPage />} />
