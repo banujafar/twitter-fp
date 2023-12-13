@@ -17,5 +17,5 @@ export interface IUserInitial {
   users: IUser[];
   error: string | null;
   loading: boolean | null;
-  isNotified: boolean | null;
+  isNotified: boolean | undefined;
 }

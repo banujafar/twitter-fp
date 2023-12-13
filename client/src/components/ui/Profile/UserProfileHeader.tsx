@@ -33,19 +33,24 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
   const isOpenEditProfile = useSelector((state) => modalIsOpenSelector(state, 'modalEditProfile'));
   const isFollowing = userInfo?.followers?.some((follower) => follower.id === user?.userId);
   const isModalOpen = useSelector((state: RootState) => state.followModal.isOpen);
-  const isNotified =
-    useSelector((state: RootState) => state.user.isNotified) 
+  const findedUser = users.find((u) => u.username === user?.username);
+  const notifiedUser = findedUser?.notifications?.some((notifiedUser) => notifiedUser.username === username);
+  const [isNotified, setIsNotified] = useState<boolean | undefined>(notifiedUser);
+  // const isNotified =
+  //   useSelector((state: RootState) => state.user.isNotified)
+  // users
+  //   .find((u) => u.username == user?.username)
+  //   ?.notifications?.some((notifiedUser) => notifiedUser.username === username);
   //     .find((u) => u.username == user?.username)
   //     ?.notifications?.some((notifiedUser) => notifiedUser.username === username);
   // console.log(isNotified,username)
   const handleButtonClick = (buttonType: string) => {
     setActiveBtn(buttonType);
   };
-
   useEffect(() => {
     dispatch(getUsers() as any);
   }, []);
-
+  console.log(users);
   const handleFollow = async () => {
     const userId = user?.userId;
     const targetUser = userInfo;
@@ -60,7 +65,7 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
       });
     } else {
       await dispatch(unfollowUser({ userId, targetUser }) as any);
-      await dispatch(getUsers() as any)
+      await dispatch(getUsers() as any);
       socketRemoveNotification({
         username: user?.username,
         receiverName: userInfo?.username,
@@ -73,13 +78,12 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
   };
 
   const handleNotification = async () => {
-    console.log(isNotified);
     if (isNotified) {
       await dispatch(removeNotifiedUser({ userId: user?.userId, notifiedUser: userInfo }));
-      console.log(isNotified);
+      setIsNotified(false);
     } else {
       await dispatch(notifyUser({ userId: user?.userId, notifiedUser: userInfo }));
-      console.log(isNotified);
+      setIsNotified(true);
     }
   };
   const handleOpenModal = (e: React.MouseEvent, listType: 'following' | 'followers') => {
@@ -90,7 +94,7 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
   const handleOpenEditModal = () => {
     dispatch(setIsOpen({ id: 'modalEditProfile', isOpen: true }));
   };
-console.log(users)
+
   const handleCreateChat = async () => {
     const firstId = user?.userId;
     const secondId = userInfo?.id;

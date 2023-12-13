@@ -21,7 +21,6 @@ const CreatePost: React.FC<{ content?: any; inModal?: boolean }> = ({ content, i
   const quoteModalContent = useSelector((state: RootState) => state.modal.postData['modalQuote']);
   const users = useSelector((state: RootState) => state.user.users);
   const userData = users.find((u) => u.id === user?.userId);
-  const currentUserInfo = users.find((singleUser) => singleUser.username == user?.username);
 
   useEffect(() => {
     dispatch(getUsers() as any);
@@ -62,14 +61,16 @@ const CreatePost: React.FC<{ content?: any; inModal?: boolean }> = ({ content, i
 
       setText('');
       setSelectedFile(null);
-
-      currentUserInfo?.notifications?.forEach((current) => {
-        socketSendNotification({
-          username: user?.username,
-          receiverName: current.username,
-          action: 'created',
+      const finded = users.filter((u) => u.notifications?.some((u) => u.id === user?.userId));
+      if (!!finded.length) {
+        finded?.forEach((current) => {
+          socketSendNotification({
+            username: user?.username,
+            receiverName: current.username,
+            action: 'created',
+          });
         });
-      });
+      }
 
       dispatch(setIsOpen({ id: 'modalQuote', isOpen: false }));
       dispatch(setPostModal({ isOpen: false }));
