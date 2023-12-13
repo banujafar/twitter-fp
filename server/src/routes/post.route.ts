@@ -210,7 +210,9 @@ postRouter.post(
 
     const newNotification = new Notifications();
     newNotification.user = user;
-    user.notifications.map((notification) => {
+    const notifications = await User.find({ relations: ['notifications'] });
+    const notifiedUser = notifications.filter((n) => n.notifications.some((notif) => notif.username === user.username));
+    notifiedUser.map((notification) => {
       newNotification.receiver = notification;
     });
     newNotification.post = post;
@@ -466,25 +468,27 @@ postRouter.post(
   }),
 );
 
-postRouter.delete('/:post_id', tryCatch(async(req:Request, res:Response)=> {
-  const {post_id} = req.params;
+postRouter.delete(
+  '/:post_id',
+  tryCatch(async (req: Request, res: Response) => {
+    const { post_id } = req.params;
 
-  const postToDelete = await UserPost.findOne({
-    where: { id: parseInt(post_id, 10) }
-  });
+    const postToDelete = await UserPost.findOne({
+      where: { id: parseInt(post_id, 10) },
+    });
 
-  if (!postToDelete) {
-    throw new AppError('Post not found', 404);
-  }
-  const notificationsToDelete = await Notifications.find({ where: { post: { id: postToDelete.id } } });
-  const retweetPostToDelete = await PostRetweet.find({ where: { post:{id: postToDelete.id} } });
+    if (!postToDelete) {
+      throw new AppError('Post not found', 404);
+    }
+    const notificationsToDelete = await Notifications.find({ where: { post: { id: postToDelete.id } } });
+    const retweetPostToDelete = await PostRetweet.find({ where: { post: { id: postToDelete.id } } });
 
+    await Notifications.remove(notificationsToDelete);
+    await PostRetweet.remove(retweetPostToDelete);
 
-  await Notifications.remove(notificationsToDelete);
-  await PostRetweet.remove(retweetPostToDelete);
+    await UserPost.remove(postToDelete);
 
-  await UserPost.remove(postToDelete);
-
-  return res.status(204).json(postToDelete);
-}))
+    return res.status(204).json(postToDelete);
+  }),
+);
 export default postRouter;

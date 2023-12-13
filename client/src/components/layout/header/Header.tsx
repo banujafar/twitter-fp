@@ -108,7 +108,7 @@ const Header = () => {
 
   useEffect(() => {
     dispatch(fetchNotifications(user?.userId));
-  }, []);
+  }, [dispatch]);
 
   const handleOpenPostModal = (e: React.MouseEvent)=> {
       e.stopPropagation();
