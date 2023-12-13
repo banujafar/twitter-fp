@@ -24,6 +24,9 @@ const Notifications = () => {
   const handleHover = (notificationId: number) => {
     setShowSenderInfo(notificationId);
   };
+  const handleLeave = () => {
+    setShowSenderInfo(null);
+  };
   console.log(showSenderInfo);
   return (
     <div className="w-[80%] border-r border-gray-200 min-h-screen ">
@@ -39,6 +42,7 @@ const Notifications = () => {
                 to={`/profile/${notification?.senderName}`}
                 className=" font-semibold"
                 onMouseEnter={() => handleHover(notification.id)}
+                onMouseLeave={handleLeave}
               >
                 {notification.senderName}
               </Link>
