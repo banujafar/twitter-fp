@@ -21,7 +21,7 @@ const passportConfig = (passport: PassportStatic) => {
             if (email && !validator.isEmail(email)) {
               return done({ isOperational: true, statusCode: 400, message: 'Incorrect email' });
             }
-
+            
             if (!user || !user.isVerified) {
               return done({ isOperational: true, statusCode: 404, message: 'User not found' });
             }
@@ -81,9 +81,8 @@ const passportConfig = (passport: PassportStatic) => {
         try {
           const user = await User.findOneBy({ email: profile.email });
           if (!user) {
-            const { id, username } = profile;
-            console.log(id);
-            return done(null, { id, username });
+            const { id, given_name } = profile;
+            return done(null, { id, username: given_name });
           } else {
             throw new AppError(
               'You have a registered address with this email.Please login with just email and password',
@@ -102,7 +101,6 @@ const passportConfig = (passport: PassportStatic) => {
     //   expiresIn: '1h',
     // });
     const { id, username } = user;
-    console.log(id);
     done(null, { id, username });
   });
 

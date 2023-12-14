@@ -7,18 +7,17 @@ import tryCatch from '../utils/tryCatch.ts';
 const checkAuthMiddleware = tryCatch((req, res: Response, next: NextFunction) => {
   if (req.isAuthenticated()) {
     const user = req.user;
-    console.log(user)
     const userId = user.id;
     const username = user.username;
 
-    const { auth_token } = req.cookies;
+    let { auth_token } = req.cookies;
 
     if (!auth_token) {
       // If auth_token doesn't exist, create a new token and set it in the response cookies
-      const newToken = jwt.sign({ userId, username }, process.env.SECRET_KEY, {
+      auth_token = jwt.sign({ userId, username }, process.env.SECRET_KEY, {
         expiresIn: '1h',
       });
-      res.cookie('auth_token', newToken, {
+      res.cookie('auth_token', auth_token, {
         httpOnly: true,
         expires: new Date(Date.now() + 1 * 3600000),
       });
