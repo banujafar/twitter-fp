@@ -8,7 +8,6 @@ import session from 'express-session';
 import { TypeormStore } from 'connect-typeorm';
 import { Session } from './entity/session.entity.ts';
 import passportConfig from './config/passport-config.ts';
-import checkAuthMiddleware from './middlewares/checkAuth.ts';
 import errorHandler from './middlewares/errorHandler.ts';
 import postRouter from './routes/post.route.ts';
 import http from 'http';
@@ -19,6 +18,7 @@ import { Server } from 'socket.io';
 import socketService from './config/socketService.ts';
 import chatRouter from './routes/chat.route.ts';
 import messageRouter from './routes/message.route.ts';
+import checkAuthMiddleware from './middlewares/checkAuth.ts';
 
 const app = express();
 const allowedOrigins = ['https://twitter-client-ckmh.onrender.com', 'http://localhost:5173'];
