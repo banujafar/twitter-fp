@@ -64,7 +64,7 @@ const ForgotPassModal = () => {
                   </button>
                 </Form>
               </Formik>
-              {successMessage && <div className="text-white mt-4 flex justify-center">{successMessage}</div>}
+              {successMessage && <div className="text-black mt-4 flex justify-center">{successMessage}</div>}
             </div>
         ),
       }}
