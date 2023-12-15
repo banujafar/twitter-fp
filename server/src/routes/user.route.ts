@@ -101,7 +101,6 @@ userRouter.get('/google', (req, res, next) => {
 
 userRouter.get('/google/callback', (req, res, next) => {
   passport.authenticate('google', {
-    
     scope: ['email', 'profile'],
     successRedirect: Base_Client_Url,
     failureRedirect: `${Base_Client_Url}login`,
@@ -298,7 +297,19 @@ userRouter.post(
   tryCatch(async (req, res) => {
     const userId = +req.params.userId;
     const notifiedId = req.body.id;
-    const user = await User.findOne({ where: { id: userId }, relations: ['notifications'] });
+    const user = await User.findOne({
+      where: { id: userId },
+      relations: ['notifications', 'following', 'followers'],
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        profilePhoto: true,
+        country: true,
+        bio: true,
+        headerPhoto: true,
+      },
+    });
     const receiverUser = await User.findOne({ where: { id: notifiedId } });
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
@@ -307,7 +318,7 @@ userRouter.post(
     if (!user.notifications.includes(receiverUser)) {
       user.notifications.push(receiverUser);
       await user.save();
-      res.status(200).json({ message: 'successfully notified' });
+      res.status(200).json(user);
     } else {
       res.status(200).json({ message: 'User already notified' });
     }
@@ -318,7 +329,19 @@ userRouter.delete(
   tryCatch(async (req, res) => {
     const userId = +req.params.userId;
     const notifiedId = req.body.id;
-    const user = await User.findOne({ where: { id: userId }, relations: ['notifications'] });
+    const user = await User.findOne({
+      where: { id: userId },
+      relations: ['notifications', 'following', 'followers'],
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        profilePhoto: true,
+        country: true,
+        bio: true,
+        headerPhoto: true,
+      },
+    });
     const receiverUser = await User.findOne({ where: { id: notifiedId } });
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
@@ -326,7 +349,7 @@ userRouter.delete(
     const filteredNotifications = user.notifications.filter((notifiedUser) => notifiedUser.id !== receiverUser.id);
     user.notifications = filteredNotifications;
     await user.save();
-    res.status(200).json({ message: 'successfully deleted' });
+    res.status(200).json(user);
   }),
 );
 export default userRouter;

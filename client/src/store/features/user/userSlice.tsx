@@ -1,9 +1,9 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, current } from '@reduxjs/toolkit';
 import { IUser, IUserInitial } from '../../../models/user';
 import fetchWrapper from '../../helpers/fetchWrapper';
 
 const BASE_URL = 'https://twitter-server-73xd.onrender.com/auth';
-
+let isFirstTimeLoading = true;
 export const getUsers = createAsyncThunk('user/getUsers', async () => {
   return fetchWrapper(`${BASE_URL}`, 'GET');
 });
@@ -70,7 +70,10 @@ const userSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(getUsers.pending, (state) => {
-        state.loading = true;
+        if (isFirstTimeLoading) {
+          state.loading = true;
+        }
+        isFirstTimeLoading = false;
         state.error = null;
       })
       .addCase(getUsers.fulfilled, (state, action) => {
@@ -117,7 +120,7 @@ const userSlice = createSlice({
         state.error = null;
       })
       .addCase(unfollowUser.fulfilled, (state, action) => {
-        console.log(action.payload)
+        console.log(action.payload);
         const targetUser = action.payload.targetUser;
         const currentUser = action.payload.currentUser;
         console.log(targetUser);
@@ -170,7 +173,14 @@ const userSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(notifyUser.fulfilled, (state, _) => {
+      .addCase(notifyUser.fulfilled, (state, action) => {
+        const updatedUsers = current(state.users).map((user) => {
+          if (user.id === action.payload.id) {
+            return action.payload;
+          }
+          return user;
+        });
+        state.users = updatedUsers;
         state.loading = false;
         state.error = null;
         state.isNotified = true;
@@ -183,7 +193,14 @@ const userSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(removeNotifiedUser.fulfilled, (state, _) => {
+      .addCase(removeNotifiedUser.fulfilled, (state, action) => {
+        const updatedUsers = current(state.users).map((user) => {
+          if (user.id === action.payload.id) {
+            return action.payload;
+          }
+          return user;
+        });
+        state.users = updatedUsers;
         state.loading = false;
         state.error = null;
         state.isNotified = false;

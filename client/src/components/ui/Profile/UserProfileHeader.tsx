@@ -1,16 +1,10 @@
 import { IoMdArrowBack } from 'react-icons/io';
 import { IoLocationOutline, IoNotificationsOffOutline, IoNotificationsOutline } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../store';
-import {
-  followUser,
-  unfollowUser,
-  getUsers,
-  notifyUser,
-  removeNotifiedUser,
-} from '../../../store/features/user/userSlice';
+import { followUser, unfollowUser, notifyUser, removeNotifiedUser } from '../../../store/features/user/userSlice';
 import UserProfileFavorites from './UserProfileFavorites';
 import UserProfilePosts from './UserProfilePosts';
 import { setModal } from '../../../store/features/modal/followModalSlice';
@@ -19,7 +13,7 @@ import { modalIsOpenSelector, setIsOpen } from '../../../store/features/modal/mo
 import EditProfile from '../../modals/EditProfile';
 import { MdOutlineEmail } from 'react-icons/md';
 import { createChat } from '../../../store/features/chat/chatSlice';
-import { socketRemoveNotification, socketSendNotification } from '../../../utils/socketClient';
+import { socketRemoveNotification, socketSendNotification, socketNotifyUser } from '../../../utils/socketClient';
 
 const UserProfileHeader = ({ username }: { username: string | undefined }) => {
   const dispatch = useDispatch<AppDispatch>();
@@ -36,25 +30,15 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
   const findedUser = users.find((u) => u.username === user?.username);
   const notifiedUser = findedUser?.notifications?.some((notifiedUser) => notifiedUser.username === username);
   const [isNotified, setIsNotified] = useState<boolean | undefined>(notifiedUser);
-  // const isNotified =
-  //   useSelector((state: RootState) => state.user.isNotified)
-  // users
-  //   .find((u) => u.username == user?.username)
-  //   ?.notifications?.some((notifiedUser) => notifiedUser.username === username);
-  //     .find((u) => u.username == user?.username)
-  //     ?.notifications?.some((notifiedUser) => notifiedUser.username === username);
-  // console.log(isNotified,username)
+
   const handleButtonClick = (buttonType: string) => {
     setActiveBtn(buttonType);
   };
-  useEffect(() => {
-    dispatch(getUsers() as any);
-  }, []);
-  console.log(users);
+
   const handleFollow = async () => {
     const userId = user?.userId;
     const targetUser = userInfo;
-    console.log(targetUser);
+    console.log(targetUser)
     if (!isFollowing) {
       await dispatch(followUser({ userId, targetUser }) as any);
       socketSendNotification({
@@ -65,7 +49,6 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
       });
     } else {
       await dispatch(unfollowUser({ userId, targetUser }) as any);
-      await dispatch(getUsers() as any);
       socketRemoveNotification({
         username: user?.username,
         receiverName: userInfo?.username,
@@ -73,19 +56,29 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
         action: 'unfollowed',
       });
     }
-
-    await dispatch(getUsers() as any);
+      socketNotifyUser({
+        username: user?.username,
+        receiverName: userInfo?.username,
+      });
+    
   };
 
   const handleNotification = async () => {
     if (isNotified) {
-      await dispatch(removeNotifiedUser({ userId: user?.userId, notifiedUser: userInfo }));
-      setIsNotified(false);
+      await dispatch(removeNotifiedUser({ userId: user?.userId, notifiedUser: userInfo })).then(() => {
+        setIsNotified(false);
+      });
     } else {
-      await dispatch(notifyUser({ userId: user?.userId, notifiedUser: userInfo }));
-      setIsNotified(true);
+      await dispatch(notifyUser({ userId: user?.userId, notifiedUser: userInfo })).then(() => {
+        setIsNotified(true);
+      });
     }
+    socketNotifyUser({
+      username: user?.username,
+      receiverName: userInfo?.username,
+    });
   };
+
   const handleOpenModal = (e: React.MouseEvent, listType: 'following' | 'followers') => {
     e.stopPropagation();
     dispatch(setModal({ isOpen: true, data: listType }));
@@ -101,6 +94,7 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
     await dispatch(createChat({ firstId, secondId }) as any);
     navigate('/messages');
   };
+
   return (
     <>
       {loading ? (
