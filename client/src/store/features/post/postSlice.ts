@@ -3,12 +3,12 @@ import { IPostInitialState, IUserPost } from '../../../models/post';
 import fetchWrapper from '../../helpers/fetchWrapper';
 
 const BASE_URL = 'https://twitter-server-73xd.onrender.com/api/posts';
-
-export const getPosts = createAsyncThunk('like/getPosts', async () => {
+let isFirstTimeLoading = true;
+export const getPosts = createAsyncThunk('post/getPosts', async () => {
   return fetchWrapper(`${BASE_URL}`, 'GET');
 });
 
-export const getPost = createAsyncThunk('like/getPost', async (postId: number) => {
+export const getPost = createAsyncThunk('post/getPost', async (postId: number) => {
   return fetchWrapper(`${BASE_URL}/${postId}`, 'GET');
 });
 
@@ -74,9 +74,9 @@ const postSlice = createSlice({
   initialState,
   reducers: {
     filterRetweet: (state, action) => {
-      console.log(action.payload)
+      console.log(action.payload);
       state.post = current(state.post).filter((item) => item.id !== action.payload);
-      console.log(state.post)
+      console.log(state.post);
     },
   },
   extraReducers: (builder) => {
@@ -103,7 +103,10 @@ const postSlice = createSlice({
         state.error = action.error.message || null;
       })
       .addCase(getPosts.pending, (state) => {
-        state.loading = true;
+        if (isFirstTimeLoading) {
+          state.loading = true;
+        }
+        isFirstTimeLoading = false;
         state.error = null;
       })
       .addCase(getPosts.fulfilled, (state, action) => {
@@ -129,7 +132,7 @@ const postSlice = createSlice({
       })
       .addCase(likePost.pending, (state) => {
         state.error = null;
-        state.loading = true;
+        //state.loading = true;
       })
       .addCase(likePost.fulfilled, (state, action) => {
         const likedPost = action.payload;
@@ -143,6 +146,7 @@ const postSlice = createSlice({
           return p;
         });
         state.post = updatedPosts;
+        console.log(updatedPosts);
         state.loading = false;
         state.error = null;
       })
@@ -152,7 +156,7 @@ const postSlice = createSlice({
       })
       .addCase(removeLike.pending, (state) => {
         state.error = null;
-        state.loading = true;
+        //state.loading = true;
       })
       .addCase(removeLike.fulfilled, (state, action) => {
         const removedLikeId = action.payload;
@@ -174,7 +178,7 @@ const postSlice = createSlice({
         state.error = action.error.message || null;
       })
       .addCase(addComment.pending, (state) => {
-        state.loading = true;
+        //state.loading = true;
         state.error = null;
       })
       .addCase(addComment.fulfilled, (state, action) => {
@@ -200,7 +204,7 @@ const postSlice = createSlice({
       })
       .addCase(retweetPost.fulfilled, (state, action) => {
         const { originalPost } = action.payload;
-        console.log(action.payload)
+        console.log(action.payload);
         const updatedPosts = current(state.post).map((post) => {
           if (post.id === originalPost.id) {
             return originalPost;
@@ -244,8 +248,9 @@ const postSlice = createSlice({
       })
       .addCase(deletePost.fulfilled, (state, action) => {
         const postId = action.payload.id;
-        console.log(postId)
-        const updatedPosts = state.post.filter((p)=> {p.id !== postId})
+        const updatedPosts = state.post.filter((p) => {
+          p.id !== postId;
+        });
         state.post = updatedPosts;
         state.loading = false;
         state.error = null;
@@ -253,7 +258,7 @@ const postSlice = createSlice({
       .addCase(deletePost.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || null;
-      })
+      });
   },
 });
 

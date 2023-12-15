@@ -6,8 +6,16 @@ import { setIsOpen } from '../../../store/features/modal/modalSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../store';
 import { CiEdit } from 'react-icons/ci';
-import { deletePost, getPosts, likePost, removeLike, removeRetweet, retweetPost } from '../../../store/features/post/postSlice';
 import {
+  deletePost,
+  getPosts,
+  likePost,
+  removeLike,
+  removeRetweet,
+  retweetPost,
+} from '../../../store/features/post/postSlice';
+import {
+  socketNotifyPost,
   socketRemoveNotification,
   socketRemoveRetweets,
   socketRetweetPosts,
@@ -83,6 +91,10 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
           action: 'liked',
         });
       }
+      socketNotifyPost({
+        username: user?.username,
+        receiverName: postData?.user.username,
+      });
     } catch (err) {
       console.log(err);
     }
@@ -102,7 +114,6 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
       };
 
       if (!isRetweeted) {
-        console.log(postData);
         const result = await dispatch(retweetPost(retweetData));
         socketSendNotification({
           username: user?.username,
@@ -119,7 +130,6 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
         const findedpost = postData.retweets?.find(
           (retweet: any) => retweet.user.id === user?.userId && !retweet.post.content,
         );
-        console.log(findedpost);
         if (findedpost) {
           await dispatch(removeRetweet(findedpost.id)).then(() => {
             socketRemoveRetweets(findedpost.post?.id);
@@ -133,6 +143,10 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
           setIsDropdownOpen(false);
         }
       }
+      socketNotifyPost({
+        username: user?.username,
+        receiverName: postData?.user.username,
+      });
     } catch (err) {
       console.log(err);
     }
@@ -194,15 +208,16 @@ const TweetActions: React.FC<{ postData: IUserPost }> = ({ postData }) => {
         </div>
       )}
 
-      {isUsersPost ?
-        <div className="flex items-center text-red-500 cursor-pointer" onClick={(e) => handleDeletePost(postData.id, e)}>
-       <FaRegTrashAlt />
-
-      </div>
-      :
-      ''
-    }
-    
+      {isUsersPost ? (
+        <div
+          className="flex items-center text-red-500 cursor-pointer"
+          onClick={(e) => handleDeletePost(postData.id, e)}
+        >
+          <FaRegTrashAlt />
+        </div>
+      ) : (
+        ''
+      )}
     </div>
   );
 };
