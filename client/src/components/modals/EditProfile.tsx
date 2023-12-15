@@ -5,7 +5,7 @@ import Modal from './Modal';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store';
 import { setIsOpen } from '../../store/features/modal/modalSlice';
-import { editUser } from '../../store/features/user/userSlice';
+import { editUser, getUsers } from '../../store/features/user/userSlice';
 const EditProfile = () => {
   const [activeModal, setActiveModal] = useState('photo');
   const [bio, setBio] = useState('');
@@ -73,6 +73,7 @@ const EditProfile = () => {
       setLocation('');
       setSelectedFile({});
       dispatch(setIsOpen({ id: 'modalEditProfile', isOpen: false }));
+      await dispatch(getUsers())
     } catch (error) {
       console.error('Error editing user:', error);
     }

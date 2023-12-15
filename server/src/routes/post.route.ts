@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { PostRetweet } from '../entity/PostRetweet.entity.ts';
 import { LikedPost } from '../entity/LikedPost.entity.ts';
 import { Notifications } from '../entity/notifications.entity.ts';
+import { In } from 'typeorm';
 
 const uploads = multer({ storage: storageCloud });
 
@@ -480,15 +481,37 @@ postRouter.delete(
     if (!postToDelete) {
       throw new AppError('Post not found', 404);
     }
-    const notificationsToDelete = await Notifications.find({ where: { post: { id: postToDelete.id } } });
-    const retweetPostToDelete = await PostRetweet.find({ where: { post: { id: postToDelete.id } } });
+
+
+    const retweetPostsToDelete = await PostRetweet.find({
+      where: [{ post: { id: postToDelete.id } }, { mainPost: { id: postToDelete.id } }],
+      relations: ['post', 'mainPost'],
+    });
+
+    await PostRetweet.remove(retweetPostsToDelete);
+    
+    const retweetPostIds = retweetPostsToDelete.map(retweet => retweet.post.id);
+    
+    
+   
+    const notificationsToDelete = await Notifications.find({
+      where: {
+        post: {
+          id: In([postToDelete.id, ...retweetPostIds]),
+        },
+      },
+    });
+    const likedPostToDelete = await LikedPost.find({ where: { post: { id: postToDelete.id } } });
+    const commentedPostToDelete = await PostComment.find({ where: { post: { id: postToDelete.id } } });
 
     await Notifications.remove(notificationsToDelete);
-    await PostRetweet.remove(retweetPostToDelete);
+    await LikedPost.remove(likedPostToDelete);
+    await PostComment.remove(commentedPostToDelete);
 
     await UserPost.remove(postToDelete);
 
-    return res.status(204).json(postToDelete);
+    return res.status(204).json({});
   }),
 );
+
 export default postRouter;
