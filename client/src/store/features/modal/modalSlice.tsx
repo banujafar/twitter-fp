@@ -37,5 +37,5 @@ const modalSelector = (state: RootState) => state.modal;
 
 const isOpenSelector = createSelector([modalSelector], (modal) => modal.isOpen);
 
-export const modalIsOpenSelector = createSelector([isOpenSelector, (state, id) => id], (isOpen: any, id) => isOpen[id]);
+export const modalIsOpenSelector = createSelector([isOpenSelector, (_, id) => id], (isOpen: any, id) => isOpen[id]);
 export default modalSlice.reducer;
