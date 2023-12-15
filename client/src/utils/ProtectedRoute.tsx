@@ -22,7 +22,7 @@ const ProtectedRoute = () => {
     };
 
     fetchData();
-  }, [isAuth, error]);
+  }, []);
   if (loading) {
     return <TwitterLoader />;
   }
