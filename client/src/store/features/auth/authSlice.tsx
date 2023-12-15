@@ -23,17 +23,7 @@ export const checkAuth = createAsyncThunk('auth/checkAuth', async () => {
   return fetchWrapper('https://twitter-server-73xd.onrender.com/checkAuth', 'GET');
 });
 export const loginUser = createAsyncThunk('auth/loginUser', async (userData: IUserLogin) => {
-  // return await fetchWrapper(`${BASE_URL}/login`, 'POST', userData);
-  try {
-    const response = await fetchWrapper(`${BASE_URL}/login`, 'POST', userData);
-
-    localStorage.setItem('token', response.token);
-
-    return response;
-  } catch (error) {
-    console.error('Login failed:', error);
-    throw error;
-  }
+  return await fetchWrapper(`${BASE_URL}/login`, 'POST', userData);
 });
 
 export const forgotPass = createAsyncThunk('auth/forgotPass', async (email: object) => {
@@ -64,6 +54,7 @@ const authSlice = createSlice({
   extraReducers: (builder) => {
     const setPending = (state: any) => {
       state.loading = true;
+      state.error = false;
     };
 
     const setError = (state: any, action: any) => {
@@ -73,6 +64,7 @@ const authSlice = createSlice({
 
     const setFulfilled = (state: any, action: any) => {
       state.error = action.payload?.error?.message || null;
+      console.log(state.error);
       state.loading = false;
     };
 
