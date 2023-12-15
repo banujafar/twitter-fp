@@ -7,7 +7,7 @@ import { checkAuth } from '../store/features/auth/authSlice';
 import Login from '../pages/Login';
 
 const ProtectedRoute = () => {
-  const { loading, isAuth, error } = useSelector((state: RootState) => state.auth);
+  const { loading, isAuth } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
