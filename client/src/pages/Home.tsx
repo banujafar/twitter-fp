@@ -4,14 +4,11 @@ import SearchBar from '../components/ui/Timeline/SearchBar';
 import { io } from 'socket.io-client';
 import { AppDispatch, RootState } from '../store';
 import { useEffect, useState } from 'react';
-import {
-  addNotification,
-  fetchNotifications,
-  removeNotification,
-} from '../store/features/notifications/notificationSlice';
-import { filterRetweet, getPost } from '../store/features/post/postSlice';
+import { addNotification, removeNotification } from '../store/features/notifications/notificationSlice';
+import { filterRetweet, getPost, getPosts } from '../store/features/post/postSlice';
 import { IUserPost } from '../models/post';
 import WhoToFollow from '../components/ui/Timeline/WhoToFollow';
+import { getUsers } from '../store/features/user/userSlice';
 const Home = () => {
   const user = useSelector((state: RootState) => state.auth.user);
   const socket = io('https://twitter-server-73xd.onrender.com');
@@ -19,7 +16,8 @@ const Home = () => {
   const [lastPosts, setLastPosts] = useState<IUserPost[]>([]);
   const { post } = useSelector((state: RootState) => state.post);
   const posts = useSelector((state: RootState) => state.post.post);
-  const users= useSelector((state: RootState) => state.user.users);
+  const users = useSelector((state: RootState) => state.user.users);
+
   useEffect(() => {
     socket.emit('newUser', {
       username: user?.username,
@@ -42,16 +40,16 @@ const Home = () => {
       dispatch(getPost(data));
     });
     socket?.on('removeRetweetedPosts', (data) => {
-      console.log(data);
       dispatch(filterRetweet(data));
     });
+    socket?.on('getUsers', () => {
+      dispatch(getUsers());
+    });
+    socket?.on('getPosts', () => {
+      dispatch(getPosts());
+    });
   }, [socket]);
-  
-  useEffect(() => {
-    const userId = user?.userId;
-    dispatch(fetchNotifications(userId));
-  }, []);
-
+console.log(posts)
   useEffect(() => {
     const currentDate = new Date();
     const filteredPosts = post.filter((singlePost) => {
@@ -85,7 +83,7 @@ const Home = () => {
       <PostsList />
       <div className="flex flex-col mx-4 sm:hidden xs:hidden xxs:hidden md:hidden lg:flex xl:flex sticky top-0 right-0">
         <div className="sm:hidden xs:hidden xxs:hidden md:hidden lg:flex xl:flex">
-          <SearchBar searchedList={posts} searchedUsers={users}/>
+          <SearchBar searchedList={posts} searchedUsers={users} />
         </div>
         <WhoToFollow />
       </div>

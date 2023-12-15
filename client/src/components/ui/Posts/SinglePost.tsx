@@ -4,7 +4,7 @@ import { CgProfile } from 'react-icons/cg';
 import { IUser } from '../../../models/user';
 import { formattedDate } from '../../../utils/FormatDate';
 
-export const UserAvatar: React.FC<{ user: IUser; size: number }> = ({ user, size }) => (
+export const UserAvatar: React.FC<{ user: IUser; size?: number }> = ({ user, size }) => (
   <Link to={`/profile/${user?.username}`} onClick={(e) => e.stopPropagation()} className="flex">
     {user?.profilePhoto ? (
       <img
@@ -34,7 +34,7 @@ const renderImages = (img: any, id: number) => {
   return null;
 };
 
-const SinglePost: React.FC<{ postData: IUserPost; size: number }> = ({ postData, size }) => {
+const SinglePost: React.FC<{ postData: IUserPost; size?: number }> = ({ postData, size }) => {
   const navigate = useNavigate();
   return (
     <div className="flex gap-2 flex-col py-2 " onClick={() => navigate(`/post/${postData.user.id}/${postData.id}`)}>

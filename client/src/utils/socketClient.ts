@@ -46,10 +46,33 @@ const socketRetweetPosts = (postId: number | undefined) => {
 const socketRemoveRetweets = (postId: number | undefined) => {
   socket.emit('removeRetweet', postId);
 };
+const socketNotifyUser = ({
+  username,
+  receiverName,
+}: {
+  username: string | undefined;
+  receiverName: string | undefined;
+}) => {
+  console.log(username, receiverName);
+  socket.emit('users', { username, receiverName });
+};
+
+const socketNotifyPost = ({
+  username,
+  receiverName,
+}: {
+  username: string | undefined;
+  receiverName?: string | undefined;
+}) => {
+  console.log(username, receiverName);
+  socket.emit('posts', { username, receiverName });
+};
 export {
   socketSendNotification,
   socketRemoveNotification,
   socketRealTimePosts,
   socketRetweetPosts,
   socketRemoveRetweets,
+  socketNotifyUser,
+  socketNotifyPost,
 };

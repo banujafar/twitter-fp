@@ -8,6 +8,7 @@ const removeUser = (socketId) => {
 const getUser = (username) => {
   return onlineUsers.find((user) => user.username === username);
 };
+console.log(onlineUsers);
 const socketService = (io) => {
   io.on('connect', (socket) => {
     console.log('A user connected', socket.id);
@@ -32,7 +33,6 @@ const socketService = (io) => {
     });
     socket.on('realTimePosts', (data) => {
       onlineUsers.forEach((user) => {
-        // Check if the user is not the sender
         io.to(user.socketId).emit('getRealTimePosts', data);
       });
     });
@@ -51,6 +51,22 @@ const socketService = (io) => {
     socket.on('sendMessage', ({ chat_id, sender_id, text }) => {
       console.log('Received new message:', text);
       io.emit('receiveMessage', { chat_id, sender_id, text });
+    });
+    socket.on('users', ({ username, receiverName }) => {
+      const receiver = getUser(receiverName);
+      io.to(receiver?.socketId).emit('getUsers');
+    });
+    socket.on('posts', ({ username, receiverName }) => {
+      console.log(receiverName, username);
+      const filteredUsers = onlineUsers.filter((user) => user.username !== username);
+      if (!receiverName) {
+        filteredUsers.forEach((user) => {
+          console.log(user);
+          io.to(user.socketId).emit('getPosts');
+        });
+      }
+      const receiver = getUser(receiverName);
+      io.to(receiver?.socketId).emit('getPosts');
     });
 
     socket.on('disconnect', () => {

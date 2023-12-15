@@ -39,7 +39,7 @@ postRouter.get(
         select: { user: { id: true, username: true, email: true } },
       });
       const comments = await PostComment.find({ where: { post: { id: post.id } }, relations: ['user', 'post'] });
-      const retweetsForPost = retweets.filter((retweet) => retweet.mainPost.id === post.id);
+      const retweetsForPost = retweets.filter((retweet) => retweet.mainPost?.id === post.id);
       const retweet = retweets.find((retweet) => retweet.post.id == post.id);
 
       const retweeted =
