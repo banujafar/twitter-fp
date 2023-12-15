@@ -54,7 +54,7 @@ const authSlice = createSlice({
   extraReducers: (builder) => {
     const setPending = (state: any) => {
       state.loading = true;
-      state.error = false;
+      state.error = null;
     };
 
     const setError = (state: any, action: any) => {
