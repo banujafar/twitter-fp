@@ -13,16 +13,22 @@ const ProtectedRoute = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      await dispatch(checkAuth()).then((res) => {
-        console.log(res.payload)
+      try {
+        const res = await dispatch(checkAuth());
+        console.log(res.payload);
+
         if (res.payload?.error) {
           navigate('/login');
         }
-      });
+      } catch (error) {
+        console.error('Error during authentication check:', error);
+        navigate('/login');
+      }
     };
 
     fetchData();
   }, []);
+  
   if (loading) {
     return <TwitterLoader />;
   }

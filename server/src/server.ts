@@ -63,7 +63,6 @@ app.use(
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const uploadDir = join(__dirname, '../../../client/src/assets/uploads');
-socketService(io);
 app.use(passport.initialize());
 app.use(passport.session());
 app.use('/api/posts', express.static(uploadDir));
@@ -83,9 +82,9 @@ app.use('/checkAuth', checkAuthMiddleware);
 app.use('/api/posts', postRouter);
 app.use('/api/chats', chatRouter);
 app.use('/api/messages', messageRouter);
-
 app.use(errorHandler);
 
+socketService(io);
 server.listen('3000', () => {
   console.log('Server is up on 3000');
 });

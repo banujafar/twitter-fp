@@ -7,7 +7,7 @@ import followModalSlice from './features/modal/followModalSlice';
 import notificationSlice from './features/notifications/notificationSlice';
 import chatSlice from './features/chat/chatSlice';
 import messageSlice from './features/message/messageSlice';
-import postModalSlice from './features/modal/postModalSlice';
+//import postModalSlice from './features/modal/postModalSlice';
 
 
 const rootReducer = combineReducers({
@@ -19,7 +19,7 @@ const rootReducer = combineReducers({
   notifications: notificationSlice,
   chat: chatSlice,
   message: messageSlice,
-  postModal: postModalSlice,
+ // postModal: postModalSlice,
 
 });
 

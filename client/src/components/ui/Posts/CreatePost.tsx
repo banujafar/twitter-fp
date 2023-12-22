@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../store';
 import { setIsOpen } from '../../../store/features/modal/modalSlice';
 import { socketRealTimePosts, socketSendNotification } from '../../../utils/socketClient';
-import { setPostModal } from '../../../store/features/modal/postModalSlice';
+//import { setPostModal } from '../../../store/features/modal/postModalSlice';
 import { addPost } from '../../../store/features/post/postSlice';
 
 const CreatePost: React.FC<{ content?: any; inModal?: boolean }> = ({ content, inModal }) => {
@@ -68,7 +68,7 @@ const CreatePost: React.FC<{ content?: any; inModal?: boolean }> = ({ content, i
       }
 
       dispatch(setIsOpen({ id: 'modalQuote', isOpen: false }));
-      dispatch(setPostModal({ isOpen: false }));
+      dispatch(setIsOpen({ id: 'postModal', isOpen: false }));
     } catch (error) {
       console.error('Error submitting post:', error);
     }
