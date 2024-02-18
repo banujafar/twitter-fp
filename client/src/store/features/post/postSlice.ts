@@ -110,7 +110,7 @@ const postSlice = createSlice({
         state.error = null;
       })
       .addCase(getPosts.fulfilled, (state, action) => {
-        state.post = action.payload;
+        state.post = action.payload || [];
         state.loading = false;
         state.error = null;
       })
