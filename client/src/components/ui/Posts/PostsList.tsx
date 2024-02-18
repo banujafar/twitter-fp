@@ -22,10 +22,6 @@ const PostsList = () => {
   const currentUserInfo = users.find((u) => u.id === currentuser?.userId);
   const currentUserfollowings = currentUserInfo?.following;
 
-  if(!posts.length) {
-    return
-  }
-
   const filteredPosts = posts?.filter(
     (post) =>
       currentUserfollowings?.map((follow) => follow.id).includes(post.user.id) || post.user.id === currentUserInfo?.id,
