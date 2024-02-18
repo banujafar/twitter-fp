@@ -13,7 +13,7 @@ const UserProfilePosts = ({ username }: { username: string | undefined }) => {
   const dispatch = useDispatch();
   const posts = useSelector((state: RootState) => state.post.post);
   const loading = useSelector((state: RootState) => state.post.loading);
-  const currentUsersPosts = posts.filter((post) => post.user.username == username);
+  const currentUsersPosts = posts?.filter((post) => post.user.username == username);
 
   const isOpenQuote = useSelector((state) => modalIsOpenSelector(state, 'modalQuote'));
   const isOpenComment = useSelector((state) => modalIsOpenSelector(state, 'modalComment'));
@@ -46,7 +46,7 @@ const UserProfilePosts = ({ username }: { username: string | undefined }) => {
         <p>Loading posts...</p>
       ) : posts && posts.length > 0 ? (
         sortedPosts.map((postData) => {
-          const isRetweet = posts.filter(
+          const isRetweet = posts?.filter(
             (singlePost) => singlePost.retweets?.find((retweet: any) => retweet.post.id === postData.id),
           );
           return isRetweet && !!isRetweet.length ? (
