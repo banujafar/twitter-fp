@@ -52,7 +52,7 @@ const Home = () => {
 console.log(posts)
   useEffect(() => {
     const currentDate = new Date();
-    const filteredPosts = post.filter((singlePost) => {
+    const filteredPosts = post?.filter((singlePost) => {
       const postDate = new Date(singlePost.created_date);
       return (
         postDate.getFullYear() === currentDate.getFullYear() &&
