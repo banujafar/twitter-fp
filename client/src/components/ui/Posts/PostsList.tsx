@@ -8,6 +8,7 @@ import QuoteModal from '../../modals/QuoteModal';
 import CommentModal from '../../modals/CommentModal';
 import CreatePost from './CreatePost';
 import { getPosts } from '../../../store/features/post/postSlice';
+import PostModal from '../../modals/PostModal';
 
 const PostsList = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -18,15 +19,18 @@ const PostsList = () => {
   const currentuser = useSelector((state: RootState) => state.auth.user);
 
   const users = useSelector((state: RootState) => state.user.users);
-  const currentUserInfo = users.find((u)=>u.id === currentuser?.userId);
+  const currentUserInfo = users.find((u) => u.id === currentuser?.userId);
   const currentUserfollowings = currentUserInfo?.following;
-  const filteredPosts = posts?.filter((post) =>
-  currentUserfollowings?.map((follow) => follow.id).includes(post.user.id) || post.user.id === currentUserInfo?.id
-);
+
+  const filteredPosts = posts?.filter(
+    (post) =>
+      currentUserfollowings?.map((follow) => follow.id).includes(post.user.id) || post.user.id === currentUserInfo?.id,
+  );
   let sortedPosts: IUserPost[];
 
   const isOpenQuote = useSelector((state) => modalIsOpenSelector(state, 'modalQuote'));
   const isOpenComment = useSelector((state) => modalIsOpenSelector(state, 'modalComment'));
+  const isModalOpen = useSelector((state) => modalIsOpenSelector(state, 'postModal'));
   if (posts) {
     sortedPosts = [...filteredPosts].sort((a, b) => {
       const dateA = new Date(a.created_date);
@@ -56,10 +60,11 @@ const PostsList = () => {
       ) : filteredPosts && filteredPosts.length > 0 ? (
         sortedPosts.map((post) => <PostsItem postData={post} key={post.id} />)
       ) : (
-        <p className='mt-5 text-3xl text-center font-medium'>No Tweets Yet</p>
+        <p className="mt-5 text-3xl text-center font-medium">No Tweets Yet</p>
       )}
       {isOpenQuote && <QuoteModal />}
       {isOpenComment && <CommentModal />}
+      {isModalOpen && <PostModal />}
     </div>
   );
 };

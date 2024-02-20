@@ -7,7 +7,7 @@ import { AppDispatch, RootState } from '../../../store';
 import { followUser, unfollowUser, notifyUser, removeNotifiedUser } from '../../../store/features/user/userSlice';
 import UserProfileFavorites from './UserProfileFavorites';
 import UserProfilePosts from './UserProfilePosts';
-import { setModal } from '../../../store/features/modal/followModalSlice';
+//import { setModal } from '../../../store/features/modal/followModalSlice';
 import FollowListModal from '../../modals/FollowListModal';
 import { modalIsOpenSelector, setIsOpen } from '../../../store/features/modal/modalSlice';
 import EditProfile from '../../modals/EditProfile';
@@ -26,7 +26,7 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
   const [activeBtn, setActiveBtn] = useState<string>('posts');
   const isOpenEditProfile = useSelector((state) => modalIsOpenSelector(state, 'modalEditProfile'));
   const isFollowing = userInfo?.followers?.some((follower) => follower.id === user?.userId);
-  const isModalOpen = useSelector((state: RootState) => state.followModal.isOpen);
+  const isModalOpen = useSelector((state) => modalIsOpenSelector(state, 'followModal'));
   const findedUser = users.find((u) => u.username === user?.username);
   const notifiedUser = findedUser?.notifications?.some((notifiedUser) => notifiedUser.username === username);
   const [isNotified, setIsNotified] = useState<boolean | undefined>(notifiedUser);
@@ -38,7 +38,7 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
   const handleFollow = async () => {
     const userId = user?.userId;
     const targetUser = userInfo;
-    console.log(targetUser)
+    console.log(targetUser);
     if (!isFollowing) {
       await dispatch(followUser({ userId, targetUser }) as any);
       socketSendNotification({
@@ -56,11 +56,10 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
         action: 'unfollowed',
       });
     }
-      socketNotifyUser({
-        username: user?.username,
-        receiverName: userInfo?.username,
-      });
-    
+    socketNotifyUser({
+      username: user?.username,
+      receiverName: userInfo?.username,
+    });
   };
 
   const handleNotification = async () => {
@@ -81,7 +80,7 @@ const UserProfileHeader = ({ username }: { username: string | undefined }) => {
 
   const handleOpenModal = (e: React.MouseEvent, listType: 'following' | 'followers') => {
     e.stopPropagation();
-    dispatch(setModal({ isOpen: true, data: listType }));
+    dispatch(setIsOpen({ isOpen: true, id: 'followModal', postData: listType }));
   };
 
   const handleOpenEditModal = () => {

@@ -13,8 +13,8 @@ import CommentModal from '../../modals/CommentModal';
 const UserProfileFavorites: React.FC<{ username: string | undefined }> = ({ username }) => {
   const posts = useSelector((state: RootState) => state.post.post);
   const users = useSelector((state: RootState) => state.user.users);
-  const favData = posts.filter((post) => post.likes?.some((like) => like.user.username === username));
-  console.log(favData);
+  const favData = posts?.filter((post) => post.likes?.some((like) => like.user.username === username));
+  console.log(posts);
   const favusers = users.filter((u) => favData.some((data) => data.user.username === u.username));
   const isOpenQuote = useSelector((state) => modalIsOpenSelector(state, 'modalQuote'));
   const isOpenComment = useSelector((state) => modalIsOpenSelector(state, 'modalComment'));
@@ -32,7 +32,7 @@ const UserProfileFavorites: React.FC<{ username: string | undefined }> = ({ user
       <div className={`${currentPath === '/favorites' ? 'w-[80%]' : 'w-full'}`}>
         {!!favData.length ? (
           favData.map((singleFav) => {
-            const isRetweet = posts.filter(
+            const isRetweet = posts?.filter(
               (post) => post.retweets?.find((retweet: any) => retweet.post.id === singleFav.id),
             );
             console.log(isRetweet);

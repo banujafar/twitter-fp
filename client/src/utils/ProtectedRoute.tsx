@@ -7,22 +7,28 @@ import { checkAuth } from '../store/features/auth/authSlice';
 import Login from '../pages/Login';
 
 const ProtectedRoute = () => {
-  const { loading, isAuth, error } = useSelector((state: RootState) => state.auth);
+  const { loading, isAuth } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
-      await dispatch(checkAuth()).then((res) => {
-        console.log(res.payload)
+      try {
+        const res = await dispatch(checkAuth());
+        console.log(res.payload);
+
         if (res.payload?.error) {
           navigate('/login');
         }
-      });
+      } catch (error) {
+        console.error('Error during authentication check:', error);
+        navigate('/login');
+      }
     };
 
     fetchData();
   }, []);
+  
   if (loading) {
     return <TwitterLoader />;
   }

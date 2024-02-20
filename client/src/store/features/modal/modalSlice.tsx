@@ -4,7 +4,7 @@ import { IUserPost } from '../../../models/post';
 
 interface ModalState {
   isOpen: { [key: string]: boolean };
-  postData: { [key: string]: IUserPost };
+  postData: { [key: string]: any };
 }
 
 export const initialState: ModalState = {
@@ -26,7 +26,7 @@ const modalSlice = createSlice({
   },
 });
 
-export const setIsOpen = (payload: { id: string; isOpen: boolean; postData?: IUserPost }) => {
+export const setIsOpen = (payload: { id: string; isOpen: boolean; postData?: any }) => {
   return {
     type: 'modal/setIsOpen',
     payload,
@@ -37,5 +37,5 @@ const modalSelector = (state: RootState) => state.modal;
 
 const isOpenSelector = createSelector([modalSelector], (modal) => modal.isOpen);
 
-export const modalIsOpenSelector = createSelector([isOpenSelector, (state, id) => id], (isOpen: any, id) => isOpen[id]);
+export const modalIsOpenSelector = createSelector([isOpenSelector, (_, id) => id], (isOpen: any, id) => isOpen[id]);
 export default modalSlice.reducer;
