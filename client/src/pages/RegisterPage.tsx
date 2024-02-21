@@ -20,7 +20,7 @@ const RegisterPage = () => {
 
   const showErrorToast = (errorMessage: string | null) => {
     toast.error(errorMessage, {
-      position: toast.POSITION.TOP_CENTER,
+      position: "top-center",
       autoClose: 5000,
     });
   };
