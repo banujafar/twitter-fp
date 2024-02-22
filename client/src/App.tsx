@@ -23,7 +23,7 @@ function App() {
   useEffect(() => {
     if (error) {
       toast.error(error, {
-        position: toast.POSITION.TOP_RIGHT,
+        position: "top-right"
         //autoClose:5000, // 5 seconds
       });
     }
